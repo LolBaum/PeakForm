@@ -4,4 +4,4 @@
 
 - don't commit binaries / files generated during compilation
 
-
+- When you think some information is importand / needs to be documented add it to this README
