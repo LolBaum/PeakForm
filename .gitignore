@@ -43,22 +43,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# Development and debugging files
-*.md.backup
-*_DEBUG_REPORT.md
-TENSORFLOW_LITE_DEBUGGING_REPORT.md
-flutter_*.png
-screenshot*.png
-debug_*.json
-
-# Temporary model files (keep only the working model)
-assets/models/posenet_*.tflite
-assets/models/1.tflite
-assets/models/4.tflite
-# Keep: assets/models/3.tflite (working model)
-
-# IDE and editor files
-*.iml
-.vscode/settings.json
-.vscode/launch.json
