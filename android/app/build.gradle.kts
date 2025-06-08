@@ -6,9 +6,9 @@ plugins {
 }
 
 android {
-    namespace = "com.peakform.peakform"
+    namespace = "com.peakform_tu.peakform_java"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "28.1.13356709"
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -21,18 +21,13 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.peakform.peakform"
+        applicationId = "com.peakform_tu.peakform_java"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 26  // Required for tflite_flutter plugin
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        
-        // Configure native libraries for TensorFlow Lite
-        ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
-        }
     }
 
     buildTypes {
@@ -41,18 +36,6 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
-    }
-    
-    // Ensure native libraries are packaged
-    packagingOptions {
-        pickFirst("**/libtensorflowlite_c.so")
-        pickFirst("**/libc++_shared.so")
-    }
-
-    // Required for tflite plugin - prevent compression of model files
-    aaptOptions {
-        noCompress("tflite")
-        noCompress("lite")
     }
 }
 

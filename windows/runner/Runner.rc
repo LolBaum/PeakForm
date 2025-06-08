@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.peakform" "\0"
-            VALUE "FileDescription", "peakform" "\0"
+            VALUE "CompanyName", "com.peakform_tu" "\0"
+            VALUE "FileDescription", "peakform_java" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "peakform" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.peakform. All rights reserved." "\0"
-            VALUE "OriginalFilename", "peakform.exe" "\0"
-            VALUE "ProductName", "peakform" "\0"
+            VALUE "InternalName", "peakform_java" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.peakform_tu. All rights reserved." "\0"
+            VALUE "OriginalFilename", "peakform_java.exe" "\0"
+            VALUE "ProductName", "peakform_java" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

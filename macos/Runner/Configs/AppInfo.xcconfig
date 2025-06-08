@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = peakform
+PRODUCT_NAME = peakform_java
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.peakform.peakform
+PRODUCT_BUNDLE_IDENTIFIER = com.peakformtu.peakformJava
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 com.peakform. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 com.peakform_tu. All rights reserved.
