@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.peakform_tu.peakform_java"
+    namespace = "com.google.ml.kit.flutter.example"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -20,11 +20,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.peakform_tu.peakform_java"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        applicationId = "com.google.ml.kit.flutter.example"
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -32,11 +29,21 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    aaptOptions {
+        noCompress("tflite")  // Your model's file extension: "tflite", "lite", etc.
+    }
+}
+
+dependencies {
+    // Add language package you need to use
+    implementation("com.google.mlkit:text-recognition-chinese:16.0.0")
+    implementation("com.google.mlkit:text-recognition-devanagari:16.0.0")
+    implementation("com.google.mlkit:text-recognition-japanese:16.0.0")
+    implementation("com.google.mlkit:text-recognition-korean:16.0.0")
 }
 
 flutter {

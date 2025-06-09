@@ -1,58 +1,77 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:camera/camera.dart';
-import 'screens/home_screen.dart';
-import 'providers/pose_detection_provider.dart';
+import 'dart:io';
 
-List<CameraDescription> cameras = [];
+import 'package:flutter/material.dart';
+import 'vision_detector_views/pose_detector_view.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  try {
-    cameras = await availableCameras();
-  } catch (e) {
-    debugPrint('Error initializing cameras: $e');
-  }
-  
-  runApp(const PeakFormApp());
+
+  runApp(MyApp());
 }
 
-class PeakFormApp extends StatelessWidget {
-  const PeakFormApp({super.key});
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Home(),
+    );
+  }
+}
+
+class Home extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Google ML Kit Demo App'),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Center(
+              child: Column(
+                children: [
+                      CustomCard('Pose Detection', PoseDetectorView()),
+                ],
+              ),
+
+
+        ),
+      ),
+    );
+  }
+}
+
+class CustomCard extends StatelessWidget {
+  final String _label;
+  final Widget _viewPage;
+  final bool featureCompleted;
+
+  const CustomCard(this._label, this._viewPage, {this.featureCompleted = true});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => PoseDetectionProvider()),
-      ],
-      child: MaterialApp(
-        title: 'PeakForm - Pose Detection',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF2196F3),
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        tileColor: Theme.of(context).primaryColor,
+        title: Text(
+          _label,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF2196F3),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
-        ),
-        home: const HomeScreen(),
-        debugShowCheckedModeBanner: false,
+        onTap: () {
+          if (!featureCompleted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content:
+                    const Text('This feature has not been implemented yet')));
+          } else {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => _viewPage));
+          }
+        },
       ),
     );
   }
