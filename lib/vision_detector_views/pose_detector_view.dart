@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 import 'detector_view.dart';
@@ -60,7 +61,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       for (Pose pose in poses) {
         print("!!!!!!!!!!!!!");
 
-
+        /*
         for(int i = 0; i < pose.landmarks.entries.length; i++){
           String name = pose.landmarks.entries.elementAt(i).key.name ;
 
@@ -73,6 +74,58 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print("Y: ${y}");
           print("Z: ${z}");
         }
+
+         */
+
+        late Vector3 r_shoulder;
+        late Vector3 r_Elbow;
+
+
+        Vector3? vec_rShoulder = getLandmarkCoordinates(pose.landmarks.entries, "rightShoulder");
+
+        if(vec_rShoulder != null){
+          r_shoulder = Vector3(vec_rShoulder.x, vec_rShoulder.y, vec_rShoulder.z);
+        }
+
+        Vector3? vec_rElbow = getLandmarkCoordinates(pose.landmarks.entries, "rightElbow");
+
+        if(vec_rElbow != null){
+          r_Elbow = Vector3(vec_rElbow.x, vec_rElbow.y, vec_rElbow.z);
+        }
+
+        print(r_shoulder.angleTo(r_Elbow));
+
+
+
+
+        /*
+          leftShoulder,
+          rightShoulder,
+          leftElbow,
+          rightElbow,
+          leftWrist,
+          rightWrist,
+
+          leftPinky,
+          rightPinky,
+          leftIndex,
+          rightIndex,
+          leftThumb,
+          rightThumb,
+
+          leftHip,
+          rightHip,
+          leftKnee,
+          rightKnee,
+          leftAnkle,
+          rightAnkle,
+          leftHeel,
+          rightHeel,
+          leftFootIndex,
+          rightFootIndex
+
+         */
+
       }
 
       //print('${pose.landmarks.keys} at (${pose.landmarks.position.x}, ${landmark.position.y})');
