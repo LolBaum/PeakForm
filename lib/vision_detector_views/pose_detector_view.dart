@@ -56,6 +56,27 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         _cameraLensDirection,
       );
       _customPaint = CustomPaint(painter: painter);
+
+      for (Pose pose in poses) {
+        print("!!!!!!!!!!!!!");
+
+
+        for(int i = 0; i < pose.landmarks.entries.length; i++){
+          String name = pose.landmarks.entries.elementAt(i).key.name ;
+
+          double x = pose.landmarks.entries.elementAt(i).value.x ;
+          double y = pose.landmarks.entries.elementAt(i).value.y ;
+          double z = pose.landmarks.entries.elementAt(i).value.z ;
+
+          print("Key:  ${name}");
+          print("X: ${x}");
+          print("Y: ${y}");
+          print("Z: ${z}");
+        }
+      }
+
+      //print('${pose.landmarks.keys} at (${pose.landmarks.position.x}, ${landmark.position.y})');
+
     } else {
       _text = 'Poses found: ${poses.length}\n\n';
       // TODO: set _customPaint to draw landmarks on top of image
