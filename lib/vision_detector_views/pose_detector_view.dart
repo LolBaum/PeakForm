@@ -58,6 +58,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       );
       _customPaint = CustomPaint(painter: painter);
 
+      double Score = 0;
+
       for (Pose pose in poses) {
         print("!!!!!!!!!!!!!");
 
@@ -76,35 +78,38 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         }
 
          */
-
-        late Vector3 r_shoulder;
+        //erstellung der Vectoren für Shoulder,Elbow,Wirst rechts
+        late Vector3 r_Shoulder;
         late Vector3 r_Elbow;
         late Vector3 r_Wrist;
 
 
         Vector3? vec_rShoulder = getLandmarkCoordinates(pose.landmarks.entries, "rightShoulder");
-
         if(vec_rShoulder != null){
-          r_shoulder = Vector3(vec_rShoulder.x, vec_rShoulder.y, vec_rShoulder.z);
+          r_Shoulder = Vector3(vec_rShoulder.x, vec_rShoulder.y, vec_rShoulder.z);
+        } else {
+          print("Fehler beim erkennen der Schulter");
         }
 
         Vector3? vec_rElbow = getLandmarkCoordinates(pose.landmarks.entries, "rightElbow");
-
         if(vec_rElbow != null){
           r_Elbow = Vector3(vec_rElbow.x, vec_rElbow.y, vec_rElbow.z);
+        } else {
+          print("Fehler beim erkennen des Ellenbogens");
         }
 
         Vector3? vec_rWrist = getLandmarkCoordinates(pose.landmarks.entries, "rightWrist");
-
         if(vec_rWrist != null){
           r_Wrist = Vector3(vec_rWrist.x, vec_rWrist.y, vec_rWrist.z);
+        } else {
+          print("Fehler beim erkennen des Handgelenks");
         }
 
-        print("Achtung!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        print("Punkte!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-        print(computeJointAngle(a: r_shoulder, b: r_Elbow, c: r_Wrist));
+        Score = Score + scoreForLateralRaise(computeJointAngle(a: r_Shoulder, b: r_Elbow, c: r_Wrist));
 
-
+        print(Score);
 
 
         /*
