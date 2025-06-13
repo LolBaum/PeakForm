@@ -22,7 +22,7 @@ repos:
         language: system
         files: \.dart$
         pass_filenames: true
-        stages: [commit]
+        stages: [pre-commit]
 
       # --- apply any `dart fix` fixes, no filenames needed ---
       - id: dart-fix
@@ -30,7 +30,7 @@ repos:
         entry: dart fix --apply
         language: system
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
 
       # --- run flutter analyze once per commit ---
       - id: flutter-analyze
@@ -38,7 +38,7 @@ repos:
         entry: flutter analyze
         language: system
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
 
       # --- optional: run full test suite ---
       - id: flutter-test
@@ -46,7 +46,7 @@ repos:
         entry: flutter test --no-pub --machine
         language: system
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
 
       # --- ensure build_runner is up to date (requires build_runner in dev_deps) ---
       - id: build-runner
@@ -55,4 +55,4 @@ repos:
           --delete-conflicting-outputs && git diff --exit-code"
         language: system
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
