@@ -8,13 +8,13 @@ List<CameraDescription> cameras = [];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     cameras = await availableCameras();
   } catch (e) {
     debugPrint('Error initializing cameras: $e');
   }
-  
+
   runApp(const PeakFormApp());
 }
 
@@ -28,17 +28,14 @@ class PeakFormApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PoseDetectionProvider()),
       ],
       child: MaterialApp(
-        title: 'PeakForm - Pose Detection',
+        title: 'PeakForm',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF2196F3),
             brightness: Brightness.light,
           ),
           useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
+          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
         ),
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
@@ -46,12 +43,12 @@ class PeakFormApp extends StatelessWidget {
             brightness: Brightness.dark,
           ),
           useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
+          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
         ),
-        home: const HomeScreen(),
+        home: Scaffold(
+          appBar: AppBar(title: const Text('PeakForm')),
+          body: const HomeScreen(),
+        ),
         debugShowCheckedModeBanner: false,
       ),
     );

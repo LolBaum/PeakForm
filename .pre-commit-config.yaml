@@ -1,0 +1,58 @@
+# .pre-commit-config.yaml
+
+repos:
+  # 1) generic file‐sanity hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # 2) Dart/Flutter local hooks
+  - repo: local
+    hooks:
+      # --- format only the staged .dart files ---
+      - id: dart-format
+        name: Format Dart code
+        entry: dart format --output write
+        language: system
+        files: \.dart$
+        pass_filenames: true
+        stages: [pre-commit]
+
+      # --- apply any `dart fix` fixes, no filenames needed ---
+      - id: dart-fix
+        name: Apply Dart fix
+        entry: dart fix --apply
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      # --- run flutter analyze once per commit ---
+      - id: flutter-analyze
+        name: Run Flutter analyze
+        entry: flutter analyze
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      # --- optional: run full test suite ---
+      - id: flutter-test
+        name: Run Flutter tests
+        entry: flutter test --no-pub --machine
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      # --- ensure build_runner is up to date (requires build_runner in dev_deps) ---
+      - id: build-runner
+        name: Ensure generated files are up to date
+        entry: bash -c "flutter pub run build_runner build \
+          --delete-conflicting-outputs && git diff --exit-code"
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
