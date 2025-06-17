@@ -20,6 +20,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   CustomPaint? _customPaint;
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back;
+  double Score = 0;
 
   @override
   void dispose() async {
@@ -58,8 +59,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       );
       _customPaint = CustomPaint(painter: painter);
 
-      double Score = 0;
-
       for (Pose pose in poses) {
         print("!!!!!!!!!!!!!");
 
@@ -76,41 +75,110 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print("Y: ${y}");
           print("Z: ${z}");
         }
+        */
 
-         */
+
+        //print('${pose.landmarks.keys} at (${pose.landmarks.position.x}, ${landmark.position.y})');
+        //pose.landmarks.entries.first.value.x
+        //print('${pose.landmarks.keys} at (${pose.landmarks.values.}, ${landmark.position.y})');
+
+
+
         //erstellung der Vectoren für Shoulder,Elbow,Wirst rechts
+        /*
         late Vector3 r_Shoulder;
         late Vector3 r_Elbow;
         late Vector3 r_Wrist;
+        late Vector3 r_Hip;
 
 
-        Vector3? vec_rShoulder = getLandmarkCoordinates(pose.landmarks.entries, "rightShoulder");
+        Vector3? vec_rShoulder = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightShoulder");
         if(vec_rShoulder != null){
           r_Shoulder = Vector3(vec_rShoulder.x, vec_rShoulder.y, vec_rShoulder.z);
         } else {
           print("Fehler beim erkennen der Schulter");
         }
 
-        Vector3? vec_rElbow = getLandmarkCoordinates(pose.landmarks.entries, "rightElbow");
+        Vector3? vec_rElbow = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightElbow");
         if(vec_rElbow != null){
           r_Elbow = Vector3(vec_rElbow.x, vec_rElbow.y, vec_rElbow.z);
         } else {
           print("Fehler beim erkennen des Ellenbogens");
         }
 
-        Vector3? vec_rWrist = getLandmarkCoordinates(pose.landmarks.entries, "rightWrist");
+        Vector3? vec_rWrist = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightWrist");
         if(vec_rWrist != null){
           r_Wrist = Vector3(vec_rWrist.x, vec_rWrist.y, vec_rWrist.z);
         } else {
           print("Fehler beim erkennen des Handgelenks");
         }
 
+        Vector3? vec_rHip = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightHip");
+        if(vec_rHip != null){
+          r_Hip = Vector3(vec_rHip.x, vec_rHip.y, vec_rHip.z);
+        } else {
+          print("Fehler beim erkennen der Hüfte");
+        }
+
         print("Punkte!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-        Score = Score + scoreForLateralRaise(computeJointAngle(a: r_Shoulder, b: r_Elbow, c: r_Wrist));
+        if (vec_rWrist != null && vec_rElbow != null && vec_rShoulder != null && vec_rHip != null) {
+          Score = Score + (scoreForLateralRaise_Arm(computeJointAngle_3d(a: r_Shoulder, b: r_Elbow, c: r_Wrist)))*(scoreForLateralRaise_Hip(computeJointAngle_3d(a: r_Elbow, b: r_Shoulder, c: r_Hip)));
+          print(Score);
+          print("ARM:");
+          print(computeJointAngle_3d(a: r_Shoulder, b: r_Elbow, c: r_Wrist));
+          print("HIP");
+          print(computeJointAngle_3d(a: r_Elbow, b: r_Shoulder, c: r_Hip));
+        }
+        */
 
-        print(Score);
+        late Vector2 r_Shoulder;
+        late Vector2 r_Elbow;
+        late Vector2 r_Wrist;
+        late Vector2 r_Hip;
 
+
+        Vector2? vec_rShoulder = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightShoulder");
+        if(vec_rShoulder != null){
+          r_Shoulder = Vector2(vec_rShoulder.x, vec_rShoulder.y);
+        } else {
+          print("Fehler beim erkennen der Schulter");
+        }
+
+        Vector2? vec_rElbow = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightElbow");
+        if(vec_rElbow != null){
+          r_Elbow = Vector2(vec_rElbow.x, vec_rElbow.y);
+        } else {
+          print("Fehler beim erkennen des Ellenbogens");
+        }
+
+        Vector2? vec_rWrist = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightWrist");
+        if(vec_rWrist != null){
+          r_Wrist = Vector2(vec_rWrist.x, vec_rWrist.y);
+        } else {
+          print("Fehler beim erkennen des Handgelenks");
+        }
+
+        Vector2? vec_rHip = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightHip");
+        if(vec_rHip != null){
+          r_Hip = Vector2(vec_rHip.x, vec_rHip.y);
+        } else {
+          print("Fehler beim erkennen der Hüfte");
+        }
+
+        print("Punkte!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+        if (vec_rWrist != null && vec_rElbow != null && vec_rShoulder != null && vec_rHip != null) {
+          Score = Score + (scoreForLateralRaise_Arm(computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist)))*(scoreForLateralRaise_Hip(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip)));
+          print(Score);
+          print("ARM:");
+          print(computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist));
+          print("HIP");
+          print(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip));
+        }
+
+        //wrist unter ellenbogeen für winkelunterscheideung
+        // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
 
         /*
           leftShoulder,
@@ -140,9 +208,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
          */
 
+
       }
 
-      //print('${pose.landmarks.keys} at (${pose.landmarks.position.x}, ${landmark.position.y})');
 
     } else {
       _text = 'Poses found: ${poses.length}\n\n';
