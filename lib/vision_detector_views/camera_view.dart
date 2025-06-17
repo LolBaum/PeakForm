@@ -56,6 +56,7 @@ class _CameraViewState extends State<CameraView> {
         break;
       }
     }
+
     if (_cameraIndex != -1) {
       _startLiveFeed();
     }

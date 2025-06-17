@@ -66,13 +66,13 @@ double computeJointAngle_2d({
 }
 
 double scoreForLateralRaise_Arm(double angle) {
-  if (angle >= 170 && angle <= 190) return 1.0;
+  if (angle >= 160 && angle <= 180) return 1.0;
   if (angle >= 60 && angle <= 120) return 0.0;
   return 0.0;
 }
 
 double scoreForLateralRaise_Hip(double angle) {
-  if (angle >= 90 && angle <= 110) return 1.0;
+  if (angle >= 90 && angle <= 100) return 1.0;
   if (angle >= 60 && angle <= 120) return 0.0;
   return 0.0;
 }

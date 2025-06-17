@@ -21,6 +21,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back;
   double Score = 0;
+  int counter = 0;
 
   @override
   void dispose() async {
@@ -177,8 +178,20 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip));
         }
 
+        print(counter);
+        counter++;
+
+
+        //oben:95+-5  unter 96
+        //mitte:60+-2
+        //unten:7+-1grad
+
+
+        //prozent an korrektheit averagen
+
         //wrist unter ellenbogeen für winkelunterscheideung
         // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
+          // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
 
         /*
           leftShoulder,
