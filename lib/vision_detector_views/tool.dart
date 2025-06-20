@@ -105,3 +105,30 @@ Vector2? getLandmarkCoordinates_2d(List<MapEntry<PoseLandmarkType, PoseLandmark>
 //nicht nur wrist zu elbow to shoulder sondern auch richtigen winkel zum oberkörper finden (der wird vlt immer über 100 sein)
 // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
 // also eine sequenz vin winkeln die gemacht werden muss
+
+class RunningAverage {
+  double _mean = 1.0; // bei 0 oder bei 1 beginnen ?
+  int _count = 0;
+
+  void add(double value) {
+    _mean = _mean + (value - _mean) / (++_count);
+  }
+
+  double get average => _mean;
+
+  int get count => _count;
+}
+
+
+Vector2? compute_2d_vector({
+  required String name,
+  required List<MapEntry<PoseLandmarkType, PoseLandmark>> entries,
+}) {
+  Vector2? vec_rShoulder = getLandmarkCoordinates_2d(entries.toList(), "rightShoulder");
+  if(vec_rShoulder != null){
+    return Vector2(vec_rShoulder.x, vec_rShoulder.y);
+  } else {
+    print("Fehler beim erkennen der Schulter");
+    return null;
+  }
+}
