@@ -230,8 +230,12 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print(angleShoulder_r);
 
           final average = bufferShoulder_r.toList().reduce((a, b) => a + b) / bufferShoulder_r.length;
+          final normalized =  bufferShoulder_r.toList().map((a) => a - average);
+          final gradient = normalized.reduce((a, b) => a + b); // Todo: Linear Regression
 
-          print('Buffer: ${bufferShoulder_r.toList()} → Average: ${average.toStringAsFixed(2)}');
+          //todo store min / max average angle.
+          //if difference ~5 away from value -> change direction
+          print('Buffer: ${bufferShoulder_r.toList()} \n→ Average: ${average.toStringAsFixed(2)} \n→ GRadient: ${gradient.toStringAsFixed(2)}');
         }
 
         //TODO: Testen wie sich der Average verhällt
