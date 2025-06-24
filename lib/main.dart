@@ -1,56 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:camera/camera.dart';
-import 'screens/home_screen.dart';
-import 'providers/pose_detection_provider.dart';
+import 'home_screen.dart';
+import 'video_screen.dart' show VideoScreen;
+import 'gym_screen.dart' show GymScreen;
+import 'result_screen.dart';
 
-List<CameraDescription> cameras = [];
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() => runApp(FitnessApp());
 
-  try {
-    cameras = await availableCameras();
-  } catch (e) {
-    debugPrint('Error initializing cameras: $e');
-  }
-
-  runApp(const PeakFormApp());
-}
-
-class PeakFormApp extends StatelessWidget {
-  const PeakFormApp({super.key});
-
+class FitnessApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => PoseDetectionProvider()),
-      ],
-      child: MaterialApp(
-        title: 'PeakForm',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF2196F3),
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF2196F3),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-        ),
-        home: Scaffold(
-          appBar: AppBar(title: const Text('PeakForm')),
-          body: const HomeScreen(),
-        ),
-        debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'LeagueSpartan',
       ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(userName: 'Norhene'),
+        '/video': (context) => VideoScreen(),
+        '/gym': (context) => GymScreen(),
+        '/result': (context) => ResultScreen(),
+
+      },
     );
   }
 }
