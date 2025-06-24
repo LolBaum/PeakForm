@@ -8,6 +8,8 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
 
+import 'camera_view.dart' as camera_view;
+
 class PoseDetectorView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _PoseDetectorViewState();
@@ -52,7 +54,12 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     setState(() {
       _text = '';
     });
-    final poses = await _poseDetector.processImage(inputImage);
+
+    List<TimedPose> recordedPoses = []; // for timestamps
+
+    final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
+    final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
+
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
       final painter = PosePainter(
@@ -84,12 +91,12 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //print('${pose.landmarks.keys} at (${pose.landmarks.position.x}, ${landmark.position.y})');
         //pose.landmarks.entries.first.value.x
         //print('${pose.landmarks.keys} at (${pose.landmarks.values.}, ${landmark.position.y})');
+        recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
 
         late Vector2 r_Shoulder;
         late Vector2 r_Elbow;
         late Vector2 r_Wrist;
         late Vector2 r_Hip;
-
 
         Vector2? vec_rShoulder = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightShoulder");
         if(vec_rShoulder != null){
@@ -153,6 +160,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print("Fehler beim erkennen der l Hüfte");
         }
 
+
         bool right_wesh = vec_rWrist != null && vec_rElbow != null && vec_rShoulder != null && vec_rHip != null;
         bool left_wesh = vec_lWrist != null && vec_lElbow != null && vec_lShoulder != null && vec_lHip != null;
 
@@ -197,7 +205,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           */
         }
 
-
         //TODO: Testen wie sich der Average verhällt
 
 
@@ -240,7 +247,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
          */
 
-
+      }
+      for(TimedPose p in recordedPoses){
+        print("${p.pose} detected at ${p.timestamp.inMilliseconds} ms\n");
       }
 
 

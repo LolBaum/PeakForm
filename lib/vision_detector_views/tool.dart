@@ -120,6 +120,18 @@ Vector2? getLandmarkCoordinates_2d(List<MapEntry<PoseLandmarkType, PoseLandmark>
   }
 }
 
+String getPoseName(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, String name){
+  try {
+    final entry = entries.firstWhere((e) => e.key.name == name);
+    final landmark = entry.key;
+    return landmark.toString();
+  } catch (e) {
+    print(e);
+    print("Keypoint '$name' nicht gefunden.");
+    return "";
+  }
+}
+
 //nicht nur wrist zu elbow to shoulder sondern auch richtigen winkel zum oberkörper finden (der wird vlt immer über 100 sein)
 // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
 // also eine sequenz vin winkeln die gemacht werden muss
@@ -142,4 +154,11 @@ double scorewithTolerances(double target_degree, double real_degree, double tole
   double difference = (target_degree-real_degree).abs();
   if ((difference > tolerance)||(tolerance == 0)) return 0.0;
   return cos(radians(difference*(90/tolerance)));
+}
+
+class TimedPose {
+  final String pose;
+  final Duration timestamp;
+
+  TimedPose(this.pose, this.timestamp);
 }

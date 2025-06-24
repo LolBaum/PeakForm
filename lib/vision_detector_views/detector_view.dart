@@ -15,7 +15,7 @@ class DetectorView extends StatefulWidget {
     this.customPaint,
     this.text,
     this.initialDetectionMode = DetectorViewMode.liveFeed,
-    this.initialCameraLensDirection = CameraLensDirection.back,
+    this.initialCameraLensDirection = CameraLensDirection.front,
     this.onCameraFeedReady,
     this.onDetectorViewModeChanged,
     this.onCameraLensDirectionChanged,
@@ -48,7 +48,7 @@ class _DetectorViewState extends State<DetectorView> {
   Widget build(BuildContext context) {
     return _mode == DetectorViewMode.liveFeed
         ? CameraView(
-            customPaint: widget.customPaint,
+                   customPaint: widget.customPaint,
             onImage: widget.onImage,
             onCameraFeedReady: widget.onCameraFeedReady,
             onDetectorViewModeChanged: _onDetectorViewModeChanged,
