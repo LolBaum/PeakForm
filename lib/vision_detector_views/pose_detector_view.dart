@@ -49,7 +49,13 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     setState(() {
       _text = '';
     });
-    final poses = await _poseDetector.processImage(inputImage);
+
+    final Stopwatch stopwatch = Stopwatch()..start();
+    List<TimedPose> recordedPoses = []; // for timestamps
+
+    final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
+    final Duration timestamp = stopwatch.elapsed;
+
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
       final painter = PosePainter(
@@ -61,6 +67,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       _customPaint = CustomPaint(painter: painter);
 
       for (Pose pose in poses) {
+        recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
 
         late Vector2 r_Shoulder;
         late Vector2 r_Elbow;
@@ -193,6 +200,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
          */
 
 
+      }
+      for(TimedPose p in recordedPoses){
+        print("${p.pose} detected at ${p.timestamp.inMilliseconds} ms\n");
       }
 
 
