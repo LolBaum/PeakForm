@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'constants/constants.dart';
+
 class HomeScreen extends StatelessWidget {
   final String userName;
 
@@ -46,7 +48,7 @@ class HomeScreen extends StatelessWidget {
                         backgroundColor: Color(0xFFB8FF7B),
                       ),
                       const SizedBox(height: 12),
-                      Text('HI, $userName!', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                      Text('Hi, $userName!', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                       const SizedBox(height: 4),
                       Text('FORTSCHRITT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey[700], letterSpacing: 1.5)),
                       const Text('LVL. 10', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87)),
@@ -98,7 +100,7 @@ class HomeScreen extends StatelessWidget {
                               onTap: () {},
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF006D42),
+                                  color: darkGreen,
                                   borderRadius: BorderRadius.circular(40),
                                 ),
                                 child: Row(
@@ -106,18 +108,18 @@ class HomeScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 12, right: 8, top: 12, bottom: 12),
+                                      padding: const EdgeInsets.only(left: 4, right: 8, top: 4, bottom: 4),
                                       child: Container(
-                                        width: 28,
-                                        height: 28,
+                                        width: 35,
+                                        height: 35,
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Color(0xFFB8FF7B),
+                                          color: green,
                                         ),
                                         child: const Center(
                                           child: SizedBox(
-                                            width: 12,
-                                            height: 12,
+                                            width: 15,
+                                            height: 15,
                                             child: DecoratedBox(
                                               decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                                             ),
@@ -127,7 +129,7 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                     const Padding(
                                       padding: EdgeInsets.only(right: 16),
-                                      child: Text('AUFNEHMEN', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                      child: Text('Aufnehmen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                                     ),
                                   ],
                                 ),
@@ -151,7 +153,7 @@ class HomeScreen extends StatelessWidget {
     return Container(
       width: 44,
       height: 44,
-      decoration: const BoxDecoration(color: Color(0xFF006D42), shape: BoxShape.circle),
+      decoration: const BoxDecoration(color: darkGreen, shape: BoxShape.circle),
       child: Icon(icon, color: Colors.white),
     );
   }

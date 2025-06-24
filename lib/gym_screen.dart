@@ -26,13 +26,13 @@ class GymScreen extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/gym_background.png',
-                fit: BoxFit.cover,
-                alignment: Alignment.topRight,
-              ),
-            ),
+            //Positioned.fill(
+            //  child: Image.asset(
+            //    'assets/gym_background.png',
+            //    fit: BoxFit.cover,
+            //    alignment: Alignment.topRight,
+            //  ),
+            //),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -40,9 +40,11 @@ class GymScreen extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Icon(Icons.arrow_back, size: 24),
-                      Icon(Icons.star, color: Color(0xFF006D42), size: 28),
+                    children: [
+                      IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back)),
+                      const Icon(Icons.star, color: Color(0xFF006D42), size: 28),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -54,8 +56,8 @@ class GymScreen extends StatelessWidget {
                       TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 16),
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: 10,
+                    runSpacing: 0,
                     children: filters.map((label) {
                       final bool selected =
                       (label == 'Lower Body' || label == 'Equipment');
