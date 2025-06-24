@@ -10,6 +10,10 @@ import 'painters/pose_painter.dart';
 
 import 'camera_view.dart' as camera_view;
 
+var lar_angels = [95.0, 60.0, 7.0];
+int angle_status = 0;
+bool angle_up = false;
+
 class PoseDetectorView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _PoseDetectorViewState();
@@ -25,8 +29,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   var _cameraLensDirection = CameraLensDirection.back;
   RunningAverage Score = RunningAverage();
   bool started = false;
-
-  //var bufferShoulder_r = CircularBuffer<double>(5);
 
   @override
   void dispose() async {
@@ -193,27 +195,28 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             print("P_Score: " + (Score.average).toString());
             print("r_ARM (wes): " + r_wes_angl.toString());
             print("r_HIP (esh): " + r_esh_angl.toString());
+
+
+            if (angle_status >= lar_angels.length-1){
+              angle_up = true;
+            } else if (angle_status <= 0) {
+              angle_up = false;
+            }
+
+            if (lar_angels[angle_status] == r_esh_angl) {
+              if (angle_up){
+                angle_status++;
+              } else {
+                angle_status--;
+              }
+            }
+
           }
 
-          /*
-          double angleShoulder_r = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
-          bufferShoulder_r.add(angleShoulder_r);
-          print(bufferShoulder_r);
-          print(angleShoulder_r);
 
-          final average = bufferShoulder_r.toList().reduce((a, b) => a + b) / bufferShoulder_r.length;
-
-          print('Buffer: ${bufferShoulder_r.toList()} → Average: ${average.toStringAsFixed(2)}');
-          */
         }
 
         //TODO: Testen wie sich der Average verhällt
-
-
-        //oben:95+-5  unter 96
-        //mitte:60+-2
-        //unten:7+-1grad
-
 
         //prozent an korrektheit averagen
 

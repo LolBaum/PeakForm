@@ -162,4 +162,9 @@ class TimedPose {
   TimedPose(this.pose, this.timestamp);
 }
 
+//static var lar_angels = [95.0, 60.0, 7.0];
+
+//oben:95+-5  unter 96
+//mitte:60+-2
+//unten:7+-1grad
 
