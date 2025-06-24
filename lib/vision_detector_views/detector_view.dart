@@ -48,7 +48,7 @@ class _DetectorViewState extends State<DetectorView> {
   Widget build(BuildContext context) {
     return _mode == DetectorViewMode.liveFeed
         ? CameraView(
-            customPaint: widget.customPaint,
+                   customPaint: widget.customPaint,
             onImage: widget.onImage,
             onCameraFeedReady: widget.onCameraFeedReady,
             onDetectorViewModeChanged: _onDetectorViewModeChanged,

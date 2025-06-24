@@ -6,17 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 
+
 class CameraView extends StatefulWidget {
   CameraView(
       {Key? key,
       required this.customPaint,
       required this.onImage,
+
       this.onCameraFeedReady,
       this.onDetectorViewModeChanged,
       this.onCameraLensDirectionChanged,
       this.initialCameraLensDirection = CameraLensDirection.back})
       : super(key: key);
 
+  static final Stopwatch stopwatch = Stopwatch();
+  static Timer? stopwatchTimer;
+  static String stopwatchTime = '00:00:00';
+  static bool isStopwatchRunning = false;
   final CustomPaint? customPaint;
   final Function(InputImage inputImage) onImage;
   final VoidCallback? onCameraFeedReady;
@@ -46,10 +52,10 @@ class _CameraViewState extends State<CameraView> {
   double _currentFps = 0.0;
 
   // Stopwatch variables
-  Stopwatch _stopwatch = Stopwatch();
-  Timer? _stopwatchTimer;
-  String _stopwatchTime = '00:00:00';
-  bool _isStopwatchRunning = false;
+//  Stopwatch _stopwatch = Stopwatch();
+//  Timer? _stopwatchTimer;
+//  String _stopwatchTime = '00:00:00';
+//  bool _isStopwatchRunning = false;
 
   @override
   void initState() {
@@ -78,7 +84,7 @@ class _CameraViewState extends State<CameraView> {
   @override
   void dispose() {
     _stopLiveFeed();
-    _stopwatchTimer?.cancel();
+    CameraView.stopwatchTimer?.cancel();
     super.dispose();
   }
 
@@ -446,10 +452,10 @@ class _CameraViewState extends State<CameraView> {
 
   // Stopwatch methods
   void _startStopwatch() {
-    if (!_isStopwatchRunning) {
-      _stopwatch.start();
-      _isStopwatchRunning = true;
-      _stopwatchTimer = Timer.periodic(Duration(milliseconds: 10), (timer) {
+    if (!CameraView.isStopwatchRunning) {
+      CameraView.stopwatch.start();
+      CameraView.isStopwatchRunning = true;
+      CameraView.stopwatchTimer = Timer.periodic(Duration(milliseconds: 10), (timer) {
         if (mounted) {
           setState(() {
             _updateStopwatchDisplay();
@@ -460,29 +466,29 @@ class _CameraViewState extends State<CameraView> {
   }
 
   void _pauseStopwatch() {
-    if (_isStopwatchRunning) {
-      _stopwatch.stop();
-      _isStopwatchRunning = false;
-      _stopwatchTimer?.cancel();
+    if (CameraView.isStopwatchRunning) {
+      CameraView.stopwatch.stop();
+      CameraView.isStopwatchRunning = false;
+      CameraView.stopwatchTimer?.cancel();
     }
   }
 
   void _resetStopwatch() {
-    _stopwatch.reset();
-    _isStopwatchRunning = false;
-    _stopwatchTimer?.cancel();
-    _stopwatchTime = '00:00:00';
+    CameraView.stopwatch.reset();
+    CameraView.isStopwatchRunning = false;
+    CameraView.stopwatchTimer?.cancel();
+    CameraView.stopwatchTime = '00:00:00';
     if (mounted) {
       setState(() {});
     }
   }
 
   void _updateStopwatchDisplay() {
-    final elapsed = _stopwatch.elapsed;
+    final elapsed = CameraView.stopwatch.elapsed;
     final minutes = elapsed.inMinutes.toString().padLeft(2, '0');
     final seconds = (elapsed.inSeconds % 60).toString().padLeft(2, '0');
     final milliseconds = ((elapsed.inMilliseconds % 1000) ~/ 10).toString().padLeft(2, '0');
-    _stopwatchTime = '$minutes:$seconds:$milliseconds';
+    CameraView.stopwatchTime = '$minutes:$seconds:$milliseconds';
   }
 
   Widget _stopwatchDisplay() => Positioned(
@@ -497,7 +503,7 @@ class _CameraViewState extends State<CameraView> {
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: Text(
-              _stopwatchTime,
+              CameraView.stopwatchTime,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -524,10 +530,10 @@ class _CameraViewState extends State<CameraView> {
                 width: 50.0,
                 child: FloatingActionButton(
                   heroTag: "stopwatch_start_pause",
-                  onPressed: _isStopwatchRunning ? _pauseStopwatch : _startStopwatch,
-                  backgroundColor: _isStopwatchRunning ? Colors.orange : Colors.green,
+                  onPressed: CameraView.isStopwatchRunning ? _pauseStopwatch : _startStopwatch,
+                  backgroundColor: CameraView.isStopwatchRunning ? Colors.orange : Colors.green,
                   child: Icon(
-                    _isStopwatchRunning ? Icons.pause : Icons.play_arrow,
+                    CameraView.isStopwatchRunning ? Icons.pause : Icons.play_arrow,
                     size: 25,
                     color: Colors.white,
                   ),

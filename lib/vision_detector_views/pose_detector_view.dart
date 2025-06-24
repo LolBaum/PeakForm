@@ -7,6 +7,8 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
 
+import 'camera_view.dart' as camera_view;
+
 class PoseDetectorView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _PoseDetectorViewState();
@@ -50,11 +52,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       _text = '';
     });
 
-    final Stopwatch stopwatch = Stopwatch()..start();
     List<TimedPose> recordedPoses = []; // for timestamps
 
     final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
-    final Duration timestamp = stopwatch.elapsed;
+    final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
 
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
@@ -137,7 +138,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print("Fehler beim erkennen der l Hüfte");
         }
 
-        print("Punkte!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         bool right_wesh = vec_rWrist != null && vec_rElbow != null && vec_rShoulder != null && vec_rHip != null;
         bool left_wesh = vec_lWrist != null && vec_lElbow != null && vec_lShoulder != null && vec_lHip != null;
@@ -159,45 +159,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //TODO: Testen wie sich der Average verhällt
 
-
-        //oben:95+-5  unter 96
-        //mitte:60+-2
-        //unten:7+-1grad
-
-
-        //prozent an korrektheit averagen
-
-        //wrist unter ellenbogeen für winkelunterscheideung
-        // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
-          // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
-
-        /*
-          leftShoulder,
-          rightShoulder,
-          leftElbow,
-          rightElbow,
-          leftWrist,
-          rightWrist,
-
-          leftPinky,
-          rightPinky,
-          leftIndex,
-          rightIndex,
-          leftThumb,
-          rightThumb,
-
-          leftHip,
-          rightHip,
-          leftKnee,
-          rightKnee,
-          leftAnkle,
-          rightAnkle,
-          leftHeel,
-          rightHeel,
-          leftFootIndex,
-          rightFootIndex
-
-         */
 
 
       }
