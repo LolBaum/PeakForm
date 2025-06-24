@@ -65,6 +65,8 @@ double computeJointAngle_2d({
   return ab.angleTo(cb);
 }
 
+//soll und ist und differenz
+
 double scoreForLateralRaise_Arm(double angle) {
   if (angle >= 160 && angle <= 180) return 1.0;
   if (angle >= 60 && angle <= 120) return 0.0;
@@ -72,10 +74,12 @@ double scoreForLateralRaise_Arm(double angle) {
 }
 
 double scoreForLateralRaise_Hip(double angle) {
-  if (angle >= 90 && angle <= 100) return 1.0;
+  if (angle >= 90-10 && angle <= 100-10) return 1.0;
   if (angle >= 60 && angle <= 120) return 0.0;
   return 0.0;
 }
+
+
 
 
 Vector3? getLandmarkCoordinates_3d(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, String name) {
@@ -109,26 +113,19 @@ Vector2? getLandmarkCoordinates_2d(List<MapEntry<PoseLandmarkType, PoseLandmark>
 class RunningAverage {
   double _mean = 1.0; // bei 0 oder bei 1 beginnen ?
   int _count = 0;
-
+  //adds and counts
   void add(double value) {
     _mean = _mean + (value - _mean) / (++_count);
   }
-
+  //_mean = (_mean *_count) + value/(++_count);
   double get average => _mean;
-
   int get count => _count;
 }
 
-
-Vector2? compute_2d_vector({
-  required String name,
-  required List<MapEntry<PoseLandmarkType, PoseLandmark>> entries,
-}) {
-  Vector2? vec_rShoulder = getLandmarkCoordinates_2d(entries.toList(), "rightShoulder");
-  if(vec_rShoulder != null){
-    return Vector2(vec_rShoulder.x, vec_rShoulder.y);
-  } else {
-    print("Fehler beim erkennen der Schulter");
-    return null;
-  }
+//die Tolleranz soll bei 45 grad erreicht sein und bis dann stetig fallen
+//der cosinus wird bei 90° = 0 also werden die differenzen verdoppelt und ab 45 gecapped
+double scorewithTolerances(double target_degree, double real_degree, double tolerance) {
+  double difference = (target_degree-real_degree).abs();
+  if ((difference > tolerance)||(tolerance == 0)) return 0.0;
+  return cos(radians(difference*(90/tolerance)));
 }

@@ -82,56 +82,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //pose.landmarks.entries.first.value.x
         //print('${pose.landmarks.keys} at (${pose.landmarks.values.}, ${landmark.position.y})');
 
-
-
-        //erstellung der Vectoren für Shoulder,Elbow,Wirst rechts
-        /*
-        late Vector3 r_Shoulder;
-        late Vector3 r_Elbow;
-        late Vector3 r_Wrist;
-        late Vector3 r_Hip;
-
-
-        Vector3? vec_rShoulder = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightShoulder");
-        if(vec_rShoulder != null){
-          r_Shoulder = Vector3(vec_rShoulder.x, vec_rShoulder.y, vec_rShoulder.z);
-        } else {
-          print("Fehler beim erkennen der Schulter");
-        }
-
-        Vector3? vec_rElbow = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightElbow");
-        if(vec_rElbow != null){
-          r_Elbow = Vector3(vec_rElbow.x, vec_rElbow.y, vec_rElbow.z);
-        } else {
-          print("Fehler beim erkennen des Ellenbogens");
-        }
-
-        Vector3? vec_rWrist = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightWrist");
-        if(vec_rWrist != null){
-          r_Wrist = Vector3(vec_rWrist.x, vec_rWrist.y, vec_rWrist.z);
-        } else {
-          print("Fehler beim erkennen des Handgelenks");
-        }
-
-        Vector3? vec_rHip = getLandmarkCoordinates_3d(pose.landmarks.entries.toList(), "rightHip");
-        if(vec_rHip != null){
-          r_Hip = Vector3(vec_rHip.x, vec_rHip.y, vec_rHip.z);
-        } else {
-          print("Fehler beim erkennen der Hüfte");
-        }
-
-        print("Punkte!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-        if (vec_rWrist != null && vec_rElbow != null && vec_rShoulder != null && vec_rHip != null) {
-          Score = Score + (scoreForLateralRaise_Arm(computeJointAngle_3d(a: r_Shoulder, b: r_Elbow, c: r_Wrist)))*(scoreForLateralRaise_Hip(computeJointAngle_3d(a: r_Elbow, b: r_Shoulder, c: r_Hip)));
-          print(Score);
-          print("ARM:");
-          print(computeJointAngle_3d(a: r_Shoulder, b: r_Elbow, c: r_Wrist));
-          print("HIP");
-          print(computeJointAngle_3d(a: r_Elbow, b: r_Shoulder, c: r_Hip));
-        }
-        */
-
         late Vector2 r_Shoulder;
         late Vector2 r_Elbow;
         late Vector2 r_Wrist;
@@ -172,7 +122,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         late Vector2 l_Wrist;
         late Vector2 l_Hip;
 
-
         Vector2? vec_lShoulder = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "leftShoulder");
         if(vec_lShoulder != null){
           l_Shoulder = Vector2(vec_lShoulder.x, vec_lShoulder.y);
@@ -201,24 +150,27 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print("Fehler beim erkennen der l Hüfte");
         }
 
-        print("Punkte!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
         bool right_wesh = vec_rWrist != null && vec_rElbow != null && vec_rShoulder != null && vec_rHip != null;
         bool left_wesh = vec_lWrist != null && vec_lElbow != null && vec_lShoulder != null && vec_lHip != null;
 
-        //für left side erweitern die null safety
+        //score wird erst berechnet wenn initial pose gefunden wird
+
+        //scores einfluss kann hier mit der certenty gewichtet werden
+        //scoreForLAt rise zu score with tolerances ersätzen
         if (right_wesh && left_wesh) {
-          //Score = Score + (scoreForLateralRaise_Arm(computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist)))*(scoreForLateralRaise_Hip(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip)));
-          //print(Score);
-          double temp_score_r = scoreForLateralRaise_Arm(computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist))*scoreForLateralRaise_Hip(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip));
-          Score.add(temp_score_r);
-          double temp_score_l = scoreForLateralRaise_Arm(computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist))*scoreForLateralRaise_Hip(computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip));
-          Score.add(temp_score_l);
-          print(Score.average);
-          print("ARM:");
-          print(computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist));
-          print("HIP");
-          print(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip));
+          double r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
+          double r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
+          double l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
+          double l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
+
+          double temp_score_r_wesh = scorewithTolerances(180, r_wes_angl, 25.0) * scorewithTolerances(90.0, r_esh_angl, 45.0); //erstmal nur hips
+          Score.add(temp_score_r_wesh);
+          double temp_score_l_wesh = scorewithTolerances(180, l_wes_angl, 25.0) * scorewithTolerances(90.0, l_esh_angl, 45.0); //erstmal nur hips
+          Score.add(temp_score_l_wesh);
+
+          print("P_Score: " + (Score.average).toString());
+          print("r_ARM (wes): " + r_wes_angl.toString());
+          print("r_HIP (esh): " + r_esh_angl.toString());
         }
 
         //TODO: Testen wie sich der Average verhällt
@@ -233,7 +185,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //wrist unter ellenbogeen für winkelunterscheideung
         // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
-          // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
+        // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
 
         /*
           leftShoulder,
