@@ -159,7 +159,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         } else {
           print("Fehler beim erkennen der l Hüfte");
         }
-
+        //
 
         bool right_wesh = vec_rWrist != null && vec_rElbow != null && vec_rShoulder != null && vec_rHip != null;
         bool left_wesh = vec_lWrist != null && vec_lElbow != null && vec_lShoulder != null && vec_lHip != null;
