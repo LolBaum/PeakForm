@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'constants/constants.dart';
+
 class VideoScreen extends StatelessWidget {
   const VideoScreen({super.key});
 
@@ -73,7 +75,7 @@ class VideoScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF006D42),
+                  backgroundColor: green,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
                   minimumSize: const Size(double.infinity, 48),
@@ -111,7 +113,7 @@ class VideoScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF006D42),
+        color: darkGreen,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(

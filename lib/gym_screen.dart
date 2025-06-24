@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'constants/constants.dart';
+
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
 
@@ -44,7 +46,7 @@ class GymScreen extends StatelessWidget {
                       IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.arrow_back)),
-                      const Icon(Icons.star, color: Color(0xFF006D42), size: 28),
+                      const Icon(Icons.star, color: darkGreen, size: 28),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -69,7 +71,7 @@ class GymScreen extends StatelessWidget {
                                     : Colors.black54,
                                 fontWeight: FontWeight.bold)),
                         backgroundColor:
-                        selected ? const Color(0xFF006D42) : Colors.grey[300],
+                        selected ? darkGreen : Colors.grey[300],
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         shape: const StadiumBorder(),
@@ -95,7 +97,7 @@ class GymScreen extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF006D42),
+                              backgroundColor: darkGreen,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
@@ -110,10 +112,10 @@ class GymScreen extends StatelessWidget {
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(width: 12),
                                 Container(
-                                  width: 30,
-                                  height: 30,
+                                  width: 35,
+                                  height: 35,
                                   decoration: const BoxDecoration(
-                                      color: Color(0xFFB8FF7B),
+                                      color: green,
                                       shape: BoxShape.circle),
                                   child: const Center(
                                     child: Icon(Icons.play_arrow,

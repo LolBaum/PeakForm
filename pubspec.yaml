@@ -19,5 +19,16 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  fonts:
+    - family: LeagueSpartan
+      fonts:
+        - asset: assets/fonts/LeagueSpartan-VariableFont_wght.ttf
+  assets:
+    - assets/fonts/
+
+    - assets/golf.jpg
+    - assets/gym.jpg
+    - assets/laufen.jpg
+    - assets/tennis.png
 
 

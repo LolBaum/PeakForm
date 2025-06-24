@@ -12,6 +12,9 @@ class FitnessApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'LeagueSpartan',
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(userName: 'Norhene'),
