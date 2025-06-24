@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
@@ -22,6 +23,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   var _cameraLensDirection = CameraLensDirection.back;
   //double Score = 0;
   RunningAverage Score = RunningAverage();
+
+  var bufferShoulder_r = CircularBuffer<double>(5);
 
   @override
   void dispose() async {
@@ -171,6 +174,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print("P_Score: " + (Score.average).toString());
           print("r_ARM (wes): " + r_wes_angl.toString());
           print("r_HIP (esh): " + r_esh_angl.toString());
+
+          double angleShoulder_r = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
+          bufferShoulder_r.add(angleShoulder_r);
+          print(bufferShoulder_r);
+          print(angleShoulder_r);
+
+          final average = bufferShoulder_r.toList().reduce((a, b) => a + b) / bufferShoulder_r.length;
+
+          print('Buffer: ${bufferShoulder_r.toList()} → Average: ${average.toStringAsFixed(2)}');
         }
 
         //TODO: Testen wie sich der Average verhällt
