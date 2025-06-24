@@ -4,16 +4,19 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'pose_detector_view.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+/*
 class MovementReference {
   double upperAngle;
   double lowerAngle;
   double tolerance;
   double minTime;
   bool isConstant;
+  bool started;
 
   MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime, this.isConstant);
-}
+} */
 
+//pro übung eine liste an toleranzen und winkel erstellen
 
 class Vector3 {
   final double x, y, z;

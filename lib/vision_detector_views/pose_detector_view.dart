@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-import 'package:circular_buffer/circular_buffer.dart';
+//import 'package:circular_buffer/circular_buffer.dart';
 
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
@@ -21,10 +21,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   CustomPaint? _customPaint;
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back;
-  //double Score = 0;
   RunningAverage Score = RunningAverage();
+  bool started = false;
 
-  var bufferShoulder_r = CircularBuffer<double>(5);
+  //var bufferShoulder_r = CircularBuffer<double>(5);
 
   @override
   void dispose() async {
@@ -157,7 +157,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         bool left_wesh = vec_lWrist != null && vec_lElbow != null && vec_lShoulder != null && vec_lHip != null;
 
         //score wird erst berechnet wenn initial pose gefunden wird
-
         //scores einfluss kann hier mit der certenty gewichtet werden
         //scoreForLAt rise zu score with tolerances ersätzen
         if (right_wesh && left_wesh) {
@@ -166,15 +165,27 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           double l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
           double l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
 
-          double temp_score_r_wesh = scorewithTolerances(180, r_wes_angl, 25.0) * scorewithTolerances(90.0, r_esh_angl, 45.0); //erstmal nur hips
-          Score.add(temp_score_r_wesh);
-          double temp_score_l_wesh = scorewithTolerances(180, l_wes_angl, 25.0) * scorewithTolerances(90.0, l_esh_angl, 45.0); //erstmal nur hips
-          Score.add(temp_score_l_wesh);
+          if (!started){
+            double high_intolerance_wesh_r = scorewithTolerances(180, r_wes_angl, 20.0) * scorewithTolerances(90.0, r_esh_angl, 30.0);
+            double high_intolerance_wesh_l = scorewithTolerances(180, l_wes_angl, 20.0) * scorewithTolerances(90.0, l_esh_angl, 30.0);
+            print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r).toString());
+            if((high_intolerance_wesh_l+high_intolerance_wesh_r) > 1.2){
+              started = true;
+            }
+          }
 
-          print("P_Score: " + (Score.average).toString());
-          print("r_ARM (wes): " + r_wes_angl.toString());
-          print("r_HIP (esh): " + r_esh_angl.toString());
+          if(started){
+            double temp_score_r_wesh = scorewithTolerances(180, r_wes_angl, 25.0) * scorewithTolerances(90.0, r_esh_angl, 45.0); //erstmal nur hips
+            Score.add(temp_score_r_wesh);
+            double temp_score_l_wesh = scorewithTolerances(180, l_wes_angl, 25.0) * scorewithTolerances(90.0, l_esh_angl, 45.0); //erstmal nur hips
+            Score.add(temp_score_l_wesh);
 
+            print("P_Score: " + (Score.average).toString());
+            print("r_ARM (wes): " + r_wes_angl.toString());
+            print("r_HIP (esh): " + r_esh_angl.toString());
+          }
+
+          /*
           double angleShoulder_r = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
           bufferShoulder_r.add(angleShoulder_r);
           print(bufferShoulder_r);
@@ -183,7 +194,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           final average = bufferShoulder_r.toList().reduce((a, b) => a + b) / bufferShoulder_r.length;
 
           print('Buffer: ${bufferShoulder_r.toList()} → Average: ${average.toStringAsFixed(2)}');
+          */
         }
+
 
         //TODO: Testen wie sich der Average verhällt
 
