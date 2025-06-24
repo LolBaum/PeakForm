@@ -135,6 +135,7 @@ String getPoseName(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, Strin
 // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
 // also eine sequenz vin winkeln die gemacht werden muss
 
+//!!! für bewertungen win fenster benutzen weil ab einer zeit ändert man nichts mehr vom score
 class RunningAverage {
   double _mean = 1.0; // bei 0 oder bei 1 beginnen ?
   int _count = 0;

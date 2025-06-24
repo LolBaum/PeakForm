@@ -10,9 +10,32 @@ import 'painters/pose_painter.dart';
 
 import 'camera_view.dart' as camera_view;
 
-var lar_angels = [95.0, 60.0, 7.0];
+//var lar_angels = [95.0, 60.0, 7.0];
+
+
+
+List<double> lar_angels = List.generate(
+    (95 - 7 + 1),             // Anzahl der Elemente
+    (i) => 95.0 - i           // 95.0, 94.0, ..., 7.0
+);
+
+/*
+double lar_min = 7.0;
+double lar_max = 95.0;
+double lar_step = 1.0;
+
+int length = ((lar_max - lar_min) / lar_step).abs().floor() + 1;
+
+List<double> lar_angels = List.generate(
+    length,
+        (i) => lar_step > 0 ? lar_min + i * lar_step : lar_max + i * lar_step
+).where((v) => lar_step > 0 ? v <= lar_max : v >= lar_min).toList();
+*/
+
+
 int angle_status = 0;
 bool angle_up = false;
+int wdhs = 0;
 
 class PoseDetectorView extends StatefulWidget {
   @override
@@ -182,14 +205,21 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             if((high_intolerance_wesh_l+high_intolerance_wesh_r) > 1.2){
               started = true;
               //camera_view.CameraView._startStopwatch();
-              camera_view.CameraView.isStopwatchRunning = true;
+              //camera_view.CameraView.isStopwatchRunning = true;
+              camera_view.CameraView.pose_Stopwatch_activation_bool = true; //umgeht einigen shit und soft dafür das bei der einmalige init pose die stopuhr mit angeht
             }
           }
 
           if(started){
-            double temp_score_r_wesh = (scorewithTolerances(180, r_wes_angl, 25.0) + scorewithTolerances(90.0, r_esh_angl, 45.0))/2; //erstmal nur hips
+            double r_wes_score = scorewithTolerances(180, r_wes_angl, 25.0);
+            double r_esh_score = scorewithTolerances(lar_angels[angle_status], r_esh_angl, 45.0); //lar_angles war vorher 90.0
+            double l_wes_score = scorewithTolerances(180, l_wes_angl, 25.0);
+            double l_esh_score = scorewithTolerances(lar_angels[angle_status], l_esh_angl, 45.0);
+
+            double temp_score_r_wesh = (r_wes_score + r_esh_score)/2;
+            double temp_score_l_wesh = (l_wes_score + l_esh_score)/2;
+
             Score.add(temp_score_r_wesh);
-            double temp_score_l_wesh = (scorewithTolerances(180, l_wes_angl, 25.0) + scorewithTolerances(90.0, l_esh_angl, 45.0))/2; //erstmal nur hips
             Score.add(temp_score_l_wesh);
 
             print("P_Score: " + (Score.average).toString());
@@ -199,17 +229,22 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
             if (angle_status >= lar_angels.length-1){
               angle_up = true;
+              wdhs++;
             } else if (angle_status <= 0) {
               angle_up = false;
             }
 
-            if (lar_angels[angle_status] == r_esh_angl) {
+
+            if (r_esh_score >= 0.7) { //toleranzen einstellen und für links das selbe
               if (angle_up){
-                angle_status++;
-              } else {
                 angle_status--;
+              } else {
+                angle_status++;
               }
             }
+
+            print("angle_Status: " + angle_status.toString());
+            print("wdhs: " + wdhs.toString());
 
           }
 
