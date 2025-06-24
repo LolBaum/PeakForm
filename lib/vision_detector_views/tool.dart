@@ -86,7 +86,6 @@ double scoreForLateralRaise_Arm(double angle) {
   if (angle >= 60 && angle <= 120) return 0.0;
   return 0.0;
 }
-
 double scoreForLateralRaise_Hip(double angle) {
   if (angle >= 90-10 && angle <= 100-10) return 1.0;
   if (angle >= 60 && angle <= 120) return 0.0;
@@ -162,3 +161,5 @@ class TimedPose {
 
   TimedPose(this.pose, this.timestamp);
 }
+
+

@@ -183,9 +183,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           }
 
           if(started){
-            double temp_score_r_wesh = scorewithTolerances(180, r_wes_angl, 25.0) * scorewithTolerances(90.0, r_esh_angl, 45.0); //erstmal nur hips
+            double temp_score_r_wesh = (scorewithTolerances(180, r_wes_angl, 25.0) + scorewithTolerances(90.0, r_esh_angl, 45.0))/2; //erstmal nur hips
             Score.add(temp_score_r_wesh);
-            double temp_score_l_wesh = scorewithTolerances(180, l_wes_angl, 25.0) * scorewithTolerances(90.0, l_esh_angl, 45.0); //erstmal nur hips
+            double temp_score_l_wesh = (scorewithTolerances(180, l_wes_angl, 25.0) + scorewithTolerances(90.0, l_esh_angl, 45.0))/2; //erstmal nur hips
             Score.add(temp_score_l_wesh);
 
             print("P_Score: " + (Score.average).toString());
