@@ -530,7 +530,7 @@ class _CameraViewState extends State<CameraView> {
                 width: 50.0,
                 child: FloatingActionButton(
                   heroTag: "stopwatch_start_pause",
-                  onPressed: CameraView.isStopwatchRunning ? _pauseStopwatch : _startStopwatch,
+                  onPressed: CameraView.isStopwatchRunning ? _pauseStopwatch : _startStopwatch, //das hier triggern über eine globale variableüber tdetector view
                   backgroundColor: CameraView.isStopwatchRunning ? Colors.orange : Colors.green,
                   child: Icon(
                     CameraView.isStopwatchRunning ? Icons.pause : Icons.play_arrow,

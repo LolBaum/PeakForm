@@ -179,6 +179,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r).toString());
             if((high_intolerance_wesh_l+high_intolerance_wesh_r) > 1.2){
               started = true;
+              //camera_view.CameraView._startStopwatch();
+              camera_view.CameraView.isStopwatchRunning = true;
             }
           }
 
