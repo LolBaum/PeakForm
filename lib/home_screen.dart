@@ -5,7 +5,7 @@ import 'constants/constants.dart';
 class HomeScreen extends StatelessWidget {
   final String userName;
 
-  const HomeScreen({Key? key, this.userName = "User"}) : super(key: key);
+  const HomeScreen({super.key, this.userName = "User"});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.grey.withAlpha((255 * 0.1).toInt()),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -48,16 +48,30 @@ class HomeScreen extends StatelessWidget {
                         backgroundColor: Color(0xFFB8FF7B),
                       ),
                       const SizedBox(height: 12),
-                      Text('Hi, $userName!', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+                      Text('Hi, $userName!',
+                          style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5)),
                       const SizedBox(height: 4),
-                      Text('FORTSCHRITT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey[700], letterSpacing: 1.5)),
-                      const Text('LVL. 10', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87)),
+                      Text('FORTSCHRITT',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[700],
+                              letterSpacing: 1.5)),
+                      const Text('LVL. 10',
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87)),
                     ],
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 24.0, left: 16, right: 16, bottom: 24),
+                padding: const EdgeInsets.only(
+                    top: 24.0, left: 16, right: 16, bottom: 24),
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -66,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.grey.withAlpha((255 * 0.1).toInt()),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -75,7 +89,11 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Wähle deinen Sport', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+                      const Text('Wähle deinen Sport',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black)),
                       const SizedBox(height: 16),
                       GridView.count(
                         shrinkWrap: true,
@@ -84,17 +102,29 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSpacing: 10,
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
-                          _sportTile(context, 'TENNIS', 'TECHNIK', null, 'assets/tennis.png'),
-                          _sportTile(context, 'LAUFEN', 'LAUFÖKONOMIE UND DRILLS', '/video', 'assets/laufen.jpg'),
-                          _sportTile(context, 'GYM', 'TECHNIK', '/gym', 'assets/gym.jpg'),
-                          _sportTile(context, 'GOLF', 'AUFSCHLÄGE', null, 'assets/golf.jpg'),
+                          _sportTile(context, 'TENNIS', 'TECHNIK', null,
+                              'assets/tennis.png'),
+                          _sportTile(
+                              context,
+                              'LAUFEN',
+                              'LAUFÖKONOMIE UND DRILLS',
+                              '/video',
+                              'assets/laufen.jpg'),
+                          _sportTile(context, 'GYM', 'TECHNIK', '/gym',
+                              'assets/gym.jpg'),
+                          _sportTile(context, 'GOLF', 'AUFSCHLÄGE', null,
+                              'assets/golf.jpg'),
                         ],
                       ),
                       const SizedBox(height: 24),
                       Center(
                         child: Column(
                           children: [
-                            Text('LETZTE AUFNAHME: TENNIS', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey[700])),
+                            Text('LETZTE AUFNAHME: TENNIS',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700])),
                             const SizedBox(height: 6),
                             GestureDetector(
                               onTap: () {},
@@ -108,7 +138,8 @@ class HomeScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 4, right: 8, top: 4, bottom: 4),
+                                      padding: const EdgeInsets.only(
+                                          left: 4, right: 8, top: 4, bottom: 4),
                                       child: Container(
                                         width: 35,
                                         height: 35,
@@ -121,7 +152,9 @@ class HomeScreen extends StatelessWidget {
                                             width: 15,
                                             height: 15,
                                             child: DecoratedBox(
-                                              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.white),
                                             ),
                                           ),
                                         ),
@@ -129,7 +162,11 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                     const Padding(
                                       padding: EdgeInsets.only(right: 16),
-                                      child: Text('Aufnehmen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                      child: Text('Aufnehmen',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white)),
                                     ),
                                   ],
                                 ),
@@ -169,7 +206,7 @@ class HomeScreen extends StatelessWidget {
             image: AssetImage(imagePath),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.4),
+              Colors.black.withAlpha((255 * 0.4).toInt()),
               BlendMode.darken,
             ),
           ),

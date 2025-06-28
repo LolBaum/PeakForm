@@ -22,15 +22,14 @@ class VideoScreen extends StatelessWidget {
               Container(
                 height: 200,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [
-                    Color(0xFF066E47),
-                    Color(0xFF5AD689)
-                  ]),
+                  gradient: const LinearGradient(
+                      colors: [Color(0xFF066E47), Color(0xFF5AD689)]),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(
                     child: Icon(Icons.play_circle_fill,
-                        color: Colors.white.withOpacity(0.6), size: 64)),
+                        color: Colors.white.withAlpha((255 * 0.6).toInt()),
+                        size: 64)),
               ),
               const SizedBox(height: 16),
               const Text('LAUFEN',
@@ -44,31 +43,29 @@ class VideoScreen extends StatelessWidget {
                 ],
               ),
               const Divider(height: 32, thickness: 1),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: const [
-                  Column(
-                      children: [
-                        Text('DURCH. ZEIT',
-                            style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold)),
-                        Text('20MIN', style: TextStyle(fontWeight: FontWeight.bold))
-                      ]),
-                  Column(
-                      children: [
-                        Text('SCHWIERIGKEIT',
-                            style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold)),
-                        Text('EINFACH',
-                            style: TextStyle(fontWeight: FontWeight.bold))
-                      ]),
-                  Column(
-                      children: [
-                        Text('INTENSITÄT',
-                            style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold)),
-                        Text('NORMAL', style: TextStyle(fontWeight: FontWeight.bold))
-                      ])
+                children: [
+                  Column(children: [
+                    Text('DURCH. ZEIT',
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text('20MIN', style: TextStyle(fontWeight: FontWeight.bold))
+                  ]),
+                  Column(children: [
+                    Text('SCHWIERIGKEIT',
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text('EINFACH',
+                        style: TextStyle(fontWeight: FontWeight.bold))
+                  ]),
+                  Column(children: [
+                    Text('INTENSITÄT',
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text('NORMAL',
+                        style: TextStyle(fontWeight: FontWeight.bold))
+                  ])
                 ],
               ),
               const SizedBox(height: 16),
@@ -88,13 +85,14 @@ class VideoScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text('SCHRITT 1 VON 3',
-                  style:
-                  TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  style: TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF006D42).withOpacity(0.05),
+                  color:
+                      const Color(0xFF006D42).withAlpha((255 * 0.05).toInt()),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Text(
@@ -118,7 +116,8 @@ class VideoScreen extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        style:
+            const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
