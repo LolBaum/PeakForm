@@ -85,8 +85,15 @@ class PoseDetectionProvider extends ChangeNotifier {
         return;
       }
 
-      // Load MoveNet model first
-      await _loadModel();
+      // Try to load MoveNet model, but continue if it fails
+      bool modelLoaded = false;
+      try {
+        await _loadModel();
+        modelLoaded = true;
+      } catch (e) {
+        _detectionStatus = '⚠️ Model loading failed: $e\nCamera preview only.';
+        debugPrint('❌ Model loading error (camera will still open): $e');
+      }
 
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
@@ -112,9 +119,14 @@ class PoseDetectionProvider extends ChangeNotifier {
       await _cameraController!.initialize();
       _isCameraInitialized = true;
 
-      _detectionStatus = 'MoveNet SinglePose Lightning model loaded and ready!';
+      if (modelLoaded) {
+        _detectionStatus =
+            'MoveNet SinglePose Lightning model loaded and ready!';
+      } else {
+        _detectionStatus = 'Camera ready. Pose detection unavailable.';
+      }
 
-      debugPrint('✅ Camera and MoveNet SinglePose Lightning model initialized');
+      debugPrint('✅ Camera initialized (model loaded: $modelLoaded)');
       notifyListeners();
     } catch (e) {
       _detectionStatus = 'Initialization failed: $e';
@@ -282,8 +294,8 @@ class PoseDetectionProvider extends ChangeNotifier {
         final hasDetection = poses.isNotEmpty;
         final totalKeypoints = poses.isNotEmpty
             ? poses.first.landmarks
-                  .where((l) => l.confidence > confidenceThreshold)
-                  .length
+                .where((l) => l.confidence > confidenceThreshold)
+                .length
             : 0;
         _detectionStatus =
             'SinglePose Lightning: ${fps.toStringAsFixed(1)} FPS | ${hasDetection ? "Person detected" : "No person"}, $totalKeypoints keypoints';
@@ -372,12 +384,11 @@ class PoseDetectionProvider extends ChangeNotifier {
     }
 
     // Calculate overall pose confidence (average of visible keypoints)
-    final visibleLandmarks = landmarks
-        .where((l) => l.confidence > confidenceThreshold)
-        .toList();
+    final visibleLandmarks =
+        landmarks.where((l) => l.confidence > confidenceThreshold).toList();
     final poseConfidence = visibleLandmarks.isNotEmpty
         ? visibleLandmarks.map((l) => l.confidence).reduce((a, b) => a + b) /
-              visibleLandmarks.length
+            visibleLandmarks.length
         : 0.0;
 
     // Debug: Show detection details every 50 frames
