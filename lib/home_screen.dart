@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'constants/constants.dart';
+import 'screens/pose_detection_screen.dart';
+import 'providers/pose_detection_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
@@ -127,7 +130,18 @@ class HomeScreen extends StatelessWidget {
                                     color: Colors.grey[700])),
                             const SizedBox(height: 6),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ChangeNotifierProvider(
+                                      create: (_) => PoseDetectionProvider(),
+                                      child: const PoseDetectionScreen(),
+                                    ),
+                                  ),
+                                );
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: darkGreen,
