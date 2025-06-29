@@ -12,6 +12,11 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
 
+  camera: any
+  provider: any
+  permission_handler: any
+  tflite_flutter: any
+  image: any
 dev_dependencies:
   build_runner: ^2.4.9
   flutter_test:
@@ -27,7 +32,7 @@ flutter:
         - asset: assets/fonts/LeagueSpartan-VariableFont_wght.ttf
   assets:
     - assets/fonts/
-
+    - assets/models/3.tflite
     - assets/golf.jpg
     - assets/gym.jpg
     - assets/laufen.jpg
