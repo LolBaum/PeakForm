@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:peakform/frosted_glasst_button.dart';
+import 'package:fitness_app/frosted_glasst_button.dart';
 
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription> cameras;

@@ -15,7 +15,7 @@ class PosePainter extends CustomPainter {
     if (poses.isEmpty) return;
 
     final pose = poses.first;
-    
+
     // Paint for confident keypoints (green)
     final confidentPointPaint = Paint()
       ..color = Colors.green
@@ -37,26 +37,26 @@ class PosePainter extends CustomPainter {
     // Draw ALL keypoints as blue dots (regardless of confidence)
     for (int i = 0; i < pose.landmarks.length; i++) {
       final landmark = pose.landmarks[i];
-      
+
       // Convert normalized coordinates (0-1) to screen coordinates
       // Mirror X coordinate for front camera (flip horizontally)
       final x = (1.0 - landmark.x) * size.width; // Flip X for front camera
       final y = landmark.y * size.height;
-      
+
       // Draw blue dot for every keypoint (larger for visibility)
       canvas.drawCircle(Offset(x, y), 6.0, allPointPaint);
-      
+
       // Draw green dot over blue if confidence is high enough
       if (landmark.confidence > 0.05) {
         canvas.drawCircle(Offset(x, y), 8.0, confidentPointPaint);
       }
-      
+
       // Debug: Draw keypoint index number
       if (landmark.confidence > 0.01) {
         final textPainter = TextPainter(
           text: TextSpan(
             text: '$i',
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -81,25 +81,25 @@ class PosePainter extends CustomPainter {
       [MoveNetKeypoints.nose, MoveNetKeypoints.rightEye],
       [MoveNetKeypoints.leftEye, MoveNetKeypoints.leftEar],
       [MoveNetKeypoints.rightEye, MoveNetKeypoints.rightEar],
-      
+
       // Torso connections
       [MoveNetKeypoints.leftShoulder, MoveNetKeypoints.rightShoulder],
       [MoveNetKeypoints.leftShoulder, MoveNetKeypoints.leftHip],
       [MoveNetKeypoints.rightShoulder, MoveNetKeypoints.rightHip],
       [MoveNetKeypoints.leftHip, MoveNetKeypoints.rightHip],
-      
+
       // Left arm
       [MoveNetKeypoints.leftShoulder, MoveNetKeypoints.leftElbow],
       [MoveNetKeypoints.leftElbow, MoveNetKeypoints.leftWrist],
-      
+
       // Right arm
       [MoveNetKeypoints.rightShoulder, MoveNetKeypoints.rightElbow],
       [MoveNetKeypoints.rightElbow, MoveNetKeypoints.rightWrist],
-      
+
       // Left leg
       [MoveNetKeypoints.leftHip, MoveNetKeypoints.leftKnee],
       [MoveNetKeypoints.leftKnee, MoveNetKeypoints.leftAnkle],
-      
+
       // Right leg
       [MoveNetKeypoints.rightHip, MoveNetKeypoints.rightKnee],
       [MoveNetKeypoints.rightKnee, MoveNetKeypoints.rightAnkle],
@@ -108,11 +108,11 @@ class PosePainter extends CustomPainter {
     for (final connection in connections) {
       final startIdx = connection[0];
       final endIdx = connection[1];
-      
+
       if (startIdx < pose.landmarks.length && endIdx < pose.landmarks.length) {
         final start = pose.landmarks[startIdx];
         final end = pose.landmarks[endIdx];
-        
+
         // Only draw line if both keypoints are confident enough
         if (start.confidence > 0.05 && end.confidence > 0.05) {
           // Mirror X coordinates for front camera
@@ -124,7 +124,7 @@ class PosePainter extends CustomPainter {
             (1.0 - end.x) * size.width,
             end.y * size.height,
           );
-          
+
           canvas.drawLine(startPoint, endPoint, paint);
         }
       }
@@ -133,4 +133,4 @@ class PosePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-} 
+}

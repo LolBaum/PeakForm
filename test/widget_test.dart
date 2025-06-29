@@ -5,23 +5,32 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:peakform/main.dart';
+import 'package:fitness_app/home_screen.dart';
 
 void main() {
-  testWidgets('PeakForm app smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const PeakFormApp());
+  // All default tests removed. Add your own widget tests here.
 
-    // Verify that the home screen loads with the app title.
-    expect(find.text('PeakForm'), findsOneWidget);
-    /* These labels do not exist in the Main widget yet.
-    expect(find.text('Welcome to PeakForm'), findsOneWidget);
+  testWidgets('HomeScreen shows greeting and sections',
+      (WidgetTester tester) async {
+    await tester
+        .pumpWidget(const MaterialApp(home: HomeScreen(userName: 'TestUser')));
 
-    // Verify that the main feature cards are present.
-    expect(find.text('Pose Detection'), findsOneWidget);
-    expect(find.text('Exercise Form'), findsOneWidget);
-    */
+    // Check for greeting
+    expect(find.text('Hi, TestUser!'), findsOneWidget);
+    // Check for "Wähle deinen Sport"
+    expect(find.text('Wähle deinen Sport'), findsOneWidget);
+    // Check for "LETZTE AUFNAHME: TENNIS"
+    expect(find.text('LETZTE AUFNAHME: TENNIS'), findsOneWidget);
   });
+/*  testWidgets('FitnessApp renders HomeScreen and navigates to /video',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const FitnessApp());
+    // Should show HomeScreen with Norhene
+    expect(find.text('Hi, Norhene!'), findsOneWidget);
+    // Tap the LAUFEN tile to navigate to /video
+    await tester.tap(find.text('LAUFEN'));
+    await tester.pumpAndSettle();
+  });*/
 }

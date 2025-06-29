@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../providers/pose_detection_provider.dart';
-import '../widgets/pose_painter.dart';
-import 'package:peakform/frosted_glasst_button.dart';
+import 'package:fitness_app/frosted_glasst_button.dart';
 import 'dart:async';
+import 'package:fitness_app/widgets/pose_painter.dart';
 
 class PoseDetectionScreen extends StatefulWidget {
   const PoseDetectionScreen({super.key});
@@ -321,8 +321,8 @@ class _StartStopButton extends StatelessWidget {
           child: FrostedGlassButton(
             onTap: provider.isCameraInitialized
                 ? (provider.isDetecting
-                      ? provider.stopDetection
-                      : provider.startDetection)
+                    ? provider.stopDetection
+                    : provider.startDetection)
                 : () {},
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -394,7 +394,7 @@ class _PermissionDeniedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Camera permission required'));
+    return const Center(child: Text('Camera permission required'));
   }
 }
 
@@ -403,6 +403,6 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: CircularProgressIndicator());
+    return const Center(child: CircularProgressIndicator());
   }
 }
