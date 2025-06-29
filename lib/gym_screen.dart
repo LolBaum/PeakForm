@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'constants/constants.dart';
+import 'main.dart';
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
@@ -23,6 +24,8 @@ class GymScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    logger.i('GymScreen displayed');
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       body: SafeArea(
@@ -44,7 +47,10 @@ class GymScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            logger.i('User navigated back from gym screen');
+                            Navigator.pop(context);
+                          },
                           icon: const Icon(Icons.arrow_back)),
                       const Icon(Icons.star, color: darkGreen, size: 28),
                     ],
@@ -52,26 +58,24 @@ class GymScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text('MEISTER DEINE',
                       style:
-                      TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
                   const Text('POSE IM GYM',
                       style:
-                      TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 16),
                   Wrap(
                     spacing: 10,
                     runSpacing: 0,
                     children: filters.map((label) {
                       final bool selected =
-                      (label == 'Lower Body' || label == 'Equipment');
+                          (label == 'Lower Body' || label == 'Equipment');
                       return Chip(
                         label: Text(label,
                             style: TextStyle(
-                                color: selected
-                                    ? Colors.white
-                                    : Colors.black54,
+                                color: selected ? Colors.white : Colors.black54,
                                 fontWeight: FontWeight.bold)),
                         backgroundColor:
-                        selected ? darkGreen : Colors.grey[300],
+                            selected ? darkGreen : Colors.grey[300],
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         shape: const StadiumBorder(),
@@ -95,7 +99,10 @@ class GymScreen extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 6.0),
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              logger.i(
+                                  'User selected exercise: ${exercises[index]}');
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: darkGreen,
                               shape: RoundedRectangleBorder(
@@ -115,8 +122,7 @@ class GymScreen extends StatelessWidget {
                                   width: 35,
                                   height: 35,
                                   decoration: const BoxDecoration(
-                                      color: green,
-                                      shape: BoxShape.circle),
+                                      color: green, shape: BoxShape.circle),
                                   child: const Center(
                                     child: Icon(Icons.play_arrow,
                                         size: 18, color: Color(0xFFDFEAE6)),

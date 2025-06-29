@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/frosted_glasst_button.dart';
+import '../main.dart';
 
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -19,42 +20,54 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
+    logger.i('CameraScreen initialized with ${widget.cameras.length} cameras');
     final firstCamera = widget.cameras.first;
+    logger
+        .i('Using camera: ${firstCamera.name} (${firstCamera.lensDirection})');
     _controller = CameraController(
       firstCamera,
       ResolutionPreset.high,
       enableAudio: true,
     );
     _initializeControllerFuture = _controller.initialize().then((_) {
+      logger.i('Camera controller initialized successfully');
       _controller.setFocusMode(FocusMode.auto);
     });
   }
 
   @override
   void dispose() {
+    logger.i('CameraScreen disposed');
     _controller.dispose();
     super.dispose();
   }
 
   Future<void> _toggleRecording() async {
     if (!_controller.value.isInitialized) {
+      logger.i('Cannot toggle recording - camera not initialized');
       return;
     }
     if (_isRecording) {
+      logger.i('Stopping video recording');
       try {
         final XFile videoFile = await _controller.stopVideoRecording();
         setState(() => _isRecording = false);
+        logger.i('Video recording stopped successfully: ${videoFile.path}');
         if (mounted) {
           Navigator.of(context).pop(videoFile.path);
         }
       } catch (e) {
+        logger.i('Error stopping video recording: $e');
         debugPrint("Error on canceling the Recoridng: $e");
       }
     } else {
+      logger.i('Starting video recording');
       try {
         await _controller.startVideoRecording();
         setState(() => _isRecording = true);
+        logger.i('Video recording started successfully');
       } catch (e) {
+        logger.i('Error starting video recording: $e');
         debugPrint("Error on start of the recording: $e");
       }
     }
@@ -91,6 +104,7 @@ class _CameraScreenState extends State<CameraScreen> {
               children: [
                 FrostedGlassButton(
                   onTap: () {
+                    logger.i('Flash button pressed');
                     debugPrint("Error on canceling the Recoridng");
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Frost-Button gedrückt")),
@@ -99,7 +113,10 @@ class _CameraScreenState extends State<CameraScreen> {
                   child: const Icon(Icons.flash_on, color: Colors.white),
                 ),
                 FrostedGlassButton(
-                  onTap: () => Navigator.of(context).pop(),
+                  onTap: () {
+                    logger.i('Close button pressed - exiting camera screen');
+                    Navigator.of(context).pop();
+                  },
                   child: const Icon(Icons.close, color: Colors.white),
                 ),
               ],

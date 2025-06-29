@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-
 import 'constants/constants.dart';
+import 'main.dart';
 
 class VideoScreen extends StatelessWidget {
   const VideoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    logger.i('VideoScreen displayed');
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -16,7 +18,10 @@ class VideoScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    logger.i('User navigated back from video screen');
+                    Navigator.pop(context);
+                  },
                   icon: const Icon(Icons.arrow_back)),
               const SizedBox(height: 16),
               Container(
@@ -70,7 +75,9 @@ class VideoScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  logger.i('User pressed START button on video screen');
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: green,
                   shape: RoundedRectangleBorder(

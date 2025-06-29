@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
+import '../main.dart';
 
 // MoveNet keypoint indices according to TensorFlow documentation
 // https://www.tensorflow.org/hub/tutorials/movenet
@@ -67,6 +68,15 @@ class PoseDetectionProvider extends ChangeNotifier {
   static const double confidenceThreshold =
       0.01; // Very low threshold to see all detections
 
+  // Safe logger access that won't crash if global logger isn't initialized
+  void _log(String message) {
+    try {
+      logger.i(message);
+    } catch (e) {
+      debugPrint('PoseDetectionProvider: $message');
+    }
+  }
+
   // Getters
   CameraController? get cameraController => _cameraController;
   List<Pose> get poses => _poses;
@@ -78,8 +88,10 @@ class PoseDetectionProvider extends ChangeNotifier {
 
   // Initialize camera and load MoveNet model
   Future<void> initializeCamera() async {
+    _log('Initializing camera and pose detection system');
     try {
       if (!isPlatformSupported) {
+        _log('Camera not supported on web platform');
         _detectionStatus = 'Camera not supported on web platform';
         notifyListeners();
         return;
@@ -90,13 +102,16 @@ class PoseDetectionProvider extends ChangeNotifier {
       try {
         await _loadModel();
         modelLoaded = true;
+        _log('MoveNet model loaded successfully');
       } catch (e) {
+        _log('Model loading failed: $e - continuing with camera only');
         _detectionStatus = '⚠️ Model loading failed: $e\nCamera preview only.';
         debugPrint('❌ Model loading error (camera will still open): $e');
       }
 
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
+        _log('No cameras available on device');
         _detectionStatus = 'No cameras available';
         notifyListeners();
         return;
@@ -108,6 +123,7 @@ class PoseDetectionProvider extends ChangeNotifier {
         orElse: () => cameras.first,
       );
 
+      _log('Using camera: ${frontCamera.name} (${frontCamera.lensDirection})');
       debugPrint('📷 Using camera: ${frontCamera.name}');
 
       _cameraController = CameraController(
@@ -122,13 +138,16 @@ class PoseDetectionProvider extends ChangeNotifier {
       if (modelLoaded) {
         _detectionStatus =
             'MoveNet SinglePose Lightning model loaded and ready!';
+        _log('Camera and model initialization completed successfully');
       } else {
         _detectionStatus = 'Camera ready. Pose detection unavailable.';
+        _log('Camera initialization completed (model unavailable)');
       }
 
       debugPrint('✅ Camera initialized (model loaded: $modelLoaded)');
       notifyListeners();
     } catch (e) {
+      _log('Camera/model initialization failed: $e');
       _detectionStatus = 'Initialization failed: $e';
       debugPrint('❌ Camera/Model init error: $e');
       notifyListeners();
@@ -182,9 +201,11 @@ class PoseDetectionProvider extends ChangeNotifier {
 
   // Start detection
   void startDetection() {
+    _log('Starting MoveNet pose detection');
     debugPrint('🚀 Starting MoveNet pose detection...');
 
     if (!isPlatformSupported) {
+      _log('Pose detection not supported on web platform');
       _detectionStatus =
           'Pose detection not supported on web. Use Android/iOS device.';
       notifyListeners();
@@ -192,6 +213,7 @@ class PoseDetectionProvider extends ChangeNotifier {
     }
 
     if (_cameraController == null || !_isCameraInitialized || !_isModelLoaded) {
+      _log('Cannot start detection - camera or model not ready');
       _detectionStatus = 'Camera or model not ready';
       notifyListeners();
       return;
@@ -206,16 +228,19 @@ class PoseDetectionProvider extends ChangeNotifier {
     // Start camera stream processing
     _cameraController!.startImageStream(_processCameraImage);
 
+    _log('Pose detection started successfully');
     notifyListeners();
   }
 
   // Stop detection
   void stopDetection() {
+    _log('Stopping MoveNet pose detection');
     _isDetecting = false;
     _cameraController?.stopImageStream();
     _detectionStatus = 'Detection stopped';
     _poses = []; // Clear poses when stopping
     debugPrint('🛑 MoveNet pose detection stopped');
+    _log('Pose detection stopped successfully');
     notifyListeners();
   }
 

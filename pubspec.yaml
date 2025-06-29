@@ -11,6 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  logger: ^2.3.0
+  http: ^1.2.1
+  flutter_dotenv: ^5.1.0
 
   camera: any
   provider: any
@@ -31,6 +34,7 @@ flutter:
       fonts:
         - asset: assets/fonts/LeagueSpartan-VariableFont_wght.ttf
   assets:
+    - .env
     - assets/fonts/
     - assets/models/3.tflite
     - assets/golf.jpg
