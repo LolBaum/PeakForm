@@ -32,7 +32,7 @@ flutter:
         - asset: assets/fonts/LeagueSpartan-VariableFont_wght.ttf
   assets:
     - assets/fonts/
-
+    - assets/models/3.tflite
     - assets/golf.jpg
     - assets/gym.jpg
     - assets/laufen.jpg
