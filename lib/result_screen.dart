@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'main.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    logger.i('ResultScreen displayed');
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -18,7 +21,10 @@ class ResultScreen extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      logger.i('User navigated back from result screen');
+                      Navigator.pop(context);
+                    },
                   ),
                   const Text(
                     'Ergebnis',
@@ -129,7 +135,9 @@ class ResultScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    logger.i('User pressed "Weiter" button on result screen');
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF006D42),
                     shape: RoundedRectangleBorder(

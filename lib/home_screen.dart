@@ -4,14 +4,25 @@ import 'package:provider/provider.dart';
 import 'constants/constants.dart';
 import 'screens/pose_detection_screen.dart';
 import 'providers/pose_detection_provider.dart';
+import 'main.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
 
   const HomeScreen({super.key, this.userName = "User"});
 
+  void _log(String message) {
+    try {
+      logger.i(message);
+    } catch (e) {
+      debugPrint('HomeScreen: $message');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _log('HomeScreen built for user: $userName');
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       body: SafeArea(
@@ -131,6 +142,8 @@ class HomeScreen extends StatelessWidget {
                             const SizedBox(height: 6),
                             GestureDetector(
                               onTap: () {
+                                _log(
+                                    'Aufnehmen button tapped - starting pose detection');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -201,18 +214,30 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _circularIconButton(IconData icon) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: const BoxDecoration(color: darkGreen, shape: BoxShape.circle),
-      child: Icon(icon, color: Colors.white),
+    return GestureDetector(
+      onTap: () {
+        String buttonName = icon == Icons.bar_chart ? 'Charts' : 'Settings';
+        _log('Circular icon button tapped: $buttonName');
+      },
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration:
+            const BoxDecoration(color: darkGreen, shape: BoxShape.circle),
+        child: Icon(icon, color: Colors.white),
+      ),
     );
   }
 
   Widget _sportTile(BuildContext context, String title, String subtitle,
       String? route, String imagePath) {
     return GestureDetector(
-      onTap: route != null ? () => Navigator.pushNamed(context, route) : null,
+      onTap: route != null
+          ? () {
+              _log('Sport tile tapped: $title (route: $route)');
+              Navigator.pushNamed(context, route);
+            }
+          : null,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
