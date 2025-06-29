@@ -62,3 +62,4 @@ assets/models/4.tflite
 *.iml
 .vscode/settings.json
 .vscode/launch.json
+.cursor
