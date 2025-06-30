@@ -71,6 +71,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   "Right Lateral Angle: $lateralAngle_r",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
+                Text(
+                  "Moving Direction: $dir",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
               ],
             ),
           ),
@@ -84,6 +88,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   bool armsUp = false;
   double lateralAngle_r = 0;
   double elbowAngle_r = 0;
+  double min_r = 180;
+  double max_r = 0;
+  direction dir = direction.down;
+  bool direction_changed = false;
 
   void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
     const double raiseThreshold = 85.0;
@@ -219,14 +227,38 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print(angleShoulder_r);
 
           final average = bufferShoulder_r.toList().reduce((a, b) => a + b) / bufferShoulder_r.length;
-          final normalized =  bufferShoulder_r.toList().map((a) => a - average);
 
           print('Buffer: ${bufferShoulder_r.toList()} → Average: ${average.toStringAsFixed(2)}');
+          print(dir);
+          if(dir == direction.down){ // Down -> Up
+            if (min_r < average){
+              dir = direction.up;
+              direction_changed = true;
+              min_r = 180;
+            }else{
+              min_r = average;
+            }
+          }
+          else{ // up -> down
+            if (max_r > average){
+              dir = direction.down;
+              direction_changed = true;
+              max_r = 0;
+            }else{
+              max_r = average;
+            }
+          }
+
+          if (direction_changed == true){
+            // TODO: Evaluate the Position
+            direction_changed = false;
+          }
+
 
 
           //todo store min / max average angle.
           //if difference ~5 away from value -> change direction
-        }
+
 
         //TODO: Testen wie sich der Average verhällt
 

@@ -4,6 +4,8 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'pose_detector_view.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+enum direction{up, down}
+
 /*
 class MovementReference {
   double upperAngle;
