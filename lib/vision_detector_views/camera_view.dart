@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+import '../services/auto_save_service.dart';
 
 
 class CameraView extends StatefulWidget {
@@ -477,14 +478,37 @@ class _CameraViewState extends State<CameraView> {
   }
 
   void _pauseStopwatch() {
+    print('🔽 STOPWATCH PAUSED - Elapsed time: ${CameraView.stopwatch.elapsed}');
     if (CameraView.isStopwatchRunning) {
       CameraView.stopwatch.stop();
       CameraView.isStopwatchRunning = false;
       CameraView.stopwatchTimer?.cancel();
+      
+      // Save score when workout is paused
+      _saveWorkoutScore();
+    }
+  }
+  
+  void _saveWorkoutScore() async {
+    print('💾 Attempting to save workout score...');
+    print('Current tracked score: ${AutoSaveService.getCurrentScore()}');
+    
+    // Save the workout score with duration when stopwatch is paused
+    try {
+      await AutoSaveService.saveScoreOnPause(CameraView.stopwatch.elapsed);
+    } catch (e) {
+      print('❌ Could not save workout score: $e');
     }
   }
 
   void _resetStopwatch() {
+    print('🔄 STOPWATCH RESET - Elapsed time: ${CameraView.stopwatch.elapsed}');
+    // Save score before resetting
+    if (CameraView.stopwatch.elapsed.inSeconds > 0) {
+      print('Saving score before reset...');
+      _saveWorkoutScore();
+    }
+    
     CameraView.stopwatch.reset();
     CameraView.isStopwatchRunning = false;
     CameraView.stopwatchTimer?.cancel();

@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\src\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\tamai\Documents\PeakForm\PeakForm"
+export "FLUTTER_ROOT=C:\Users\Rourou nse ftourou\OneDrive\Documents\flutter"
+export "FLUTTER_APPLICATION_PATH=E:\Wi-ing\6. Semester\google-ML\PeakForm"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
