@@ -148,7 +148,7 @@ class RunningAverage {
   int get count => _count;
 }
 
-/*
+
 class SlidingAverage {
   final int windowSize;
   final List<double> _values;
@@ -169,7 +169,7 @@ class SlidingAverage {
 
   double get average => _sum / windowSize;
   int get count => _values.length;
-} */
+}
 
 
 //die Tolleranz soll bei 45 grad erreicht sein und bis dann stetig fallen
@@ -195,7 +195,7 @@ class TimedPose {
 
 
 //klasse zum lesen und Aktualliseren der Daten für die Lateral rises
-class lateral_rises {
+class Lateral_rises {
   late Pose pose; // wird immer aktualisert
 
   late Vector2 r_Shoulder;
@@ -265,7 +265,7 @@ class lateral_rises {
 
   //init then allways set dann get wesh joint und start bewertung und dann bewertung und zustands veränderung
 
-  lateral_rises();
+  //lateral_rises();
 
   //trotzdem funktion zum aktualisieren
 
@@ -366,8 +366,9 @@ class lateral_rises {
 
   //mit camera_view starten
   // vlt werte als klassen variable machen ?
-  intolerance_t_pose_starter({camera_view, tolerance_wes = 20.0, tolerance_esh = 30.0, intolerance = 1.2}){
-    if (started || !is_wesh()) return;
+  bool intolerance_t_pose_starter({tolerance_wes = 20.0, tolerance_esh = 30.0, intolerance = 1.2}){
+    if (started) return true;
+    if (!is_wesh()) return false;
     double high_intolerance_wesh_r = scorewithTolerances(180, r_wes_angl, tolerance_wes) * scorewithTolerances(90.0, r_esh_angl, tolerance_esh);
     double high_intolerance_wesh_l = scorewithTolerances(180, l_wes_angl, tolerance_wes) * scorewithTolerances(90.0, l_esh_angl, tolerance_esh);
     print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r).toString());
@@ -375,8 +376,11 @@ class lateral_rises {
       started = true;
       //camera_view.CameraView._startStopwatch();
       //camera_view.CameraView.isStopwatchRunning = true;
-      camera_view.CameraView.pose_Stopwatch_activation_bool = true; //umgeht einigen shit und soft dafür das bei der einmalige init pose die stopuhr mit angeht
+      //camera_view.CameraView.pose_Stopwatch_activation_bool = true
+      //activate_watch = true; //umgeht einigen shit und soft dafür das bei der einmalige init pose die stopuhr mit angeht
+      return true;
     }
+    return false;
   }
 
   //mit score zum adden
@@ -391,15 +395,22 @@ class lateral_rises {
     r_wesh_score = (r_wes_score + r_esh_score)/2;
     l_wesh_score = (l_wes_score + l_esh_score)/2;
 
+    print("t_Score: " + r_wesh_score.toString());
+    print("t_Score: " + l_wesh_score.toString());
+
     Score.add(r_wesh_score);
     Score.add(l_wesh_score);
 
     print("P_Score: " + (Score.average).toString());
     print("r_ARM (wes): " + r_wes_angl.toString());
     print("r_HIP (esh): " + r_esh_angl.toString());
+    return true;
   }
 
   state_change(){
+
+    //erstmal die oberfunktionen ausführen sodass nur noch der aufruf statechange gebraucht wird
+
     if (angle_status >= lar_angels.length-1){
       angle_up = true;
     } else if (angle_status <= 0) {

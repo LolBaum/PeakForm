@@ -23,9 +23,11 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   CustomPaint? _customPaint;
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back;
+
   RunningAverage Score = RunningAverage();
-  //SlidingAverage Score = SlidingAverage(100);
+  //SlidingAverage Score = SlidingAverage(10);
   bool started = false;
+  Lateral_rises exercise = Lateral_rises();
 
   @override
   void dispose() async {
@@ -57,7 +59,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     List<TimedPose> recordedPoses = []; // for timestamps
 
     final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
-    final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
+    //final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
 
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
@@ -85,12 +87,25 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print("Z: ${z}");
         }
         */
-
-
         //print('${pose.landmarks.keys} at (${pose.landmarks.position.x}, ${landmark.position.y})');
         //pose.landmarks.entries.first.value.x
         //print('${pose.landmarks.keys} at (${pose.landmarks.values.}, ${landmark.position.y})');
         //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
+
+        //--------
+
+        exercise.set_new_pose(pose);
+        exercise.get_lr_wesh();
+        exercise.compute_wesh_joints();
+        //print("P_Score: " + Score.average.toString());
+        camera_view.CameraView.pose_Stopwatch_activation_bool = exercise.intolerance_t_pose_starter();
+        //gucken wie man diesen ausdruck bekommt und dann testen
+        if(camera_view.CameraView.pose_Stopwatch_activation_bool){
+          if(exercise.evaluation(Score)){
+            exercise.state_change();
+          }
+        }
+
 
 
         //ein init und dann aktuallisieren
