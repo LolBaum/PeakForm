@@ -12,8 +12,7 @@ class CameraView extends StatefulWidget {
       {Key? key,
       required this.customPaint,
       required this.onImage,
-
-      this.onCameraFeedReady,
+        this.onCameraFeedReady,
       this.onDetectorViewModeChanged,
       this.onCameraLensDirectionChanged,
       this.initialCameraLensDirection = CameraLensDirection.back})
