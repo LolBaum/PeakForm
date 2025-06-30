@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/frosted_glasst_button.dart';
-import '../main.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -20,9 +20,10 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
-    logger.i('CameraScreen initialized with ${widget.cameras.length} cameras');
+    LoggingService.instance
+        .i('CameraScreen initialized with ${widget.cameras.length} cameras');
     final firstCamera = widget.cameras.first;
-    logger
+    LoggingService.instance
         .i('Using camera: ${firstCamera.name} (${firstCamera.lensDirection})');
     _controller = CameraController(
       firstCamera,
@@ -30,44 +31,46 @@ class _CameraScreenState extends State<CameraScreen> {
       enableAudio: true,
     );
     _initializeControllerFuture = _controller.initialize().then((_) {
-      logger.i('Camera controller initialized successfully');
+      LoggingService.instance.i('Camera controller initialized successfully');
       _controller.setFocusMode(FocusMode.auto);
     });
   }
 
   @override
   void dispose() {
-    logger.i('CameraScreen disposed');
+    LoggingService.instance.i('CameraScreen disposed');
     _controller.dispose();
     super.dispose();
   }
 
   Future<void> _toggleRecording() async {
     if (!_controller.value.isInitialized) {
-      logger.i('Cannot toggle recording - camera not initialized');
+      LoggingService.instance
+          .i('Cannot toggle recording - camera not initialized');
       return;
     }
     if (_isRecording) {
-      logger.i('Stopping video recording');
+      LoggingService.instance.i('Stopping video recording');
       try {
         final XFile videoFile = await _controller.stopVideoRecording();
         setState(() => _isRecording = false);
-        logger.i('Video recording stopped successfully: ${videoFile.path}');
+        LoggingService.instance
+            .i('Video recording stopped successfully: ${videoFile.path}');
         if (mounted) {
           Navigator.of(context).pop(videoFile.path);
         }
       } catch (e) {
-        logger.i('Error stopping video recording: $e');
+        LoggingService.instance.i('Error stopping video recording: $e');
         debugPrint("Error on canceling the Recoridng: $e");
       }
     } else {
-      logger.i('Starting video recording');
+      LoggingService.instance.i('Starting video recording');
       try {
         await _controller.startVideoRecording();
         setState(() => _isRecording = true);
-        logger.i('Video recording started successfully');
+        LoggingService.instance.i('Video recording started successfully');
       } catch (e) {
-        logger.i('Error starting video recording: $e');
+        LoggingService.instance.i('Error starting video recording: $e');
         debugPrint("Error on start of the recording: $e");
       }
     }
@@ -104,7 +107,7 @@ class _CameraScreenState extends State<CameraScreen> {
               children: [
                 FrostedGlassButton(
                   onTap: () {
-                    logger.i('Flash button pressed');
+                    LoggingService.instance.i('Flash button pressed');
                     debugPrint("Error on canceling the Recoridng");
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Frost-Button gedrückt")),
@@ -114,7 +117,8 @@ class _CameraScreenState extends State<CameraScreen> {
                 ),
                 FrostedGlassButton(
                   onTap: () {
-                    logger.i('Close button pressed - exiting camera screen');
+                    LoggingService.instance
+                        .i('Close button pressed - exiting camera screen');
                     Navigator.of(context).pop();
                   },
                   child: const Icon(Icons.close, color: Colors.white),

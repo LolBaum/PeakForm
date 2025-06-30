@@ -7,6 +7,8 @@ import 'package:logger/logger.dart';
 import 'package:fitness_app/util/axiom_log_output.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fitness_app/util/logging_service.dart';
+import 'package:fitness_app/util/custom_pretty_printer.dart';
 
 late final Logger logger;
 
@@ -30,15 +32,7 @@ Future<void> main() async {
 
   // Initialize the logger with the credentials from .env
   logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 1, // number of method calls to be displayed
-      errorMethodCount: 8, // number of method calls if stacktrace is provided
-      lineLength: 120, // width of the output
-      colors: true, // Colorful log messages
-      printEmojis: true, // Print an emoji for each log message
-      dateTimeFormat:
-          DateTimeFormat.onlyTime, // Should each log print contain a timestamp
-    ),
+    printer: kDebugMode ? CustomPrettyPrinter() : SimplePrinter(),
     output: MultiOutput([
       ConsoleOutput(),
       // Only send to Axiom in production mode
@@ -51,13 +45,20 @@ Future<void> main() async {
     filter: kReleaseMode ? ProductionFilter() : DevelopmentFilter(),
   );
 
-  logger.i('Logger initialized successfully.');
+  await LoggingService.instance.init(logger);
+  LoggingService.instance.setScreenContext("AppStart");
+  LoggingService.instance.setUserContext(
+      id: dotenv.env['USER_ID'] ?? '123',
+      email: dotenv.env['USER_EMAIL'] ?? 'test@test.com',
+      username: dotenv.env['USER_NAME'] ?? 'test');
 
   // Test logging in different modes
   if (kDebugMode) {
-    logger.i('🔧 Running in DEBUG mode - logs will appear in console');
+    LoggingService.instance
+        .i('🔧 Running in DEBUG mode - logs will appear in console');
   } else {
-    logger.i('🚀 Running in PRODUCTION mode - logs will be sent to Axiom');
+    LoggingService.instance
+        .i('🚀 Running in PRODUCTION mode - logs will be sent to Axiom');
   }
 
   return runApp(const FitnessApp());
@@ -75,7 +76,8 @@ class FitnessApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(userName: 'Norhene'),
+        '/': (context) =>
+            HomeScreen(userName: dotenv.env['USER_NAME'] ?? 'User'),
         '/video': (context) => const VideoScreen(),
         '/gym': (context) => const GymScreen(),
         '/result': (context) => const ResultScreen(),

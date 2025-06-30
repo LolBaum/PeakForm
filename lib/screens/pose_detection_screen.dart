@@ -7,7 +7,7 @@ import 'package:fitness_app/providers/pose_detection_provider.dart';
 import 'package:fitness_app/frosted_glasst_button.dart';
 import 'dart:async';
 import 'package:fitness_app/widgets/pose_painter.dart';
-import '../main.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class PoseDetectionScreen extends StatefulWidget {
   const PoseDetectionScreen({super.key});
@@ -28,7 +28,7 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   @override
   void initState() {
     super.initState();
-    logger.i('PoseDetectionScreen initialized');
+    LoggingService.instance.i('PoseDetectionScreen initialized');
     if (defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS) {
       _requestPermissions();
@@ -39,16 +39,16 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   ///
   /// This method is responsible for requesting permissions to use the camera.
   Future<void> _requestPermissions() async {
-    logger.i('Requesting camera permissions');
+    LoggingService.instance.i('Requesting camera permissions');
     final status = await Permission.camera.request();
     if (status.isGranted) {
-      logger.i('Camera permission granted');
+      LoggingService.instance.i('Camera permission granted');
       setState(() {
         _permissionGranted = true;
       });
       _initializeCamera();
     } else {
-      logger.i('Camera permission denied: $status');
+      LoggingService.instance.i('Camera permission denied: $status');
       _showPermissionDialog();
     }
   }
@@ -58,7 +58,7 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   /// This method is responsible for showing a dialog to the user to request permissions.
   /// It uses the PermissionHandler to request permissions.
   void _showPermissionDialog() {
-    logger.i('Showing permission dialog to user');
+    LoggingService.instance.i('Showing permission dialog to user');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -69,14 +69,15 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              logger.i('User cancelled permission request');
+              LoggingService.instance.i('User cancelled permission request');
               Navigator.pop(context);
             },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
-              logger.i('User opened app settings for permission');
+              LoggingService.instance
+                  .i('User opened app settings for permission');
               Navigator.pop(context);
               openAppSettings();
             },
@@ -92,10 +93,10 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   /// This method is responsible for initializing the camera.
   /// It uses the PoseDetectionProvider to initialize the camera.
   Future<void> _initializeCamera() async {
-    logger.i('Initializing camera through provider');
+    LoggingService.instance.i('Initializing camera through provider');
     final provider = Provider.of<PoseDetectionProvider>(context, listen: false);
     await provider.initializeCamera();
-    logger.i('Camera initialization completed');
+    LoggingService.instance.i('Camera initialization completed');
   }
 
   /// Build

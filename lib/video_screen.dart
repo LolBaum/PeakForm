@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'constants/constants.dart';
-import 'main.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class VideoScreen extends StatelessWidget {
   const VideoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    logger.i('VideoScreen displayed');
+    LoggingService.instance.i('VideoScreen displayed');
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -19,7 +19,8 @@ class VideoScreen extends StatelessWidget {
             children: [
               IconButton(
                   onPressed: () {
-                    logger.i('User navigated back from video screen');
+                    LoggingService.instance
+                        .i('User navigated back from video screen');
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.arrow_back)),
@@ -76,7 +77,8 @@ class VideoScreen extends StatelessWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  logger.i('User pressed START button on video screen');
+                  LoggingService.instance
+                      .i('User pressed START button on video screen');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: green,

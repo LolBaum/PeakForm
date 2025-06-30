@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'constants/constants.dart';
-import 'main.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
@@ -24,7 +24,7 @@ class GymScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.i('GymScreen displayed');
+    LoggingService.instance.i('GymScreen displayed');
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
@@ -48,7 +48,8 @@ class GymScreen extends StatelessWidget {
                     children: [
                       IconButton(
                           onPressed: () {
-                            logger.i('User navigated back from gym screen');
+                            LoggingService.instance
+                                .i('User navigated back from gym screen');
                             Navigator.pop(context);
                           },
                           icon: const Icon(Icons.arrow_back)),
@@ -100,7 +101,7 @@ class GymScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 6.0),
                           child: ElevatedButton(
                             onPressed: () {
-                              logger.i(
+                              LoggingService.instance.i(
                                   'User selected exercise: ${exercises[index]}');
                             },
                             style: ElevatedButton.styleFrom(

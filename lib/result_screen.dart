@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    logger.i('ResultScreen displayed');
+    LoggingService.instance.i('ResultScreen displayed');
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -22,7 +22,8 @@ class ResultScreen extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      logger.i('User navigated back from result screen');
+                      LoggingService.instance
+                          .i('User navigated back from result screen');
                       Navigator.pop(context);
                     },
                   ),
@@ -136,7 +137,8 @@ class ResultScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    logger.i('User pressed "Weiter" button on result screen');
+                    LoggingService.instance
+                        .i('User pressed "Weiter" button on result screen');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF006D42),

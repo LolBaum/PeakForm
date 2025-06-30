@@ -14,7 +14,9 @@ dependencies:
   logger: ^2.3.0
   http: ^1.2.1
   flutter_dotenv: ^5.1.0
-
+  package_info_plus: ^8.0.0 # For app version and build number
+  device_info_plus: ^10.1.0 # For device model, OS version
+  uuid: ^4.4.0 # To generate unique session IDs
   camera: any
   provider: any
   permission_handler: any

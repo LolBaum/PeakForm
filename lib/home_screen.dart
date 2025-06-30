@@ -4,24 +4,16 @@ import 'package:provider/provider.dart';
 import 'constants/constants.dart';
 import 'screens/pose_detection_screen.dart';
 import 'providers/pose_detection_provider.dart';
-import 'main.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
 
   const HomeScreen({super.key, this.userName = "User"});
 
-  void _log(String message) {
-    try {
-      logger.i(message);
-    } catch (e) {
-      debugPrint('HomeScreen: $message');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    _log('HomeScreen built for user: $userName');
+    LoggingService.instance.i('HomeScreen built for user: $userName');
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
@@ -142,7 +134,7 @@ class HomeScreen extends StatelessWidget {
                             const SizedBox(height: 6),
                             GestureDetector(
                               onTap: () {
-                                _log(
+                                LoggingService.instance.i(
                                     'Aufnehmen button tapped - starting pose detection');
                                 Navigator.push(
                                   context,
@@ -217,7 +209,7 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         String buttonName = icon == Icons.bar_chart ? 'Charts' : 'Settings';
-        _log('Circular icon button tapped: $buttonName');
+        LoggingService.instance.i('Circular icon button tapped: $buttonName');
       },
       child: Container(
         width: 44,
@@ -234,7 +226,8 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: route != null
           ? () {
-              _log('Sport tile tapped: $title (route: $route)');
+              LoggingService.instance
+                  .i('Sport tile tapped: $title (route: $route)');
               Navigator.pushNamed(context, route);
             }
           : null,
