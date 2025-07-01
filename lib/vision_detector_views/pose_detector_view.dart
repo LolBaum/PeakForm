@@ -75,6 +75,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   "Moving Direction: $dir",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
+                arm_bent ? Text(
+                  "Arm ist not straight!",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ) : SizedBox.shrink(),
               ],
             ),
           ),
@@ -82,7 +86,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       ],
     );
   }
-
 
   int reps = 0;
   bool armsUp = false;
@@ -94,6 +97,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   bool direction_changed = false;
   DateTime? _lastActionTime;
   final Duration _cooldown = Duration(milliseconds: 250);
+  int bentArm_count = 0;
+  bool arm_bent = false;
 
   void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
     const double raiseThreshold = 85.0;
@@ -122,6 +127,22 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     }
   }
 
+  void checkElbowAngle(double leftAngle, double rightAngle){
+    double tolerance = 30.0;
+    double lowerTolerance = 180.0 - tolerance;
+
+    if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
+      bentArm_count++;
+    } else{
+      bentArm_count = 0;
+      arm_bent = false;
+    }
+
+    if(bentArm_count > 20){
+      print("Arm is not straight");
+      arm_bent = true;
+    }
+  }
 
   Future<void> _processImage(InputImage inputImage) async {
     if (!_canProcess) return;
@@ -182,7 +203,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //scores einfluss kann hier mit der certenty gewichtet werden
         //scoreForLAt rise zu score with tolerances ersätzen
 
-
         double r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
           double r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
           double l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
@@ -219,9 +239,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             //print("r_HIP (esh): " + r_esh_angl.toString());
 
             checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
+            checkElbowAngle(l_wes_angl, r_wes_angl);
 
           }
-
 
           double angleShoulder_r = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
           bufferShoulder_r.add(angleShoulder_r);
