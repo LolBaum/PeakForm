@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-import 'package:circular_buffer/circular_buffer.dart';
+//import 'package:circular_buffer/circular_buffer.dart';
 
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
@@ -23,10 +23,13 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   CustomPaint? _customPaint;
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back;
+
   RunningAverage Score = RunningAverage();
+  //SlidingAverage Score = SlidingAverage(10);
   bool started = false;
 
   var bufferShoulder_r = CircularBuffer<double>(10);
+  Lateral_rises exercise = Lateral_rises();
 
   @override
   void dispose() async {
@@ -155,7 +158,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     List<TimedPose> recordedPoses = []; // for timestamps
 
     final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
-    final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
+    //final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
 
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
@@ -179,6 +182,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           return vec;
         }
 
+        //to be removed
         late Vector2 r_Shoulder;
         late Vector2 r_Elbow;
         late Vector2 r_Wrist;
@@ -188,6 +192,21 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         r_Elbow    = getLandmarkOrError("rightElbow", "Fehler beim Erkennen des rechten Ellenbogens");
         r_Wrist    = getLandmarkOrError("rightWrist", "Fehler beim Erkennen des rechten Handgelenks");
         r_Hip      = getLandmarkOrError("rightHip", "Fehler beim Erkennen der rechten Hüfte");
+        exercise.set_new_pose(pose);
+        exercise.get_lr_wesh();
+        exercise.compute_wesh_joints();
+        //print("P_Score: " + Score.average.toString());
+        camera_view.CameraView.pose_Stopwatch_activation_bool = exercise.intolerance_t_pose_starter();
+        //gucken wie man diesen ausdruck bekommt und dann testen
+        if(camera_view.CameraView.pose_Stopwatch_activation_bool){
+          if(exercise.evaluation(Score)){
+            exercise.state_change();
+          }
+        }
+
+
+
+        //ein init und dann aktuallisieren
 
         late Vector2 l_Shoulder;
         late Vector2 l_Elbow;
@@ -294,45 +313,13 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //TODO: Testen wie sich der Average verhällt
 
-
-        //oben:95+-5  unter 96
-        //mitte:60+-2
-        //unten:7+-1grad
-
-
         //prozent an korrektheit averagen
 
         //wrist unter ellenbogeen für winkelunterscheideung
         // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
         // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
 
-        /*
-          leftShoulder,
-          rightShoulder,
-          leftElbow,
-          rightElbow,
-          leftWrist,
-          rightWrist,
 
-          leftPinky,
-          rightPinky,
-          leftIndex,
-          rightIndex,
-          leftThumb,
-          rightThumb,
-
-          leftHip,
-          rightHip,
-          leftKnee,
-          rightKnee,
-          leftAnkle,
-          rightAnkle,
-          leftHeel,
-          rightHeel,
-          leftFootIndex,
-          rightFootIndex
-
-         */
 
       }
       for(TimedPose p in recordedPoses){

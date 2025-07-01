@@ -29,6 +29,8 @@ class CameraView extends StatefulWidget {
   final Function(CameraLensDirection direction)? onCameraLensDirectionChanged;
   final CameraLensDirection initialCameraLensDirection;
 
+  static bool pose_Stopwatch_activation_bool = false;
+
   @override
   State<CameraView> createState() => _CameraViewState();
 }
@@ -360,6 +362,7 @@ class _CameraViewState extends State<CameraView> {
     
     // Update FPS calculation
     _updateFps();
+    _pose_Stopwatch_activation(); //vlt hier probieren ?
     
     widget.onImage(inputImage);
   }
@@ -378,6 +381,7 @@ class _CameraViewState extends State<CameraView> {
       // Update UI
       if (mounted) {
         setState(() {});
+        //_pose_Stopwatch_activation(); //ganz nasty einfach rein
       }
     }
   }
@@ -461,6 +465,13 @@ class _CameraViewState extends State<CameraView> {
           });
         }
       });
+    }
+  }
+
+  void _pose_Stopwatch_activation() {
+    if (CameraView.pose_Stopwatch_activation_bool) {
+      _startStopwatch();
+      CameraView.pose_Stopwatch_activation_bool = false;
     }
   }
 
