@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-//import 'package:circular_buffer/circular_buffer.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
@@ -30,6 +30,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
   var bufferShoulder_r = CircularBuffer<double>(10);
   Lateral_rises exercise = Lateral_rises();
+  MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
 
   @override
   void dispose() async {
@@ -58,27 +59,27 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  armsUp ? "Beide Arme oben!" : "Arme unten",
+                  lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  "Wiederholungen: $reps",
+                  "Wiederholungen: ${lateral_rises.reps}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
-                  "Elbow Angle: $elbowAngle_r",
+                  "Elbow Angle: ${lateral_rises.secondary_angle}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
-                  "Right Lateral Angle: $lateralAngle_r",
+                  "Right Lateral Angle: ${lateral_rises.angle}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
-                  "Moving Direction: $dir",
+                  "Moving Direction: ${lateral_rises.dir}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                arm_bent ? Text(
+                lateral_rises.dir == direction.up ? Text(
                   "Arm ist not straight!",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ) : SizedBox.shrink(),
@@ -90,62 +91,22 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     );
   }
 
-  int reps = 0;
-  bool armsUp = false;
-  double lateralAngle_r = 0;
-  double elbowAngle_r = 0;
-  double min_r = 180;
-  double max_r = 0;
-  direction dir = direction.down;
-  bool direction_changed = false;
-  DateTime? _lastActionTime;
-  final Duration _cooldown = Duration(milliseconds: 250);
-  int bentArm_count = 0;
-  bool arm_bent = false;
+  //int reps = 0;
+  // bool armsUp = false;
+  // double lateralAngle_r = 0;
+  // double elbowAngle_r = 0;
+  // double min_r = 180;
+  // double max_r = 0;
+  // direction dir = direction.down;
+  // bool direction_changed = false;
+  // DateTime? _lastActionTime;
+  // final Duration _cooldown = Duration(milliseconds: 250);
+  // int bentArm_count = 0;
+  // bool arm_bent = false;
 
-  void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
-    const double raiseThreshold = 85.0;
-    const double lowerThreshold = 35.0;
 
-    lateralAngle_r = rightAngle;
 
-    bool leftArmUp = leftAngle > raiseThreshold;
-    bool rightArmUp = rightAngle > raiseThreshold;
-    bool leftArmDown = leftAngle < lowerThreshold;
-    bool rightArmDown = rightAngle < lowerThreshold;
 
-    if (!armsUp && leftArmUp && rightArmUp) {
-      setState(() {
-        armsUp = true;
-      });
-      print("Beide Arme oben angekommen!");
-    }
-
-    if (armsUp && leftArmDown && rightArmDown) {
-      setState(() {
-        armsUp = false;
-        reps++;
-      });
-      print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
-    }
-  }
-
-  void checkElbowAngle(double leftAngle, double rightAngle){
-    double tolerance = 30.0;
-    double lowerTolerance = 180.0 - tolerance;
-
-    if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
-      bentArm_count++;
-    } else{
-      bentArm_count = 0;
-      arm_bent = false;
-    }
-
-    if(bentArm_count > 20){
-      print("Arm is not straight");
-      arm_bent = true;
-    }
-  }
 
   Future<void> _processImage(InputImage inputImage) async {
     if (!_canProcess) return;
@@ -231,7 +192,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           double l_wsh_angl = computeJointAngle_2d(a: l_Hip, b: l_Shoulder, c: l_Wrist);
           double r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
 
-          elbowAngle_r = r_wes_angl;
 
         if (!started){
             double high_intolerance_wesh_r = scorewithTolerances(180, r_wes_angl, 20.0) * scorewithTolerances(90.0, r_wsh_angl, 30.0);
@@ -252,58 +212,18 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
             print("P_Score: " + (Score.average).toString());
             //print("r_ARM (wes): " + r_wes_angl.toString());
-            print("ARM_UP: " + armsUp.toString());
+            print("ARM_UP: " + lateral_rises.dir.toString());
             print("r_HIP_WRIST_SHOULDER (wsh): " + r_wsh_angl.toString());
             print("l_HIP_WRIST_SHOULDER (wsh): " + l_wsh_angl.toString());
             //print("r_HIP (esh): " + r_esh_angl.toString());
 
-            checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
-            checkElbowAngle(l_wes_angl, r_wes_angl);
+            lateral_rises.checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
+            lateral_rises.checkElbowAngle(l_wes_angl, r_wes_angl);
 
           }
 
-          double angleShoulder_r = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
-          bufferShoulder_r.add(angleShoulder_r);
-          print(bufferShoulder_r);
-          print(angleShoulder_r);
 
-          final average = bufferShoulder_r.toList().reduce((a, b) => a + b) / bufferShoulder_r.length;
-
-          print('Buffer: ${bufferShoulder_r.toList()} → Average: ${average.toStringAsFixed(2)}');
-          print(dir);
-          if(dir == direction.down){ // Down -> Up
-            if (min_r < average){
-              direction_changed = true;
-              min_r = 180;
-            }else{
-              min_r = average;
-            }
-          }
-          else{ // up -> down
-            if (max_r > average){
-              direction_changed = true;
-              max_r = 0;
-            }else{
-              max_r = average;
-            }
-          }
-
-          if (direction_changed == true){
-            // TODO: Evaluate the Position
-            direction_changed = false;
-
-            final now = DateTime.now();
-            if (_lastActionTime == null ||
-                now.difference(_lastActionTime!) > _cooldown) {
-              if (dir == direction.up){
-                dir = direction.down;
-              }
-              else{
-                dir = direction.up;
-              }
-              _lastActionTime = now;
-            }
-          }
+          lateral_rises.update_angles(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip), r_wes_angl);
 
 
 

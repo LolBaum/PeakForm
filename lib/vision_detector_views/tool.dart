@@ -3,20 +3,116 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 import 'pose_detector_view.dart';
 import 'package:vector_math/vector_math_64.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 
 enum direction{up, down}
 
-/*
+
 class MovementReference {
   double upperAngle;
   double lowerAngle;
   double tolerance;
   double minTime;
-  bool isConstant;
-  bool started;
+  direction dir = direction.down;
+  bool direction_changed = false;
+  DateTime? _lastActionTime;
+  final Duration _cooldown = Duration(milliseconds: 250);
+  var buffer = CircularBuffer<double>(10);
+  double angle = 0;
+  double secondary_angle = 180;
+  double min_r = 180;
+  double max_r = 0;
+  double average = 0;
+  int bent_count = 0;
+  bool bent = false;
+  int reps = 0;
 
-  MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime, this.isConstant);
-} */
+
+
+  MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime);
+
+  void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
+    const double raiseThreshold = 85.0;
+    const double lowerThreshold = 35.0;
+
+    bool leftArmUp = leftAngle > raiseThreshold;
+    bool rightArmUp = rightAngle > raiseThreshold;
+    bool leftArmDown = leftAngle < lowerThreshold;
+    bool rightArmDown = rightAngle < lowerThreshold;
+
+    if (dir == direction.down && leftArmUp && rightArmUp) {
+        dir = direction.up;
+      print("Beide Arme oben angekommen!");
+    }
+
+    if (dir == direction.up && leftArmDown && rightArmDown) {
+        dir = direction.down;
+        reps++;
+      print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
+    }
+  }
+
+  void checkElbowAngle(double leftAngle, double rightAngle){
+    double tolerance = 30.0;
+    double lowerTolerance = 180.0 - tolerance;
+
+    if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
+      bent_count++;
+    } else{
+      bent_count = 0;
+      bent = false;
+    }
+
+    if(bent_count > 20){
+      print("Arm is not straight");
+      bent = true;
+    }
+  }
+
+  void update_angles(double a, double b){
+    angle=a;
+    secondary_angle=b;
+    buffer.add(angle);
+    average = buffer.toList().reduce((a, b) => a + b) / buffer.length;
+  }
+
+  void update_direction(){
+    if(dir == direction.down){ // Down -> Up
+      if (min_r < average){
+        direction_changed = true;
+        min_r = 180;
+      }else{
+        min_r = average;
+      }
+    }
+    else{ // up -> down
+      if (max_r > average){
+        direction_changed = true;
+        max_r = 0;
+      }else{
+        max_r = average;
+      }
+    }
+
+    if (direction_changed == true){
+      // TODO: Evaluate the Position
+      direction_changed = false;
+
+      final now = DateTime.now();
+      if (_lastActionTime == null ||
+          now.difference(_lastActionTime!) > _cooldown) {
+        if (dir == direction.up){
+          dir = direction.down;
+        }
+        else{
+          dir = direction.up;
+        }
+        _lastActionTime = now;
+      }
+    }
+  }
+
+}
 
 //pro übung eine liste an toleranzen und winkel erstellen
 
