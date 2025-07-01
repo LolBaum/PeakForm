@@ -172,7 +172,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
       for (Pose pose in poses) {
 
-        recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
+        //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
 
         Vector2 getLandmarkOrError(String landmarkName, String errorText) {
           Vector2? vec = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), landmarkName);
