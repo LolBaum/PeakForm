@@ -26,7 +26,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   RunningAverage Score = RunningAverage();
   bool started = false;
 
-  var bufferShoulder_r = CircularBuffer<double>(5);
+  var bufferShoulder_r = CircularBuffer<double>(10);
 
   @override
   void dispose() async {
@@ -92,6 +92,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   double max_r = 0;
   direction dir = direction.down;
   bool direction_changed = false;
+  DateTime? _lastActionTime;
+  final Duration _cooldown = Duration(milliseconds: 250);
 
   void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
     const double raiseThreshold = 85.0;
@@ -232,7 +234,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           print(dir);
           if(dir == direction.down){ // Down -> Up
             if (min_r < average){
-              dir = direction.up;
               direction_changed = true;
               min_r = 180;
             }else{
@@ -241,7 +242,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           }
           else{ // up -> down
             if (max_r > average){
-              dir = direction.down;
               direction_changed = true;
               max_r = 0;
             }else{
@@ -252,6 +252,18 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           if (direction_changed == true){
             // TODO: Evaluate the Position
             direction_changed = false;
+
+            final now = DateTime.now();
+            if (_lastActionTime == null ||
+                now.difference(_lastActionTime!) > _cooldown) {
+              if (dir == direction.up){
+                dir = direction.down;
+              }
+              else{
+                dir = direction.up;
+              }
+              _lastActionTime = now;
+            }
           }
 
 
