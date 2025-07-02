@@ -194,23 +194,22 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //scoreForLAt rise zu score with tolerances ersätzen
 
 
-          elbowAngle_r = exercise.r_wes_angl;
+        elbowAngle_r = exercise.r_wes_angl;
 
-          //lateral_rises.checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
-          //lateral_rises.checkElbowAngle(l_wes_angl, r_wes_angl);
+        //lateral_rises.checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
+        //lateral_rises.checkElbowAngle(l_wes_angl, r_wes_angl);
 
-          bufferShoulder_r.add(exercise.r_esh_angl);
-          print(bufferShoulder_r);
-          print(exercise.r_esh_angl);
-
-
-          lateral_rises.update_angles(exercise.r_esh_angl, exercise.r_wes_angl);
+        bufferShoulder_r.add(exercise.r_esh_angl);
+        print(bufferShoulder_r);
+        print(exercise.r_esh_angl);
 
 
+        lateral_rises.update_angles(exercise.r_esh_angl, exercise.r_wes_angl);
 
-          //todo store min / max average angle.
-          //if difference ~5 away from value -> change direction
 
+
+        //todo store min / max average angle.
+        //if difference ~5 away from value -> change direction
 
         //TODO: Testen wie sich der Average verhällt
 
