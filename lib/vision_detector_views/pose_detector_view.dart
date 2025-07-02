@@ -205,6 +205,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
 
         lateral_rises.update_angles(exercise.r_esh_angl, exercise.r_wes_angl);
+        lateral_rises.update_direction();
 
 
 
