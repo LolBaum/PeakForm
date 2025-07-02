@@ -24,8 +24,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   String? _text;
   var _cameraLensDirection = CameraLensDirection.back;
 
-  RunningAverage Score = RunningAverage();
-  //SlidingAverage Score = SlidingAverage(10);
+  //RunningAverage Score = RunningAverage();
+  SlidingAverage Score = SlidingAverage(10);
   bool started = false;
 
   var bufferShoulder_r = CircularBuffer<double>(10);
@@ -91,22 +91,62 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     );
   }
 
-  //int reps = 0;
-  // bool armsUp = false;
-  // double lateralAngle_r = 0;
-  // double elbowAngle_r = 0;
-  // double min_r = 180;
-  // double max_r = 0;
-  // direction dir = direction.down;
-  // bool direction_changed = false;
-  // DateTime? _lastActionTime;
-  // final Duration _cooldown = Duration(milliseconds: 250);
-  // int bentArm_count = 0;
-  // bool arm_bent = false;
+  int reps = 0;
+  bool armsUp = false;
+  double lateralAngle_r = 0;
+  double elbowAngle_r = 0;
+  double min_r = 180;
+  double max_r = 0;
+  direction dir = direction.down;
+  bool direction_changed = false;
+  DateTime? _lastActionTime;
+  final Duration _cooldown = Duration(milliseconds: 250);
+  int bentArm_count = 0;
+  bool arm_bent = false;
 
+  void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
+    const double raiseThreshold = 85.0;
+    const double lowerThreshold = 35.0;
 
+    lateralAngle_r = rightAngle;
 
+    bool leftArmUp = leftAngle > raiseThreshold;
+    bool rightArmUp = rightAngle > raiseThreshold;
+    bool leftArmDown = leftAngle < lowerThreshold;
+    bool rightArmDown = rightAngle < lowerThreshold;
 
+    if (!armsUp && leftArmUp && rightArmUp) {
+      setState(() {
+        armsUp = true;
+      });
+      print("Beide Arme oben angekommen!");
+    }
+
+    if (armsUp && leftArmDown && rightArmDown) {
+      setState(() {
+        armsUp = false;
+        reps++;
+      });
+      print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
+    }
+  }
+
+  void checkElbowAngle(double leftAngle, double rightAngle){
+    double tolerance = 30.0;
+    double lowerTolerance = 180.0 - tolerance;
+
+    if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
+      bentArm_count++;
+    } else{
+      bentArm_count = 0;
+      arm_bent = false;
+    }
+
+    if(bentArm_count > 20){
+      print("Arm is not straight");
+      arm_bent = true;
+    }
+  }
 
   Future<void> _processImage(InputImage inputImage) async {
     if (!_canProcess) return;
@@ -135,24 +175,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
 
-        Vector2 getLandmarkOrError(String landmarkName, String errorText) {
-          Vector2? vec = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), landmarkName);
-          if (vec == null) {
-            throw Exception(errorText);
-          }
-          return vec;
-        }
-
-        //to be removed
-        late Vector2 r_Shoulder;
-        late Vector2 r_Elbow;
-        late Vector2 r_Wrist;
-        late Vector2 r_Hip;
-
-        r_Shoulder = getLandmarkOrError("rightShoulder", "Fehler beim Erkennen der rechten Schulter");
-        r_Elbow    = getLandmarkOrError("rightElbow", "Fehler beim Erkennen des rechten Ellenbogens");
-        r_Wrist    = getLandmarkOrError("rightWrist", "Fehler beim Erkennen des rechten Handgelenks");
-        r_Hip      = getLandmarkOrError("rightHip", "Fehler beim Erkennen der rechten Hüfte");
         exercise.set_new_pose(pose);
         exercise.get_lr_wesh();
         exercise.compute_wesh_joints();
@@ -167,63 +189,22 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
 
 
-        //ein init und dann aktuallisieren
-
-        late Vector2 l_Shoulder;
-        late Vector2 l_Elbow;
-        late Vector2 l_Wrist;
-        late Vector2 l_Hip;
-
-        l_Shoulder = getLandmarkOrError("leftShoulder", "Fehler beim Erkennen der linken Schulter");
-        l_Elbow = getLandmarkOrError("leftElbow", "Fehler beim Erkennen des linken Ellenbogens");
-        l_Wrist = getLandmarkOrError("leftWrist", "Fehler beim Erkennen des linken Handgelenks");
-        l_Hip = getLandmarkOrError("leftHip", "Fehler beim Erkennen der linken Hüfte");
-
         //score wird erst berechnet wenn initial pose gefunden wird
         //scores einfluss kann hier mit der certenty gewichtet werden
         //scoreForLAt rise zu score with tolerances ersätzen
 
-        double r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
-          double r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
-          double l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
-          double l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
 
-          //die sind besser als esh
-          double l_wsh_angl = computeJointAngle_2d(a: l_Hip, b: l_Shoulder, c: l_Wrist);
-          double r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
+          elbowAngle_r = exercise.r_wes_angl;
 
+          //lateral_rises.checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
+          //lateral_rises.checkElbowAngle(l_wes_angl, r_wes_angl);
 
-        if (!started){
-            double high_intolerance_wesh_r = scorewithTolerances(180, r_wes_angl, 20.0) * scorewithTolerances(90.0, r_wsh_angl, 30.0);
-            double high_intolerance_wesh_l = scorewithTolerances(180, l_wes_angl, 20.0) * scorewithTolerances(90.0, l_wsh_angl, 30.0);
-            print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r).toString());
-            if((high_intolerance_wesh_l+high_intolerance_wesh_r) > 1.2){
-              started = true;
-              //camera_view.CameraView._startStopwatch();
-              camera_view.CameraView.isStopwatchRunning = true;
-            }
-          }
-
-          if(started){
-            double temp_score_r_wesh = (scorewithTolerances(180, r_wes_angl, 25.0) + scorewithTolerances(90.0, r_wsh_angl, 45.0))/2; //erstmal nur hips
-            Score.add(temp_score_r_wesh);
-            double temp_score_l_wesh = (scorewithTolerances(180, l_wes_angl, 25.0) + scorewithTolerances(90.0, l_wsh_angl, 45.0))/2; //erstmal nur hips
-            Score.add(temp_score_l_wesh);
-
-            print("P_Score: " + (Score.average).toString());
-            //print("r_ARM (wes): " + r_wes_angl.toString());
-            print("ARM_UP: " + lateral_rises.dir.toString());
-            print("r_HIP_WRIST_SHOULDER (wsh): " + r_wsh_angl.toString());
-            print("l_HIP_WRIST_SHOULDER (wsh): " + l_wsh_angl.toString());
-            //print("r_HIP (esh): " + r_esh_angl.toString());
-
-            lateral_rises.checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
-            lateral_rises.checkElbowAngle(l_wes_angl, r_wes_angl);
-
-          }
+          bufferShoulder_r.add(exercise.r_esh_angl);
+          print(bufferShoulder_r);
+          print(exercise.r_esh_angl);
 
 
-          lateral_rises.update_angles(computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip), r_wes_angl);
+          lateral_rises.update_angles(exercise.r_esh_angl, exercise.r_wes_angl);
 
 
 

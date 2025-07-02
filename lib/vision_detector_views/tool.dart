@@ -253,7 +253,7 @@ class SlidingAverage {
   double _sum;
 
   SlidingAverage(this.windowSize)
-      : _values = List.filled(windowSize, 1.0),
+      : _values = List.filled(windowSize, 1.0, growable: true),
         _sum = windowSize * 1.0;
 
   void add(double value) {
@@ -263,6 +263,10 @@ class SlidingAverage {
     // Neuen Wert hinzufügen
     _values.add(value);
     _sum += value;
+
+    if (_sum < 0){
+      _sum = 0;
+    }
   }
 
   double get average => _sum / windowSize;
@@ -303,11 +307,11 @@ class Lateral_rises {
   late Vector2 r_Wrist;
   late Vector2 r_Hip;
 
-
   late Vector2 l_Wrist;
   late Vector2 l_Elbow;
   late Vector2 l_Shoulder;
   late Vector2 l_Hip;
+
 
   bool r_w = false;
   bool r_e = false;
@@ -324,7 +328,22 @@ class Lateral_rises {
   late double l_wes_angl;
   late double l_esh_angl;
 
+  late double l_wsh_angl;
+  late double r_wsh_angl;
+
   bool started = false;
+
+  int angle_status = 0;
+  bool angle_up = false;
+  int wdhs = 0;
+
+  double r_wesh_score = 0.0;
+  double l_wesh_score = 0.0;
+
+  double r_wes_score = 0.0;
+  double r_esh_score = 0.0;
+  double l_wes_score = 0.0;
+  double l_esh_score = 0.0;
 
   //var lar_angels = [95.0, 60.0, 7.0];
 
@@ -349,17 +368,7 @@ class Lateral_rises {
   ).where((v) => lar_step > 0 ? v <= lar_max : v >= lar_min).toList();
   */
 
-  int angle_status = 0;
-  bool angle_up = false;
-  int wdhs = 0;
 
-  double r_wesh_score = 0.0;
-  double l_wesh_score = 0.0;
-
-  double r_wes_score = 0.0;
-  double r_esh_score = 0.0;
-  double l_wes_score = 0.0;
-  double l_esh_score = 0.0;
 
   //vlt einfach nur score machen und der guckt selber nach get pose und so
 
@@ -373,6 +382,37 @@ class Lateral_rises {
   set_new_pose(Pose p) {
     this.pose = p;
   }
+
+  /*
+  Vector2 getLandmarkOrError(String landmarkName, String errorText) {
+    Vector2? vec = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), landmarkName);
+    if (vec == null) {
+      throw Exception(errorText);
+    }
+    return vec;
+  }*/
+
+  /*
+        r_Shoulder = getLandmarkOrError("rightShoulder", "Fehler beim Erkennen der rechten Schulter");
+        r_Elbow    = getLandmarkOrError("rightElbow", "Fehler beim Erkennen des rechten Ellenbogens");
+        r_Wrist    = getLandmarkOrError("rightWrist", "Fehler beim Erkennen des rechten Handgelenks");
+        r_Hip      = getLandmarkOrError("rightHip", "Fehler beim Erkennen der rechten Hüfte");
+
+        l_Shoulder = getLandmarkOrError("leftShoulder", "Fehler beim Erkennen der linken Schulter");
+        l_Elbow = getLandmarkOrError("leftElbow", "Fehler beim Erkennen des linken Ellenbogens");
+        l_Wrist = getLandmarkOrError("leftWrist", "Fehler beim Erkennen des linken Handgelenks");
+        l_Hip = getLandmarkOrError("leftHip", "Fehler beim Erkennen der linken Hüfte");
+
+                  double r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
+          double r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
+          double l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
+          double l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
+
+          //die sind besser als esh
+          double l_wsh_angl = computeJointAngle_2d(a: l_Hip, b: l_Shoulder, c: l_Wrist);
+          double r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
+
+   */
 
   get_lr_wesh(){
 
@@ -462,17 +502,20 @@ class Lateral_rises {
     r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
     l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
     l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
+
+    l_wsh_angl = computeJointAngle_2d(a: l_Hip, b: l_Shoulder, c: l_Wrist);
+    r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
   }
 
   //mit camera_view starten
   // vlt werte als klassen variable machen ?
-  bool intolerance_t_pose_starter({tolerance_wes = 20.0, tolerance_esh = 30.0, intolerance = 1.2}){
+  bool intolerance_t_pose_starter({tolerance_wes = 25.0, tolerance_esh = 20.0, intolerance = 0.7}){
     if (started) return true;
     if (!is_wesh()) return false;
-    double high_intolerance_wesh_r = scorewithTolerances(180, r_wes_angl, tolerance_wes) * scorewithTolerances(90.0, r_esh_angl, tolerance_esh);
-    double high_intolerance_wesh_l = scorewithTolerances(180, l_wes_angl, tolerance_wes) * scorewithTolerances(90.0, l_esh_angl, tolerance_esh);
-    print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r).toString());
-    if((high_intolerance_wesh_l+high_intolerance_wesh_r) > intolerance){
+    double high_intolerance_wesh_r = scorewithTolerances(180, r_wes_angl, tolerance_wes) * scorewithTolerances(95.0, r_esh_angl, tolerance_esh);
+    double high_intolerance_wesh_l = scorewithTolerances(180, l_wes_angl, tolerance_wes) * scorewithTolerances(95.0, l_esh_angl, tolerance_esh);
+    print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r/2).toString());
+    if((high_intolerance_wesh_l+high_intolerance_wesh_r/2) > intolerance){
       started = true;
       //camera_view.CameraView._startStopwatch();
       //camera_view.CameraView.isStopwatchRunning = true;
@@ -495,15 +538,15 @@ class Lateral_rises {
     r_wesh_score = (r_wes_score + r_esh_score)/2;
     l_wesh_score = (l_wes_score + l_esh_score)/2;
 
-    print("t_Score: " + r_wesh_score.toString());
-    print("t_Score: " + l_wesh_score.toString());
-
     Score.add(r_wesh_score);
     Score.add(l_wesh_score);
 
     print("P_Score: " + (Score.average).toString());
     print("r_ARM (wes): " + r_wes_angl.toString());
     print("r_HIP (esh): " + r_esh_angl.toString());
+
+
+
     return true;
   }
 
