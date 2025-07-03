@@ -196,8 +196,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         elbowAngle_r = exercise.r_wes_angl;
 
-        //lateral_rises.checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
-        //lateral_rises.checkElbowAngle(l_wes_angl, r_wes_angl);
+        lateral_rises.checkLateralRaiseCycle(exercise.l_wsh_angl, exercise.r_wsh_angl);
+        lateral_rises.checkElbowAngle(exercise.l_wes_angl, exercise.r_wes_angl);
 
         bufferShoulder_r.add(exercise.r_esh_angl);
         print(bufferShoulder_r);

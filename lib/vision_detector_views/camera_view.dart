@@ -480,6 +480,7 @@ class _CameraViewState extends State<CameraView> {
       CameraView.stopwatch.stop();
       CameraView.isStopwatchRunning = false;
       CameraView.stopwatchTimer?.cancel();
+      CameraView.pose_Stopwatch_activation_bool = false;
     }
   }
 

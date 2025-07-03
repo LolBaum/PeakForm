@@ -27,6 +27,11 @@ class MovementReference {
   bool bent = false;
   int reps = 0;
 
+  bool leftArmUp = false;
+  bool rightArmUp = false;
+  bool leftArmDown = false;
+  bool rightArmDown = false;
+
 
 
   MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime);
@@ -35,10 +40,10 @@ class MovementReference {
     const double raiseThreshold = 85.0;
     const double lowerThreshold = 35.0;
 
-    bool leftArmUp = leftAngle > raiseThreshold;
-    bool rightArmUp = rightAngle > raiseThreshold;
-    bool leftArmDown = leftAngle < lowerThreshold;
-    bool rightArmDown = rightAngle < lowerThreshold;
+    leftArmUp = leftAngle > raiseThreshold;
+    rightArmUp = rightAngle > raiseThreshold;
+    leftArmDown = leftAngle < lowerThreshold;
+    rightArmDown = rightAngle < lowerThreshold;
 
     if (dir == direction.down && leftArmUp && rightArmUp) {
         dir = direction.up;
@@ -56,6 +61,8 @@ class MovementReference {
     double tolerance = 30.0;
     double lowerTolerance = 180.0 - tolerance;
 
+    //scorewithTolerances(180.0, rightAngle, 20.0);
+
     if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
       bent_count++;
     } else{
@@ -63,7 +70,7 @@ class MovementReference {
       bent = false;
     }
 
-    if(bent_count > 20){
+    if(bent_count > 30){
       print("Arm is not straight");
       bent = true;
     }
