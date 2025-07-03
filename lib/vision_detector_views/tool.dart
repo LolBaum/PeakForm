@@ -26,6 +26,7 @@ class MovementReference {
   int bent_count = 0;
   bool bent = false;
   int reps = 0;
+  bool armsUp = false;
 
   bool leftArmUp = false;
   bool rightArmUp = false;
@@ -45,13 +46,13 @@ class MovementReference {
     leftArmDown = leftAngle < lowerThreshold;
     rightArmDown = rightAngle < lowerThreshold;
 
-    if (dir == direction.down && leftArmUp && rightArmUp) {
-        dir = direction.up;
+    if (!armsUp && leftArmUp && rightArmUp) {
+        armsUp = true;
       print("Beide Arme oben angekommen!");
     }
 
-    if (dir == direction.up && leftArmDown && rightArmDown) {
-        dir = direction.down;
+    if (armsUp && leftArmDown && rightArmDown) {
+        armsUp = false;
         reps++;
       print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
     }
