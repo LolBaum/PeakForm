@@ -1,11 +1,23 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'vision_detector_views/pose_detector_view.dart';
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  //not secure
+  //sowie native_device_orientation-1.2
+  //import 'package:flutter/services.dart'; was dafür verwendet wurde
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
+
 
   runApp(MyApp());
 }
@@ -36,7 +48,6 @@ class Home extends StatelessWidget {
                       CustomCard('Pose Detection', PoseDetectorView()),
                 ],
               ),
-
 
         ),
       ),

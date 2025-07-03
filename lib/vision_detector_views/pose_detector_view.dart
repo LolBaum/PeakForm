@@ -25,7 +25,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   var _cameraLensDirection = CameraLensDirection.back;
 
   //RunningAverage Score = RunningAverage();
-  SlidingAverage Score = SlidingAverage(10);
+  SlidingAverage Score = SlidingAverage(100);
   bool started = false;
 
   var bufferShoulder_r = CircularBuffer<double>(10);
@@ -91,63 +91,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     );
   }
 
-  int reps = 0;
-  bool armsUp = false;
-  double lateralAngle_r = 0;
-  double elbowAngle_r = 0;
-  double min_r = 180;
-  double max_r = 0;
-  direction dir = direction.down;
-  bool direction_changed = false;
-  DateTime? _lastActionTime;
-  final Duration _cooldown = Duration(milliseconds: 250);
-  int bentArm_count = 0;
-  bool arm_bent = false;
-
-  void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
-    const double raiseThreshold = 85.0;
-    const double lowerThreshold = 35.0;
-
-    lateralAngle_r = rightAngle;
-
-    bool leftArmUp = leftAngle > raiseThreshold;
-    bool rightArmUp = rightAngle > raiseThreshold;
-    bool leftArmDown = leftAngle < lowerThreshold;
-    bool rightArmDown = rightAngle < lowerThreshold;
-
-    if (!armsUp && leftArmUp && rightArmUp) {
-      setState(() {
-        armsUp = true;
-      });
-      print("Beide Arme oben angekommen!");
-    }
-
-    if (armsUp && leftArmDown && rightArmDown) {
-      setState(() {
-        armsUp = false;
-        reps++;
-      });
-      print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
-    }
-  }
-
-  void checkElbowAngle(double leftAngle, double rightAngle){
-    double tolerance = 30.0;
-    double lowerTolerance = 180.0 - tolerance;
-
-    if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
-      bentArm_count++;
-    } else{
-      bentArm_count = 0;
-      arm_bent = false;
-    }
-
-    if(bentArm_count > 20){
-      print("Arm is not straight");
-      arm_bent = true;
-    }
-  }
-
   Future<void> _processImage(InputImage inputImage) async {
     if (!_canProcess) return;
     if (_isBusy) return;
@@ -193,8 +136,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //scores einfluss kann hier mit der certenty gewichtet werden
         //scoreForLAt rise zu score with tolerances ersätzen
 
-
-        elbowAngle_r = exercise.r_wes_angl;
 
         lateral_rises.checkLateralRaiseCycle(exercise.l_wsh_angl, exercise.r_wsh_angl);
         lateral_rises.checkElbowAngle(exercise.l_wes_angl, exercise.r_wes_angl);
