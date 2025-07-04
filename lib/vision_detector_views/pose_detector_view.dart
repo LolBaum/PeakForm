@@ -101,7 +101,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       _text = '';
     });
 
-    List<TimedPose> recordedPoses = []; // for timestamps
+    //List<TimedPose> recordedPoses = []; // for timestamps
 
     final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
     //final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
@@ -185,9 +185,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
 
       }
-      for(TimedPose p in recordedPoses){
+      //for(TimedPose p in recordedPoses){
         //print("${p.pose} detected at ${p.timestamp.inMilliseconds} ms\n");
-      }
+      //}
 
 
     } else {
