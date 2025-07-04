@@ -29,10 +29,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   Pose_analytics analytics = Pose_analytics();
   LAR_Evaluation eval = LAR_Evaluation();
 
-
-
-  var bufferShoulder_r = CircularBuffer<double>(10);
   MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
+
+
 
   @override
   void dispose() async {
@@ -70,21 +69,32 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
-                  "Elbow Angle: ${lateral_rises.secondary_angle}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "Right Lateral Angle: ${lateral_rises.angle}",
+                  "Elbow Angle: ${lateral_rises.wes_buffer_average_l}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
                   "Moving Direction: ${lateral_rises.dir}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
+                Text(
+                  "average: ${lateral_rises.esh_buffer_average_l}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "uFB: ${lateral_rises.esh_dir_change_upper_feedback}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "dFB: ${lateral_rises.esh_dir_change_downer_feedback}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                /*
                 lateral_rises.dir == direction.up ? Text(
                   "Arm ist not straight!",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ) : SizedBox.shrink(),
+
+                 */
               ],
             ),
           ),
@@ -124,8 +134,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         analytics.get_lr_wesh_points();
         analytics.compute_wesh_joints();
 
-        //eval.intolerance_t_pose_starter(); //set triggered
-        //camera_view.CameraView.pose_Stopwatch_activation_bool = eval.triggered;
 
         //bei pausieren wieder in den init zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
@@ -138,51 +146,46 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           camera_view.CameraView.pose_Stopwatch_activation_bool =
               eval.triggered;
         }
-        //gucken ob an und aus geht und danach score
+
+        if(camera_view.CameraView.pose_Stopwatch_activation_bool){
+          //lateral_rises.update_direction_lr('l', lateral_rises.esh_buffer_average_l);
+          //lateral_rises.update_direction_lr('r', lateral_rises.esh_buffer_average_r);
+          lateral_rises.update_direction_lr('beide', (lateral_rises.esh_buffer_average_l + lateral_rises.esh_buffer_average_r)/2);
+
+          //lateral_rises.checkLateralRaiseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
+          lateral_rises.checkElbowAngle(analytics.l_wes_angl, analytics.r_wes_angl);
+
+          lateral_rises.update_esh_angles(analytics.l_esh_angl, analytics.r_esh_angl);
+        }
 
         /*
-        //gucken wie man diesen ausdruck bekommt und dann testen
-        if(camera_view.CameraView.pose_Stopwatch_activation_bool){
-          if(eval.evaluation(score)){
-            //exercise.state_change();
-          }
-        } else {
-          eval.started = false;
-        }
+        Todo:
+        //durchgängige arm kontrolle und score
+        //notes vom handy holen
+
+        //full into KI mit bewegungsablauf oder noch kontrolle haben ?
+
+        //nicht nur wrist zu elbow to shoulder sondern auch richtigen winkel zum oberkörper finden (der wird vlt immer über 100 sein)
+        // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
+        // also eine sequenz vin winkeln die gemacht werden muss
+
+        //pro übung eine liste an toleranzen und winkel erstellen
+        //unterscheidung linker und rechter arm
+        //klassen so verallgemeinern das man mehrere übungen damit machen kann
+
+
         */
-
-
 
         //score wird erst berechnet wenn initial pose gefunden wird
         //scores einfluss kann hier mit der certenty gewichtet werden
         //scoreForLAt rise zu score with tolerances ersätzen
-
-
-        lateral_rises.checkLateralRaiseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
-        lateral_rises.checkElbowAngle(analytics.l_wes_angl, analytics.r_wes_angl);
-
-        bufferShoulder_r.add(analytics.r_esh_angl);
-        print(bufferShoulder_r);
-        print(analytics.r_esh_angl);
-
-
-        lateral_rises.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
-        lateral_rises.update_direction();
+        // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
+        // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
 
 
 
         //todo store min / max average angle.
         //if difference ~5 away from value -> change direction
-
-        //TODO: Testen wie sich der Average verhällt
-
-        //prozent an korrektheit averagen
-
-        //wrist unter ellenbogeen für winkelunterscheideung
-        // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
-        // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
-
-
 
       }
       //for(TimedPose p in recordedPoses){
