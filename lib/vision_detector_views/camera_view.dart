@@ -471,7 +471,7 @@ class _CameraViewState extends State<CameraView> {
   void _pose_Stopwatch_activation() {
     if (CameraView.pose_Stopwatch_activation_bool) {
       _startStopwatch();
-      CameraView.pose_Stopwatch_activation_bool = false;
+      //CameraView.pose_Stopwatch_activation_bool = false;
     }
   }
 

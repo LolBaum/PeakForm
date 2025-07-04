@@ -8,120 +8,6 @@ import 'package:circular_buffer/circular_buffer.dart';
 enum direction{up, down}
 
 
-class MovementReference {
-  double upperAngle;
-  double lowerAngle;
-  double tolerance;
-  double minTime;
-  direction dir = direction.down;
-  bool direction_changed = false;
-  DateTime? _lastActionTime;
-  final Duration _cooldown = Duration(milliseconds: 250);
-  var buffer = CircularBuffer<double>(10);
-  double angle = 0;
-  double secondary_angle = 180;
-  double min_r = 180;
-  double max_r = 0;
-  double average = 0;
-  int bent_count = 0;
-  bool bent = false;
-  int reps = 0;
-  bool armsUp = false;
-
-  bool leftArmUp = false;
-  bool rightArmUp = false;
-  bool leftArmDown = false;
-  bool rightArmDown = false;
-
-
-
-  MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime);
-
-  void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
-    const double raiseThreshold = 85.0;
-    const double lowerThreshold = 35.0;
-
-    leftArmUp = leftAngle > raiseThreshold;
-    rightArmUp = rightAngle > raiseThreshold;
-    leftArmDown = leftAngle < lowerThreshold;
-    rightArmDown = rightAngle < lowerThreshold;
-
-    if (!armsUp && leftArmUp && rightArmUp) {
-        armsUp = true;
-      print("Beide Arme oben angekommen!");
-    }
-
-    if (armsUp && leftArmDown && rightArmDown) {
-        armsUp = false;
-        reps++;
-      print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
-    }
-  }
-
-  void checkElbowAngle(double leftAngle, double rightAngle){
-    double tolerance = 30.0;
-    double lowerTolerance = 180.0 - tolerance;
-
-    //scorewithTolerances(180.0, rightAngle, 20.0);
-
-    if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
-      bent_count++;
-    } else{
-      bent_count = 0;
-      bent = false;
-    }
-
-    if(bent_count > 30){
-      print("Arm is not straight");
-      bent = true;
-    }
-  }
-
-  void update_angles(double a, double b){
-    angle=a;
-    secondary_angle=b;
-    buffer.add(angle);
-    average = buffer.toList().reduce((a, b) => a + b) / buffer.length;
-  }
-
-  void update_direction(){
-    if(dir == direction.down){ // Down -> Up
-      if (min_r < average){
-        direction_changed = true;
-        min_r = 180;
-      }else{
-        min_r = average;
-      }
-    }
-    else{ // up -> down
-      if (max_r > average){
-        direction_changed = true;
-        max_r = 0;
-      }else{
-        max_r = average;
-      }
-    }
-
-    if (direction_changed == true){
-      // TODO: Evaluate the Position
-      direction_changed = false;
-
-      final now = DateTime.now();
-      if (_lastActionTime == null ||
-          now.difference(_lastActionTime!) > _cooldown) {
-        if (dir == direction.up){
-          dir = direction.down;
-        }
-        else{
-          dir = direction.up;
-        }
-        _lastActionTime = now;
-      }
-    }
-  }
-
-}
-
 //pro übung eine liste an toleranzen und winkel erstellen
 
 class Vector3 {
@@ -241,18 +127,6 @@ String getPoseName(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, Strin
 // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
 // also eine sequenz vin winkeln die gemacht werden muss
 
-//!!! für bewertungen win fenster benutzen weil ab einer zeit ändert man nichts mehr vom score
-class RunningAverage {
-  double _mean = 1.0; // bei 0 oder bei 1 beginnen ?
-  int _count = 0;
-  //adds and counts
-  void add(double value) {
-    _mean = _mean + (value - _mean) / (++_count);
-  }
-  //_mean = (_mean *_count) + value/(++_count);
-  double get average => _mean;
-  int get count => _count;
-}
 
 
 class SlidingAverage {
@@ -299,15 +173,126 @@ class TimedPose {
   TimedPose(this.pose, this.timestamp);
 }
 
-//static var lar_angels = [95.0, 60.0, 7.0];
+class MovementReference {
+  double upperAngle;
+  double lowerAngle;
+  double tolerance;
+  double minTime;
+  direction dir = direction.down;
+  bool direction_changed = false;
+  DateTime? _lastActionTime;
+  final Duration _cooldown = Duration(milliseconds: 250);
+  var buffer = CircularBuffer<double>(10);
+  double angle = 0;
+  double secondary_angle = 180;
+  double min_r = 180;
+  double max_r = 0;
+  double average = 0;
+  int bent_count = 0;
+  bool bent = false;
+  int reps = 0;
+  bool armsUp = false;
 
-//oben:95+-5  unter 96
-//mitte:60+-2
-//unten:7+-1grad
+  bool leftArmUp = false;
+  bool rightArmUp = false;
+  bool leftArmDown = false;
+  bool rightArmDown = false;
+
+
+
+  MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime);
+
+  void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
+    const double raiseThreshold = 85.0;
+    const double lowerThreshold = 35.0;
+
+    leftArmUp = leftAngle > raiseThreshold;
+    rightArmUp = rightAngle > raiseThreshold;
+    leftArmDown = leftAngle < lowerThreshold;
+    rightArmDown = rightAngle < lowerThreshold;
+
+    if (!armsUp && leftArmUp && rightArmUp) {
+      armsUp = true;
+      print("Beide Arme oben angekommen!");
+    }
+
+    if (armsUp && leftArmDown && rightArmDown) {
+      armsUp = false;
+      reps++;
+      print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
+    }
+  }
+
+  void checkElbowAngle(double leftAngle, double rightAngle){
+    double tolerance = 30.0;
+    double lowerTolerance = 180.0 - tolerance;
+
+    //scorewithTolerances(180.0, rightAngle, 20.0);
+
+    if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
+      bent_count++;
+    } else{
+      bent_count = 0;
+      bent = false;
+    }
+
+    if(bent_count > 30){
+      print("Arm is not straight");
+      bent = true;
+    }
+  }
+
+  void update_angles(double a, double b){
+    angle=a;
+    secondary_angle=b;
+    buffer.add(angle);
+    average = buffer.toList().reduce((a, b) => a + b) / buffer.length;
+  }
+
+  void update_direction(){
+    if(dir == direction.down){ // Down -> Up
+      if (min_r < average){
+        direction_changed = true;
+        min_r = 180;
+      }else{
+        min_r = average;
+      }
+    }
+    else{ // up -> down
+      if (max_r > average){
+        direction_changed = true;
+        max_r = 0;
+      }else{
+        max_r = average;
+      }
+    }
+
+    if (direction_changed == true){
+      // TODO: Evaluate the Position
+      direction_changed = false;
+
+      final now = DateTime.now();
+      if (_lastActionTime == null ||
+          now.difference(_lastActionTime!) > _cooldown) {
+        if (dir == direction.up){
+          dir = direction.down;
+        }
+        else{
+          dir = direction.up;
+        }
+        _lastActionTime = now;
+      }
+    }
+  }
+
+}
+
+
+
 
 
 //klasse zum lesen und Aktualliseren der Daten für die Lateral rises
-class Lateral_rises {
+class Pose_analytics {
   late Pose pose; // wird immer aktualisert
 
   late Vector2 r_Shoulder;
@@ -319,7 +304,6 @@ class Lateral_rises {
   late Vector2 l_Elbow;
   late Vector2 l_Shoulder;
   late Vector2 l_Hip;
-
 
   bool r_w = false;
   bool r_e = false;
@@ -339,29 +323,25 @@ class Lateral_rises {
   late double l_wsh_angl;
   late double r_wsh_angl;
 
-  bool started = false;
-
-  int angle_status = 0;
-  bool angle_up = false;
-  int wdhs = 0;
-
-  double r_wesh_score = 0.0;
-  double l_wesh_score = 0.0;
-
-  double r_wes_score = 0.0;
-  double r_esh_score = 0.0;
-  double l_wes_score = 0.0;
-  double l_esh_score = 0.0;
+  //später punkte übern aufruf angeben
 
   //var lar_angels = [95.0, 60.0, 7.0];
 
   //kalibrieren oberster und unterster winkel
 
   //messen welcher winkel wirklich erreicht wird
+  /*
   List<double> lar_angels = List.generate(
       (95 - 15 + 1),             // Anzahl der Elemente
           (i) => 95.0 - i           // 95.0, 94.0, ..., 7.0
   ); //höhere granularität schnellerer ablauf
+  */
+
+  //static var lar_angels = [95.0, 60.0, 7.0];
+
+  //oben:95+-5  unter 96
+  //mitte:60+-2
+  //unten:7+-1grad
 
   /*
   double lar_min = 7.0;
@@ -377,15 +357,6 @@ class Lateral_rises {
   */
 
 
-
-  //vlt einfach nur score machen und der guckt selber nach get pose und so
-
-  //init then allways set dann get wesh joint und start bewertung und dann bewertung und zustands veränderung
-
-  //lateral_rises();
-
-  //trotzdem funktion zum aktualisieren
-
   //set new pose als init aber auch durchgängig
   set_new_pose(Pose p) {
     this.pose = p;
@@ -400,56 +371,37 @@ class Lateral_rises {
     return vec;
   }*/
 
-  /*
-        r_Shoulder = getLandmarkOrError("rightShoulder", "Fehler beim Erkennen der rechten Schulter");
-        r_Elbow    = getLandmarkOrError("rightElbow", "Fehler beim Erkennen des rechten Ellenbogens");
-        r_Wrist    = getLandmarkOrError("rightWrist", "Fehler beim Erkennen des rechten Handgelenks");
-        r_Hip      = getLandmarkOrError("rightHip", "Fehler beim Erkennen der rechten Hüfte");
-
-        l_Shoulder = getLandmarkOrError("leftShoulder", "Fehler beim Erkennen der linken Schulter");
-        l_Elbow = getLandmarkOrError("leftElbow", "Fehler beim Erkennen des linken Ellenbogens");
-        l_Wrist = getLandmarkOrError("leftWrist", "Fehler beim Erkennen des linken Handgelenks");
-        l_Hip = getLandmarkOrError("leftHip", "Fehler beim Erkennen der linken Hüfte");
-
-                  double r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
-          double r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
-          double l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
-          double l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
-
-          //die sind besser als esh
-          double l_wsh_angl = computeJointAngle_2d(a: l_Hip, b: l_Shoulder, c: l_Wrist);
-          double r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
-
-   */
-
-  get_lr_wesh(){
-
-    Vector2? vec_rWrist = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightWrist");
-    if(vec_rWrist != null){
+  get_lr_wesh_points() {
+    Vector2? vec_rWrist = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightWrist");
+    if (vec_rWrist != null) {
       r_Wrist = Vector2(vec_rWrist.x, vec_rWrist.y);
       r_w = true;
     } else {
       print("Fehler beim erkennen des r Handgelenks");
       r_w = false;
     }
-    Vector2? vec_rElbow = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightElbow");
-    if(vec_rElbow != null){
+    Vector2? vec_rElbow = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightElbow");
+    if (vec_rElbow != null) {
       r_Elbow = Vector2(vec_rElbow.x, vec_rElbow.y);
       r_e = true;
     } else {
       print("Fehler beim erkennen des r Ellenbogens");
       r_e = false;
     }
-    Vector2? vec_rShoulder = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightShoulder");
-    if(vec_rShoulder != null){
+    Vector2? vec_rShoulder = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightShoulder");
+    if (vec_rShoulder != null) {
       r_Shoulder = Vector2(vec_rShoulder.x, vec_rShoulder.y);
       r_s = true;
     } else {
       print("Fehler beim erkennen der r Schulter");
       r_s = false;
     }
-    Vector2? vec_rHip = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "rightHip");
-    if(vec_rHip != null){
+    Vector2? vec_rHip = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightHip");
+    if (vec_rHip != null) {
       r_Hip = Vector2(vec_rHip.x, vec_rHip.y);
       r_h = true;
     } else {
@@ -457,8 +409,9 @@ class Lateral_rises {
       r_h = false;
     }
 
-    Vector2? vec_lWrist = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "leftWrist");
-    if(vec_lWrist != null){
+    Vector2? vec_lWrist = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftWrist");
+    if (vec_lWrist != null) {
       l_Wrist = Vector2(vec_lWrist.x, vec_lWrist.y);
       l_w = true;
     } else {
@@ -466,8 +419,9 @@ class Lateral_rises {
       l_w = false;
     }
 
-    Vector2? vec_lElbow = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "leftElbow");
-    if(vec_lElbow != null){
+    Vector2? vec_lElbow = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftElbow");
+    if (vec_lElbow != null) {
       l_Elbow = Vector2(vec_lElbow.x, vec_lElbow.y);
       l_e = true;
     } else {
@@ -475,8 +429,9 @@ class Lateral_rises {
       l_e = false;
     }
 
-    Vector2? vec_lShoulder = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "leftShoulder");
-    if(vec_lShoulder != null){
+    Vector2? vec_lShoulder = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftShoulder");
+    if (vec_lShoulder != null) {
       l_Shoulder = Vector2(vec_lShoulder.x, vec_lShoulder.y);
       l_s = true;
     } else {
@@ -484,8 +439,9 @@ class Lateral_rises {
       l_s = false;
     }
 
-    Vector2? vec_lHip = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), "leftHip");
-    if(vec_lHip != null){
+    Vector2? vec_lHip = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftHip");
+    if (vec_lHip != null) {
       l_Hip = Vector2(vec_lHip.x, vec_lHip.y);
       l_h = true;
     } else {
@@ -495,15 +451,15 @@ class Lateral_rises {
   }
 
   // muss this. davor oder geht es auch so ?
-  bool is_wesh(){
+  bool is_wesh() {
     if (r_w && r_e && r_s && r_h && l_w && l_e && l_s && l_h) {
       return true;
     }
     return false;
   }
 
-  compute_wesh_joints(){
-    if (!is_wesh()){
+  compute_wesh_joints() {
+    if (!is_wesh()) {
       return;
     }
     r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
@@ -515,41 +471,81 @@ class Lateral_rises {
     r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
   }
 
-  //mit camera_view starten
-  // vlt werte als klassen variable machen ?
-  bool intolerance_t_pose_starter({tolerance_wes = 25.0, tolerance_esh = 20.0, intolerance = 0.7}){
-    if (started) return true;
-    if (!is_wesh()) return false;
-    double high_intolerance_wesh_r = scorewithTolerances(180, r_wes_angl, tolerance_wes) * scorewithTolerances(95.0, r_esh_angl, tolerance_esh);
-    double high_intolerance_wesh_l = scorewithTolerances(180, l_wes_angl, tolerance_wes) * scorewithTolerances(95.0, l_esh_angl, tolerance_esh);
+}
+
+// wie richtig machst du die übung ...
+
+class LAR_Evaluation {
+  bool triggered = false;
+  bool stoped = false;
+  bool init = false;
+
+  //int angle_status = 0;
+  //bool angle_up = false;
+  //int wdhs = 0;
+
+  double r_wesh_score = 0.0;
+  double l_wesh_score = 0.0;
+
+  double r_wes_score = 0.0;
+  double r_esh_score = 0.0;
+  double l_wes_score = 0.0;
+  double l_esh_score = 0.0;
+
+  SlidingAverage score = SlidingAverage(100);
+
+
+  session(bool init, r_wes_angl, r_esh_angl, l_wes_angl, l_esh_angl){
+    if (init) return intolerance_t_pose_starter(r_wes_angl: r_wes_angl, r_esh_angl: r_esh_angl, l_wes_angl: l_wes_angl, l_esh_angl: l_esh_angl);
+    return evaluation(r_wes_angl: r_wes_angl, r_esh_angl: r_esh_angl, l_wes_angl: l_wes_angl, l_esh_angl: l_esh_angl);
+  }
+
+  bool intolerance_t_pose_starter({
+    double target_wes = 180.0,
+    double target_esh = 95.0,
+    double tolerance_wes = 25.0,
+    double tolerance_esh = 20.0,
+    double intolerance = 0.7,
+
+    double r_wes_angl = 0.0,
+    double r_esh_angl = 0.0,
+    double l_wes_angl = 0.0,
+    double l_esh_angl = 0.0
+
+  }){
+    double high_intolerance_wesh_r = scorewithTolerances(target_wes, r_wes_angl, tolerance_wes) * scorewithTolerances(target_esh, r_esh_angl, tolerance_esh);
+    double high_intolerance_wesh_l = scorewithTolerances(target_wes, l_wes_angl, tolerance_wes) * scorewithTolerances(target_esh, l_esh_angl, tolerance_esh);
     print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r/2).toString());
     if((high_intolerance_wesh_l+high_intolerance_wesh_r/2) > intolerance){
-      started = true;
-      //camera_view.CameraView._startStopwatch();
-      //camera_view.CameraView.isStopwatchRunning = true;
-      //camera_view.CameraView.pose_Stopwatch_activation_bool = true
-      //activate_watch = true; //umgeht einigen shit und soft dafür das bei der einmalige init pose die stopuhr mit angeht
+      triggered = true;
       return true;
     }
     return false;
+
   }
 
-  //mit score zum adden
-  //werte hier noch anpassen die toleranzen
-  evaluation(Score) {
-    if(!started || !is_wesh()) return;
+
+  //über die zeit verfolgen ob die arme richtig sind und dann wenn richtungswechsel ist ob dieser im richtigen winkel stattfand (mit einem faktor)
+  //auch arm veränderungen bestrafen
+  evaluation({
+    r_wes_angl = 0.0,
+    r_esh_angl = 0.0,
+    l_wes_angl = 0.0,
+    l_esh_angl = 0.0
+  }) {
+    //if(!started || !is_wesh()) return;
     r_wes_score = scorewithTolerances(180, r_wes_angl, 25.0);
-    r_esh_score = scorewithTolerances(lar_angels[angle_status], r_esh_angl, 45.0); //lar_angles war vorher 90.0
+    //r_esh_score = scorewithTolerances(lar_angels[angle_status], r_esh_angl, 45.0); //lar_angles war vorher 90.0
     l_wes_score = scorewithTolerances(180, l_wes_angl, 25.0);
-    l_esh_score = scorewithTolerances(lar_angels[angle_status], l_esh_angl, 45.0);
+    //l_esh_score = scorewithTolerances(lar_angels[angle_status], l_esh_angl, 45.0);
 
     r_wesh_score = (r_wes_score + r_esh_score)/2;
     l_wesh_score = (l_wes_score + l_esh_score)/2;
 
-    Score.add(r_wesh_score);
-    Score.add(l_wesh_score);
+    score.add(r_wesh_score);
+    score.add(l_wesh_score);
 
-    print("P_Score: " + (Score.average).toString());
+    print("P_Score: " + (score.average).toString());
     print("r_ARM (wes): " + r_wes_angl.toString());
     print("r_HIP (esh): " + r_esh_angl.toString());
 
@@ -558,6 +554,7 @@ class Lateral_rises {
     return true;
   }
 
+  /*
   state_change(){
 
     //erstmal die oberfunktionen ausführen sodass nur noch der aufruf statechange gebraucht wird
@@ -581,7 +578,7 @@ class Lateral_rises {
     print("angle_Status: " + angle_status.toString());
     print("wdhs: " + wdhs.toString());
 
-  }
+  }*/
 
   /*
   leftShoulder,

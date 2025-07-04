@@ -1,5 +1,5 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
@@ -22,14 +22,16 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
-  var _cameraLensDirection = CameraLensDirection.back;
+  //var _cameraLensDirection = CameraLensDirection.back;
+  var _cameraLensDirection = CameraLensDirection.front;
 
-  //RunningAverage Score = RunningAverage();
-  SlidingAverage Score = SlidingAverage(100);
-  bool started = false;
+
+  Pose_analytics analytics = Pose_analytics();
+  LAR_Evaluation eval = LAR_Evaluation();
+
+
 
   var bufferShoulder_r = CircularBuffer<double>(10);
-  Lateral_rises exercise = Lateral_rises();
   MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
 
   @override
@@ -118,17 +120,36 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
 
-        exercise.set_new_pose(pose);
-        exercise.get_lr_wesh();
-        exercise.compute_wesh_joints();
-        //print("P_Score: " + Score.average.toString());
-        camera_view.CameraView.pose_Stopwatch_activation_bool = exercise.intolerance_t_pose_starter();
+        analytics.set_new_pose(pose);
+        analytics.get_lr_wesh_points();
+        analytics.compute_wesh_joints();
+
+        //eval.intolerance_t_pose_starter(); //set triggered
+        //camera_view.CameraView.pose_Stopwatch_activation_bool = eval.triggered;
+
+        //bei pausieren wieder in den init zustand bringen
+        if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
+          eval.triggered = false;
+        }
+        if(analytics.is_wesh()) {
+          eval.session(!camera_view.CameraView.pose_Stopwatch_activation_bool,
+              analytics.r_wes_angl, analytics.r_esh_angl, analytics.l_wes_angl,
+              analytics.l_esh_angl);
+          camera_view.CameraView.pose_Stopwatch_activation_bool =
+              eval.triggered;
+        }
+        //gucken ob an und aus geht und danach score
+
+        /*
         //gucken wie man diesen ausdruck bekommt und dann testen
         if(camera_view.CameraView.pose_Stopwatch_activation_bool){
-          if(exercise.evaluation(Score)){
-            exercise.state_change();
+          if(eval.evaluation(score)){
+            //exercise.state_change();
           }
+        } else {
+          eval.started = false;
         }
+        */
 
 
 
@@ -137,15 +158,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //scoreForLAt rise zu score with tolerances ersätzen
 
 
-        lateral_rises.checkLateralRaiseCycle(exercise.l_wsh_angl, exercise.r_wsh_angl);
-        lateral_rises.checkElbowAngle(exercise.l_wes_angl, exercise.r_wes_angl);
+        lateral_rises.checkLateralRaiseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
+        lateral_rises.checkElbowAngle(analytics.l_wes_angl, analytics.r_wes_angl);
 
-        bufferShoulder_r.add(exercise.r_esh_angl);
+        bufferShoulder_r.add(analytics.r_esh_angl);
         print(bufferShoulder_r);
-        print(exercise.r_esh_angl);
+        print(analytics.r_esh_angl);
 
 
-        lateral_rises.update_angles(exercise.r_esh_angl, exercise.r_wes_angl);
+        lateral_rises.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
         lateral_rises.update_direction();
 
 
