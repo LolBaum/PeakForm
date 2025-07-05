@@ -17,6 +17,10 @@ dependencies:
   package_info_plus: ^8.0.0 # For app version and build number
   device_info_plus: ^10.1.0 # For device model, OS version
   uuid: ^4.4.0 # To generate unique session IDs
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
   camera: any
   provider: any
   permission_handler: any
@@ -28,6 +32,11 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^3.0.0
 
+l10n:
+  arb-dir: lib/l10n
+  template-arb-file: app_en.arb
+  output-localization-file: app_localizations.dart
+
 flutter:
   uses-material-design: true
 
@@ -35,6 +44,13 @@ flutter:
     - family: LeagueSpartan
       fonts:
         - asset: assets/fonts/LeagueSpartan-VariableFont_wght.ttf
+        - asset: assets/fonts/LeagueSpartan-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/LeagueSpartan-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/LeagueSpartan-Bold.ttf
+          weight: 700
+
   assets:
     - .env
     - assets/fonts/
@@ -43,3 +59,5 @@ flutter:
     - assets/gym.jpg
     - assets/laufen.jpg
     - assets/tennis.png
+    - assets/
+  generate: true
