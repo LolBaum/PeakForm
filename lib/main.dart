@@ -77,7 +77,7 @@ class FitnessApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) =>
-            HomeScreen(userName: dotenv.env['USER_NAME'] ?? 'User'),
+            HomeScreen(userName: dotenv.env['USER_NAME'] ?? 'TestUser'),
         '/video': (context) => const VideoScreen(),
         '/gym': (context) => const GymScreen(),
         '/result': (context) => const ResultScreen(),

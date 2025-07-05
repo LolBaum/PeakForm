@@ -7,6 +7,7 @@ import 'package:fitness_app/providers/pose_detection_provider.dart';
 import 'package:fitness_app/frosted_glasst_button.dart';
 import 'dart:async';
 import 'package:fitness_app/widgets/pose_painter.dart';
+import 'package:fitness_app/constants/constants.dart';
 import 'package:fitness_app/util/logging_service.dart';
 
 class PoseDetectionScreen extends StatefulWidget {
@@ -331,32 +332,40 @@ class _StartStopButton extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Center(
-          child: FrostedGlassButton(
-            onTap: provider.isCameraInitialized
-                ? (provider.isDetecting
-                    ? provider.stopDetection
-                    : provider.startDetection)
-                : () {},
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 12.0,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    provider.isDetecting ? Icons.stop : Icons.play_arrow,
-                    color: Colors.white,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FrostedGlassButton(
+                onTap: provider.isCameraInitialized
+                    ? (provider.isDetecting
+                        ? provider.stopDetection
+                        : provider.startDetection)
+                    : () {},
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 12.0,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    provider.isDetecting ? 'Stop Detection' : 'Start Detection',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        provider.isDetecting ? Icons.stop : Icons.play_arrow,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        provider.isDetecting
+                            ? 'Stop Detection'
+                            : 'Start Detection',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -376,7 +385,7 @@ class _PoseCountOverlay extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.green.withAlpha((255 * 0.8).toInt()),
+          color: AppColors.secondary.withAlpha((255 * 0.8).toInt()),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -386,14 +395,15 @@ class _PoseCountOverlay extends StatelessWidget {
             Text(
               'Poses: ${provider.poses.length}',
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             if (provider.poses.isNotEmpty)
               Text(
                 'Confidence: ${(provider.poses.first.confidence * 100).toStringAsFixed(1)}%',
-                style: const TextStyle(color: Colors.white, fontSize: 12),
+                style:
+                    const TextStyle(color: AppColors.onPrimary, fontSize: 12),
               ),
           ],
         ),

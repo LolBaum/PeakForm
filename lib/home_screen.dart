@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:fitness_app/util/logging_service.dart';
 import 'constants/constants.dart';
 import 'screens/pose_detection_screen.dart';
 import 'providers/pose_detection_provider.dart';
-import 'package:fitness_app/util/logging_service.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
 
   const HomeScreen({super.key, this.userName = "User"});
 
+  void _log(String message) {
+    try {
+      LoggingService.instance.i(message);
+    } catch (e) {
+      debugPrint('HomeScreen: $message');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    LoggingService.instance.i('HomeScreen built for user: $userName');
+    _log('HomeScreen built for user: $userName');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -37,11 +44,12 @@ class HomeScreen extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withAlpha((255 * 0.1).toInt()),
+                        color:
+                            AppColors.lightGrey.withAlpha((255 * 0.1).toInt()),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -51,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       const CircleAvatar(
                         radius: 30,
-                        backgroundColor: Color(0xFFB8FF7B),
+                        backgroundColor: AppColors.accent,
                       ),
                       const SizedBox(height: 12),
                       Text('Hi, $userName!',
@@ -60,17 +68,17 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.5)),
                       const SizedBox(height: 4),
-                      Text('FORTSCHRITT',
+                      const Text('FORTSCHRITT',
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey[700],
+                              color: AppColors.darkGrey,
                               letterSpacing: 1.5)),
                       const Text('LVL. 10',
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87)),
+                              color: AppColors.onSurface)),
                     ],
                   ),
                 ),
@@ -82,11 +90,12 @@ class HomeScreen extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withAlpha((255 * 0.1).toInt()),
+                        color:
+                            AppColors.lightGrey.withAlpha((255 * 0.1).toInt()),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -99,7 +108,7 @@ class HomeScreen extends StatelessWidget {
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black)),
+                              color: AppColors.onSurface)),
                       const SizedBox(height: 16),
                       GridView.count(
                         shrinkWrap: true,
@@ -126,15 +135,15 @@ class HomeScreen extends StatelessWidget {
                       Center(
                         child: Column(
                           children: [
-                            Text('LETZTE AUFNAHME: TENNIS',
+                            const Text('LETZTE AUFNAHME: TENNIS',
                                 style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.grey[700])),
+                                    color: AppColors.darkGrey)),
                             const SizedBox(height: 6),
                             GestureDetector(
                               onTap: () {
-                                LoggingService.instance.i(
+                                _log(
                                     'Aufnehmen button tapped - starting pose detection');
                                 Navigator.push(
                                   context,
@@ -149,7 +158,7 @@ class HomeScreen extends StatelessWidget {
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: darkGreen,
+                                  color: AppColors.primary,
                                   borderRadius: BorderRadius.circular(40),
                                 ),
                                 child: Row(
@@ -164,7 +173,7 @@ class HomeScreen extends StatelessWidget {
                                         height: 35,
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: green,
+                                          color: AppColors.secondary,
                                         ),
                                         child: const Center(
                                           child: SizedBox(
@@ -173,7 +182,7 @@ class HomeScreen extends StatelessWidget {
                                             child: DecoratedBox(
                                               decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: Colors.white),
+                                                  color: AppColors.onPrimary),
                                             ),
                                           ),
                                         ),
@@ -185,7 +194,7 @@ class HomeScreen extends StatelessWidget {
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.white)),
+                                              color: AppColors.onPrimary)),
                                     ),
                                   ],
                                 ),
@@ -209,14 +218,14 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         String buttonName = icon == Icons.bar_chart ? 'Charts' : 'Settings';
-        LoggingService.instance.i('Circular icon button tapped: $buttonName');
+        _log('Circular icon button tapped: $buttonName');
       },
       child: Container(
         width: 44,
         height: 44,
-        decoration:
-            const BoxDecoration(color: darkGreen, shape: BoxShape.circle),
-        child: Icon(icon, color: Colors.white),
+        decoration: const BoxDecoration(
+            color: AppColors.primary, shape: BoxShape.circle),
+        child: Icon(icon, color: AppColors.onPrimary),
       ),
     );
   }
@@ -226,8 +235,7 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: route != null
           ? () {
-              LoggingService.instance
-                  .i('Sport tile tapped: $title (route: $route)');
+              _log('Sport tile tapped: $title (route: $route)');
               Navigator.pushNamed(context, route);
             }
           : null,
@@ -238,7 +246,7 @@ class HomeScreen extends StatelessWidget {
             image: AssetImage(imagePath),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withAlpha((255 * 0.4).toInt()),
+              AppColors.lightGrey.withAlpha((255 * 0.4).toInt()),
               BlendMode.darken,
             ),
           ),
@@ -252,7 +260,7 @@ class HomeScreen extends StatelessWidget {
               title,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColors.onPrimary,
                 fontSize: 16,
               ),
             ),
@@ -263,7 +271,7 @@ class HomeScreen extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColors.onPrimary,
               ),
             ),
           ],

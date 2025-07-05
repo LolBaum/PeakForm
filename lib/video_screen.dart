@@ -10,7 +10,7 @@ class VideoScreen extends StatelessWidget {
     LoggingService.instance.i('VideoScreen displayed');
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -29,12 +29,13 @@ class VideoScreen extends StatelessWidget {
                 height: 200,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                      colors: [Color(0xFF066E47), Color(0xFF5AD689)]),
+                      colors: [AppColors.primary, AppColors.secondary]),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(
                     child: Icon(Icons.play_circle_fill,
-                        color: Colors.white.withAlpha((255 * 0.6).toInt()),
+                        color:
+                            AppColors.onPrimary.withAlpha((255 * 0.6).toInt()),
                         size: 64)),
               ),
               const SizedBox(height: 16),
@@ -81,7 +82,7 @@ class VideoScreen extends StatelessWidget {
                       .i('User pressed START button on video screen');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: green,
+                  backgroundColor: AppColors.secondary,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
                   minimumSize: const Size(double.infinity, 48),
@@ -100,8 +101,7 @@ class VideoScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color:
-                      const Color(0xFF006D42).withAlpha((255 * 0.05).toInt()),
+                  color: AppColors.primary.withAlpha((255 * 0.05).toInt()),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Text(
@@ -120,7 +120,7 @@ class VideoScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: darkGreen,
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(

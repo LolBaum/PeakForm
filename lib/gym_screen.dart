@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'constants/constants.dart';
 import 'package:fitness_app/util/logging_service.dart';
+import 'constants/constants.dart';
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
@@ -73,10 +72,12 @@ class GymScreen extends StatelessWidget {
                       return Chip(
                         label: Text(label,
                             style: TextStyle(
-                                color: selected ? Colors.white : Colors.black54,
+                                color: selected
+                                    ? AppColors.onPrimary
+                                    : AppColors.darkGrey,
                                 fontWeight: FontWeight.bold)),
                         backgroundColor:
-                            selected ? darkGreen : Colors.grey[300],
+                            selected ? AppColors.primary : AppColors.lightGrey,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         shape: const StadiumBorder(),
@@ -105,7 +106,7 @@ class GymScreen extends StatelessWidget {
                                   'User selected exercise: ${exercises[index]}');
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: darkGreen,
+                              backgroundColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
@@ -116,17 +117,18 @@ class GymScreen extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 Text('${index + 1}',
                                     style: const TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.onPrimary,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(width: 12),
                                 Container(
                                   width: 35,
                                   height: 35,
                                   decoration: const BoxDecoration(
-                                      color: green, shape: BoxShape.circle),
+                                      color: AppColors.secondary,
+                                      shape: BoxShape.circle),
                                   child: const Center(
                                     child: Icon(Icons.play_arrow,
-                                        size: 18, color: Color(0xFFDFEAE6)),
+                                        size: 18, color: AppColors.surface),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -135,7 +137,7 @@ class GymScreen extends StatelessWidget {
                                     exercises[index],
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: AppColors.onPrimary,
                                       fontSize: 16,
                                     ),
                                   ),
