@@ -8,7 +8,7 @@ class VideoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final translation = AppLocalizations.of(context)!;
     LoggingService.instance.i('VideoScreen displayed');
 
     return Scaffold(
@@ -26,7 +26,7 @@ class VideoScreen extends StatelessWidget {
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.arrow_back)),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppGaps.gap16),
               Container(
                 height: 200,
                 decoration: BoxDecoration(
@@ -40,16 +40,17 @@ class VideoScreen extends StatelessWidget {
                             AppColors.onPrimary.withAlpha((255 * 0.6).toInt()),
                         size: 64)),
               ),
-              const SizedBox(height: 16),
-              Text(loc.video_running,
+              const SizedBox(height: AppGaps.gap16),
+              Text(translation.video_running,
                   style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
+                      fontSize: AppFontSizes.headline,
+                      fontWeight: AppFontWeights.bold)),
+              const SizedBox(height: AppGaps.gap8),
               Wrap(
-                spacing: 10,
+                spacing: AppSpacing.icon,
                 children: [
-                  _laufenTag(loc.video_calf),
-                  _laufenTag(loc.video_thigh),
+                  _laufenTag(translation.video_calf),
+                  _laufenTag(translation.video_thigh),
                 ],
               ),
               const Divider(height: 32, thickness: 1),
@@ -57,29 +58,32 @@ class VideoScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Column(children: [
-                    Text(loc.video_duration,
+                    Text(translation.video_duration,
                         style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text(loc.video_duration_value,
-                        style: const TextStyle(fontWeight: FontWeight.bold))
+                            fontSize: AppFontSizes.small,
+                            fontWeight: AppFontWeights.bold)),
+                    Text(translation.video_duration_value,
+                        style: const TextStyle(fontWeight: AppFontWeights.bold))
                   ]),
                   Column(children: [
-                    Text(loc.video_difficulty,
+                    Text(translation.video_difficulty,
                         style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text(loc.video_difficulty_value,
-                        style: const TextStyle(fontWeight: FontWeight.bold))
+                            fontSize: AppFontSizes.small,
+                            fontWeight: AppFontWeights.bold)),
+                    Text(translation.video_difficulty_value,
+                        style: const TextStyle(fontWeight: AppFontWeights.bold))
                   ]),
                   Column(children: [
-                    Text(loc.video_intensity,
+                    Text(translation.video_intensity,
                         style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text(loc.video_intensity_value,
-                        style: const TextStyle(fontWeight: FontWeight.bold))
+                            fontSize: AppFontSizes.small,
+                            fontWeight: AppFontWeights.bold)),
+                    Text(translation.video_intensity_value,
+                        style: const TextStyle(fontWeight: AppFontWeights.bold))
                   ])
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppGaps.gap16),
               ElevatedButton(
                 onPressed: () {
                   LoggingService.instance
@@ -91,19 +95,19 @@ class VideoScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30)),
                   minimumSize: const Size(double.infinity, 48),
                 ),
-                child: Text(loc.video_start,
+                child: Text(translation.video_start,
                     style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: AppFontSizes.title,
+                        fontWeight: AppFontWeights.bold,
                         color: Colors.white)),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppGaps.gap16),
               Text(
-                loc.video_course_description,
+                translation.video_course_description,
                 style: const TextStyle(
-                    color: Colors.grey, fontWeight: FontWeight.bold),
+                    color: Colors.grey, fontWeight: AppFontWeights.bold),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppGaps.gap8),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -111,8 +115,8 @@ class VideoScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  loc.video_course_description,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  translation.video_course_description,
+                  style: const TextStyle(fontWeight: AppFontWeights.bold),
                 ),
               ),
             ],
@@ -124,15 +128,16 @@ class VideoScreen extends StatelessWidget {
 
   Widget _laufenTag(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.icon, vertical: AppGaps.gap6),
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
         text,
-        style:
-            const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        style: const TextStyle(
+            fontWeight: AppFontWeights.bold, color: Colors.white),
       ),
     );
   }

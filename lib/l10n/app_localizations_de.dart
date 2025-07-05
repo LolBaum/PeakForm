@@ -32,14 +32,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get home_choose_sport => 'Wähle deinen Sport';
 
   @override
-  String home_sport_tile_title(Object title) {
-    return '$title';
-  }
+  String get home_sport_tile_title_tennis => 'TENNIS';
 
   @override
-  String home_sport_tile_subtitle(Object subtitle) {
-    return '$subtitle';
-  }
+  String get home_sport_tile_title_running => 'LAUFEN';
+
+  @override
+  String get home_sport_tile_title_gym => 'GYM';
+
+  @override
+  String get home_sport_tile_title_golf => 'GOLF';
+
+  @override
+  String get home_sport_tile_subtitle_tennis => 'TECHNIK';
+
+  @override
+  String get home_sport_tile_subtitle_running => 'LAUFÖKONOMIE UND DRILLS';
+
+  @override
+  String get home_sport_tile_subtitle_gym => 'TECHNIK';
+
+  @override
+  String get home_sport_tile_subtitle_golf => 'AUFSCHLÄGE';
 
   @override
   String get home_charts => 'Diagramme';

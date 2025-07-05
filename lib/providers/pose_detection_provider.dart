@@ -135,7 +135,7 @@ class PoseDetectionProvider extends ChangeNotifier {
       await _cameraController!.initialize();
       _isCameraInitialized = true;
 
-      if (modelLoaded) {
+      if (modelLoaded && kDebugMode) {
         _detectionStatus =
             'MoveNet SinglePose Lightning model loaded and ready!';
         _log('Camera and model initialization completed successfully');

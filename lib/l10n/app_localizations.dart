@@ -140,17 +140,53 @@ abstract class AppLocalizations {
   /// **'Choose your sport'**
   String get home_choose_sport;
 
-  /// No description provided for @home_sport_tile_title.
+  /// No description provided for @home_sport_tile_title_tennis.
   ///
   /// In en, this message translates to:
-  /// **'{title}'**
-  String home_sport_tile_title(Object title);
+  /// **'TENNIS'**
+  String get home_sport_tile_title_tennis;
 
-  /// No description provided for @home_sport_tile_subtitle.
+  /// No description provided for @home_sport_tile_title_running.
   ///
   /// In en, this message translates to:
-  /// **'{subtitle}'**
-  String home_sport_tile_subtitle(Object subtitle);
+  /// **'RUNNING'**
+  String get home_sport_tile_title_running;
+
+  /// No description provided for @home_sport_tile_title_gym.
+  ///
+  /// In en, this message translates to:
+  /// **'GYM'**
+  String get home_sport_tile_title_gym;
+
+  /// No description provided for @home_sport_tile_title_golf.
+  ///
+  /// In en, this message translates to:
+  /// **'GOLF'**
+  String get home_sport_tile_title_golf;
+
+  /// No description provided for @home_sport_tile_subtitle_tennis.
+  ///
+  /// In en, this message translates to:
+  /// **'TECHNIQUE'**
+  String get home_sport_tile_subtitle_tennis;
+
+  /// No description provided for @home_sport_tile_subtitle_running.
+  ///
+  /// In en, this message translates to:
+  /// **'RUNNING ECONOMY AND DRILLS'**
+  String get home_sport_tile_subtitle_running;
+
+  /// No description provided for @home_sport_tile_subtitle_gym.
+  ///
+  /// In en, this message translates to:
+  /// **'TECHNIQUE'**
+  String get home_sport_tile_subtitle_gym;
+
+  /// No description provided for @home_sport_tile_subtitle_golf.
+  ///
+  /// In en, this message translates to:
+  /// **'SERVES'**
+  String get home_sport_tile_subtitle_golf;
 
   /// No description provided for @home_charts.
   ///

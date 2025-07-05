@@ -27,3 +27,60 @@ class AppColors {
   static const Color blue = Color(0xFF2196F3);
   static const Color transparent = Colors.transparent;
 }
+
+// Font Sizes
+class AppFontSizes {
+  static const double headline = 26;
+  static const double title = 20;
+  static const double subtitle = 16;
+  static const double body = 14;
+  static const double small = 12;
+}
+
+// Font Weights
+class AppFontWeights {
+  static const FontWeight bold = FontWeight.bold;
+  static const FontWeight semiBold = FontWeight.w600;
+  static const FontWeight medium = FontWeight.w500;
+  static const FontWeight regular = FontWeight.w400;
+  static const FontWeight extraBold = FontWeight.w700;
+}
+
+// Common SizedBox Heights
+class AppGaps {
+  static const double gap4 = 4;
+  static const double gap6 = 6;
+  static const double gap8 = 8;
+  static const double gap10 = 10;
+  static const double gap12 = 12;
+  static const double gap16 = 16;
+  static const double gap20 = 20;
+  static const double gap24 = 24;
+  static const double gap32 = 32;
+  static const double gap40 = 40;
+}
+
+// Common Paddings
+class AppPaddings {
+  static const EdgeInsets all8 = EdgeInsets.all(8);
+  static const EdgeInsets all12 = EdgeInsets.all(12);
+  static const EdgeInsets all16 = EdgeInsets.all(16);
+  static const EdgeInsets horizontal16 = EdgeInsets.symmetric(horizontal: 16);
+  static const EdgeInsets vertical8 = EdgeInsets.symmetric(vertical: 8);
+  static const EdgeInsets vertical16 = EdgeInsets.symmetric(vertical: 16);
+  static const EdgeInsets button =
+      EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+}
+
+// Common Margins
+class AppMargins {
+  static const EdgeInsets card = EdgeInsets.all(16);
+  static const EdgeInsets section = EdgeInsets.symmetric(vertical: 24);
+}
+
+// Common Spacing
+class AppSpacing {
+  static const double icon = 12;
+  static const double chip = 10;
+  static const double listItem = 6;
+}

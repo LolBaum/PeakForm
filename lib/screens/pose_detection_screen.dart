@@ -380,7 +380,7 @@ class _PoseCountOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final translation = AppLocalizations.of(context)!;
     return Positioned(
       bottom: 100,
       left: 16,
@@ -395,7 +395,7 @@ class _PoseCountOverlay extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              loc.pose_count(provider.poses.length),
+              translation.pose_count(provider.poses.length),
               style: const TextStyle(
                 color: AppColors.onPrimary,
                 fontWeight: FontWeight.bold,
@@ -403,7 +403,7 @@ class _PoseCountOverlay extends StatelessWidget {
             ),
             if (provider.poses.isNotEmpty)
               Text(
-                loc.pose_confidence(
+                translation.pose_confidence(
                     (provider.poses.first.confidence * 100).toStringAsFixed(1)),
                 style:
                     const TextStyle(color: AppColors.onPrimary, fontSize: 12),
@@ -420,8 +420,8 @@ class _PermissionDeniedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Center(child: Text(loc.pose_permission_required));
+    final translation = AppLocalizations.of(context)!;
+    return Center(child: Text(translation.pose_permission_required));
   }
 }
 

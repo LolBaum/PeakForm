@@ -95,7 +95,28 @@ class FitnessApp extends StatelessWidget {
             HomeScreen(userName: dotenv.env['USER_NAME'] ?? 'TestUser'),
         '/video': (context) => const VideoScreen(),
         '/gym': (context) => const GymScreen(),
-        '/result': (context) => const ResultScreen(),
+        '/result': (context) {
+          final translation = AppLocalizations.of(context)!;
+          return ResultScreen(
+            goodFeedback: [
+              FeedbackItem(
+                  label: translation.tooltip_good_posture, timestamp: "00:10"),
+              FeedbackItem(label: translation.tooltip_good_breathing),
+            ],
+            badFeedback: [
+              FeedbackItem(
+                  label: translation.result_bad_arms, timestamp: "00:20"),
+              FeedbackItem(
+                  label: translation.result_bad_heel, timestamp: "00:32"),
+              FeedbackItem(
+                  label: translation.result_bad_calf, timestamp: "00:45"),
+            ],
+            tips: [
+              FeedbackItem(label: translation.result_tip_midfoot),
+              FeedbackItem(label: translation.result_tip_arms),
+            ],
+          );
+        },
       },
     );
   }

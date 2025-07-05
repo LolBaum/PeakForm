@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final translation = AppLocalizations.of(context)!;
     _log('HomeScreen built for user: $userName');
 
     return Scaffold(
@@ -35,8 +35,8 @@ class HomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _circularIconButton(Icons.bar_chart, loc),
-                    _circularIconButton(Icons.settings, loc),
+                    _circularIconButton(Icons.bar_chart, translation),
+                    _circularIconButton(Icons.settings, translation),
                   ],
                 ),
               ),
@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  padding: const EdgeInsets.symmetric(vertical: AppGaps.gap20),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(24),
@@ -63,23 +63,23 @@ class HomeScreen extends StatelessWidget {
                         radius: 30,
                         backgroundColor: AppColors.accent,
                       ),
-                      const SizedBox(height: 12),
-                      Text(loc.home_hi_user(userName),
+                      const SizedBox(height: AppGaps.gap12),
+                      Text(translation.home_hi_user(userName),
                           style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700,
+                              fontSize: AppFontSizes.headline,
+                              fontWeight: AppFontWeights.extraBold,
                               letterSpacing: 0.5)),
-                      const SizedBox(height: 4),
-                      Text(loc.home_progress,
+                      const SizedBox(height: AppGaps.gap4),
+                      Text(translation.home_progress,
                           style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                              fontSize: AppFontSizes.body,
+                              fontWeight: AppFontWeights.bold,
                               color: AppColors.darkGrey,
                               letterSpacing: 1.5)),
-                      Text(loc.home_level,
+                      Text(translation.home_level,
                           style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                              fontSize: AppFontSizes.body,
+                              fontWeight: AppFontWeights.bold,
                               color: AppColors.onSurface)),
                     ],
                   ),
@@ -108,10 +108,10 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       const Text('Wähle deinen Sport',
                           style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                              fontSize: AppFontSizes.title,
+                              fontWeight: AppFontWeights.bold,
                               color: AppColors.onSurface)),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppGaps.gap16),
                       GridView.count(
                         shrinkWrap: true,
                         crossAxisCount: 2,
@@ -119,30 +119,42 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSpacing: 10,
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
-                          _sportTile(context, 'TENNIS', 'TECHNIK', null,
+                          _sportTile(
+                              context,
+                              translation.home_sport_tile_title_tennis,
+                              translation.home_sport_tile_subtitle_tennis,
+                              null,
                               'assets/tennis.png'),
                           _sportTile(
                               context,
-                              'LAUFEN',
-                              'LAUFÖKONOMIE UND DRILLS',
+                              translation.home_sport_tile_title_running,
+                              translation.home_sport_tile_subtitle_running,
                               '/video',
                               'assets/laufen.jpg'),
-                          _sportTile(context, 'GYM', 'TECHNIK', '/gym',
+                          _sportTile(
+                              context,
+                              translation.home_sport_tile_title_gym,
+                              translation.home_sport_tile_subtitle_gym,
+                              '/gym',
                               'assets/gym.jpg'),
-                          _sportTile(context, 'GOLF', 'AUFSCHLÄGE', null,
+                          _sportTile(
+                              context,
+                              translation.home_sport_tile_title_golf,
+                              translation.home_sport_tile_subtitle_golf,
+                              null,
                               'assets/golf.jpg'),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppGaps.gap24),
                       Center(
                         child: Column(
                           children: [
-                            Text(loc.home_last_recording,
+                            Text(translation.home_last_recording,
                                 style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: AppFontSizes.small,
+                                    fontWeight: AppFontWeights.bold,
                                     color: AppColors.darkGrey)),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: AppGaps.gap6),
                             GestureDetector(
                               onTap: () {
                                 _log(
@@ -158,13 +170,47 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 16),
-                                child: Text(loc.home_record,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.onPrimary)),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 8),
+                                      child: Container(
+                                        width: 35,
+                                        height: 35,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: green,
+                                        ),
+                                        child: const Center(
+                                          child: SizedBox(
+                                            width: 15,
+                                            height: 15,
+                                            child: DecoratedBox(
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.only(right: 16),
+                                      child: Text('Aufnehmen',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -181,11 +227,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _circularIconButton(IconData icon, AppLocalizations loc) {
+  Widget _circularIconButton(IconData icon, AppLocalizations translation) {
     return GestureDetector(
       onTap: () {
-        String buttonName =
-            icon == Icons.bar_chart ? loc.home_charts : loc.home_settings;
+        String buttonName = icon == Icons.bar_chart
+            ? translation.home_charts
+            : translation.home_settings;
         _log('Circular icon button tapped: $buttonName');
       },
       child: Container(
@@ -200,7 +247,6 @@ class HomeScreen extends StatelessWidget {
 
   Widget _sportTile(BuildContext context, String title, String subtitle,
       String? route, String imagePath) {
-    final loc = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: route != null
           ? () {
@@ -224,22 +270,22 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: AppGaps.gap10),
             Text(
-              loc.home_sport_tile_title(title),
+              title,
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: AppFontWeights.bold,
                 color: AppColors.onPrimary,
-                fontSize: 16,
+                fontSize: AppFontSizes.title,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppGaps.gap4),
             Text(
-              loc.home_sport_tile_subtitle(subtitle),
+              subtitle,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontSize: AppFontSizes.body,
+                fontWeight: AppFontWeights.bold,
                 color: AppColors.onPrimary,
               ),
             ),
