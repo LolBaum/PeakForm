@@ -7,6 +7,9 @@ import 'package:logger/logger.dart';
 import 'package:fitness_app/util/axiom_log_output.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fitness_app/util/logging_service.dart';
+import 'package:fitness_app/util/custom_pretty_printer.dart';
+import 'l10n/app_localizations.dart';
 
 late final Logger logger;
 
@@ -30,15 +33,7 @@ Future<void> main() async {
 
   // Initialize the logger with the credentials from .env
   logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 1, // number of method calls to be displayed
-      errorMethodCount: 8, // number of method calls if stacktrace is provided
-      lineLength: 120, // width of the output
-      colors: true, // Colorful log messages
-      printEmojis: true, // Print an emoji for each log message
-      dateTimeFormat:
-          DateTimeFormat.onlyTime, // Should each log print contain a timestamp
-    ),
+    printer: kDebugMode ? CustomPrettyPrinter() : SimplePrinter(),
     output: MultiOutput([
       ConsoleOutput(),
       // Only send to Axiom in production mode
@@ -51,13 +46,20 @@ Future<void> main() async {
     filter: kReleaseMode ? ProductionFilter() : DevelopmentFilter(),
   );
 
-  logger.i('Logger initialized successfully.');
+  await LoggingService.instance.init(logger);
+  LoggingService.instance.setScreenContext("AppStart");
+  LoggingService.instance.setUserContext(
+      id: dotenv.env['USER_ID'] ?? '123',
+      email: dotenv.env['USER_EMAIL'] ?? 'test@test.com',
+      username: dotenv.env['USER_NAME'] ?? 'test');
 
   // Test logging in different modes
   if (kDebugMode) {
-    logger.i('🔧 Running in DEBUG mode - logs will appear in console');
+    LoggingService.instance
+        .i('🔧 Running in DEBUG mode - logs will appear in console');
   } else {
-    logger.i('🚀 Running in PRODUCTION mode - logs will be sent to Axiom');
+    LoggingService.instance
+        .i('🚀 Running in PRODUCTION mode - logs will be sent to Axiom');
   }
 
   return runApp(const FitnessApp());
@@ -73,12 +75,48 @@ class FitnessApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'LeagueSpartan',
       ),
+
+      // Localization
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (locale == null) return supportedLocales.first;
+        for (var supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale.languageCode) {
+            return supportedLocale;
+          }
+        }
+        return supportedLocales.first;
+      },
+      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(userName: 'Norhene'),
+        '/': (context) =>
+            HomeScreen(userName: dotenv.env['USER_NAME'] ?? 'TestUser'),
         '/video': (context) => const VideoScreen(),
         '/gym': (context) => const GymScreen(),
-        '/result': (context) => const ResultScreen(),
+        '/result': (context) {
+          final translation = AppLocalizations.of(context)!;
+          return ResultScreen(
+            goodFeedback: [
+              FeedbackItem(
+                  label: translation.tooltip_good_posture, timestamp: "00:10"),
+              FeedbackItem(label: translation.tooltip_good_breathing),
+            ],
+            badFeedback: [
+              FeedbackItem(
+                  label: translation.result_bad_arms, timestamp: "00:20"),
+              FeedbackItem(
+                  label: translation.result_bad_heel, timestamp: "00:32"),
+              FeedbackItem(
+                  label: translation.result_bad_calf, timestamp: "00:45"),
+            ],
+            tips: [
+              FeedbackItem(label: translation.result_tip_midfoot),
+              FeedbackItem(label: translation.result_tip_arms),
+            ],
+          );
+        },
       },
     );
   }

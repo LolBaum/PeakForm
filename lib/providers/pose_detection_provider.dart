@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
-import '../main.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 // MoveNet keypoint indices according to TensorFlow documentation
 // https://www.tensorflow.org/hub/tutorials/movenet
@@ -71,7 +71,7 @@ class PoseDetectionProvider extends ChangeNotifier {
   // Safe logger access that won't crash if global logger isn't initialized
   void _log(String message) {
     try {
-      logger.i(message);
+      LoggingService.instance.i(message);
     } catch (e) {
       debugPrint('PoseDetectionProvider: $message');
     }
@@ -135,7 +135,7 @@ class PoseDetectionProvider extends ChangeNotifier {
       await _cameraController!.initialize();
       _isCameraInitialized = true;
 
-      if (modelLoaded) {
+      if (modelLoaded && kDebugMode) {
         _detectionStatus =
             'MoveNet SinglePose Lightning model loaded and ready!';
         _log('Camera and model initialization completed successfully');

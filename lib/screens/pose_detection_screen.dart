@@ -7,7 +7,9 @@ import 'package:fitness_app/providers/pose_detection_provider.dart';
 import 'package:fitness_app/frosted_glasst_button.dart';
 import 'dart:async';
 import 'package:fitness_app/widgets/pose_painter.dart';
-import '../main.dart';
+import 'package:fitness_app/constants/constants.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class PoseDetectionScreen extends StatefulWidget {
   const PoseDetectionScreen({super.key});
@@ -28,7 +30,7 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   @override
   void initState() {
     super.initState();
-    logger.i('PoseDetectionScreen initialized');
+    LoggingService.instance.i('PoseDetectionScreen initialized');
     if (defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS) {
       _requestPermissions();
@@ -39,16 +41,16 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   ///
   /// This method is responsible for requesting permissions to use the camera.
   Future<void> _requestPermissions() async {
-    logger.i('Requesting camera permissions');
+    LoggingService.instance.i('Requesting camera permissions');
     final status = await Permission.camera.request();
     if (status.isGranted) {
-      logger.i('Camera permission granted');
+      LoggingService.instance.i('Camera permission granted');
       setState(() {
         _permissionGranted = true;
       });
       _initializeCamera();
     } else {
-      logger.i('Camera permission denied: $status');
+      LoggingService.instance.i('Camera permission denied: $status');
       _showPermissionDialog();
     }
   }
@@ -58,7 +60,7 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   /// This method is responsible for showing a dialog to the user to request permissions.
   /// It uses the PermissionHandler to request permissions.
   void _showPermissionDialog() {
-    logger.i('Showing permission dialog to user');
+    LoggingService.instance.i('Showing permission dialog to user');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -69,14 +71,15 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              logger.i('User cancelled permission request');
+              LoggingService.instance.i('User cancelled permission request');
               Navigator.pop(context);
             },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
-              logger.i('User opened app settings for permission');
+              LoggingService.instance
+                  .i('User opened app settings for permission');
               Navigator.pop(context);
               openAppSettings();
             },
@@ -92,10 +95,10 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   /// This method is responsible for initializing the camera.
   /// It uses the PoseDetectionProvider to initialize the camera.
   Future<void> _initializeCamera() async {
-    logger.i('Initializing camera through provider');
+    LoggingService.instance.i('Initializing camera through provider');
     final provider = Provider.of<PoseDetectionProvider>(context, listen: false);
     await provider.initializeCamera();
-    logger.i('Camera initialization completed');
+    LoggingService.instance.i('Camera initialization completed');
   }
 
   /// Build
@@ -330,32 +333,40 @@ class _StartStopButton extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Center(
-          child: FrostedGlassButton(
-            onTap: provider.isCameraInitialized
-                ? (provider.isDetecting
-                    ? provider.stopDetection
-                    : provider.startDetection)
-                : () {},
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 12.0,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    provider.isDetecting ? Icons.stop : Icons.play_arrow,
-                    color: Colors.white,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FrostedGlassButton(
+                onTap: provider.isCameraInitialized
+                    ? (provider.isDetecting
+                        ? provider.stopDetection
+                        : provider.startDetection)
+                    : () {},
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 12.0,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    provider.isDetecting ? 'Stop Detection' : 'Start Detection',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        provider.isDetecting ? Icons.stop : Icons.play_arrow,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        provider.isDetecting
+                            ? 'Stop Detection'
+                            : 'Start Detection',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -369,13 +380,14 @@ class _PoseCountOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final translation = AppLocalizations.of(context)!;
     return Positioned(
       bottom: 100,
       left: 16,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.green.withAlpha((255 * 0.8).toInt()),
+          color: AppColors.secondary.withAlpha((255 * 0.8).toInt()),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -383,16 +395,18 @@ class _PoseCountOverlay extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Poses: ${provider.poses.length}',
+              translation.pose_count(provider.poses.length),
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             if (provider.poses.isNotEmpty)
               Text(
-                'Confidence: ${(provider.poses.first.confidence * 100).toStringAsFixed(1)}%',
-                style: const TextStyle(color: Colors.white, fontSize: 12),
+                translation.pose_confidence(
+                    (provider.poses.first.confidence * 100).toStringAsFixed(1)),
+                style:
+                    const TextStyle(color: AppColors.onPrimary, fontSize: 12),
               ),
           ],
         ),
@@ -406,7 +420,8 @@ class _PermissionDeniedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Camera permission required'));
+    final translation = AppLocalizations.of(context)!;
+    return Center(child: Text(translation.pose_permission_required));
   }
 }
 

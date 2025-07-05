@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'package:fitness_app/util/logging_service.dart';
 import 'constants/constants.dart';
-import 'main.dart';
+import 'l10n/app_localizations.dart';
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
-
+  // TODOD: Localize
   final List<String> filters = const [
     'Lower Body',
     'Equipment',
@@ -15,6 +15,7 @@ class GymScreen extends StatelessWidget {
     'Arme',
     'Po'
   ];
+  // TODOD: Localize
   final List<String> exercises = const [
     'Back Squat',
     'Front Squat',
@@ -24,9 +25,11 @@ class GymScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.i('GymScreen displayed');
+    final translation = AppLocalizations.of(context)!;
+    LoggingService.instance.i('GymScreen displayed');
 
     return Scaffold(
+      // TODO: Use constants
       backgroundColor: const Color(0xFFF2F2F2),
       body: SafeArea(
         child: Stack(
@@ -39,6 +42,7 @@ class GymScreen extends StatelessWidget {
             //  ),
             //),
             Padding(
+              // TODO: Use constants
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,84 +52,97 @@ class GymScreen extends StatelessWidget {
                     children: [
                       IconButton(
                           onPressed: () {
-                            logger.i('User navigated back from gym screen');
+                            LoggingService.instance
+                                .i('User navigated back from gym screen');
                             Navigator.pop(context);
                           },
                           icon: const Icon(Icons.arrow_back)),
                       const Icon(Icons.star, color: darkGreen, size: 28),
                     ],
                   ),
+                  // TODOD: Localize
                   const SizedBox(height: 16),
                   const Text('MEISTER DEINE',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                      style: TextStyle(
+                          fontSize: AppFontSizes.headline,
+                          fontWeight: AppFontWeights.extraBold)),
                   const Text('POSE IM GYM',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                      style: TextStyle(
+                          fontSize: AppFontSizes.headline,
+                          fontWeight: AppFontWeights.extraBold)),
                   const SizedBox(height: 16),
                   Wrap(
                     spacing: 10,
                     runSpacing: 0,
                     children: filters.map((label) {
+                      // TODOD: Localize
                       final bool selected =
                           (label == 'Lower Body' || label == 'Equipment');
                       return Chip(
                         label: Text(label,
                             style: TextStyle(
-                                color: selected ? Colors.white : Colors.black54,
-                                fontWeight: FontWeight.bold)),
+                                color: selected
+                                    ? AppColors.onPrimary
+                                    : AppColors.darkGrey,
+                                fontWeight: AppFontWeights.bold)),
                         backgroundColor:
-                            selected ? darkGreen : Colors.grey[300],
+                            selected ? AppColors.primary : AppColors.lightGrey,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                            horizontal: AppSpacing.chip,
+                            vertical: AppGaps.gap4),
                         shape: const StadiumBorder(),
                       );
                     }).toList(),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'VERBESSERN SIE FLEXIBILITÄT, STEIGERN\nSIE MOBILITÄT UND FÖRDERN SIE DAS\nWOHLBEFINDEN.',
-                    style: TextStyle(height: 1.4, fontWeight: FontWeight.bold),
+                  Text(
+                    translation.gym_improve_flexibility,
+                    style: const TextStyle(
+                        height: 1.4, fontWeight: AppFontWeights.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'EIN KURS, DER EFFEKTIVES FEEDBACK FÜR\nIHRE KNIEBEUGEN BIETET',
-                    style: TextStyle(height: 1.4, fontWeight: FontWeight.bold),
+                  Text(
+                    translation.gym_course_feedback,
+                    style: const TextStyle(
+                        height: 1.4, fontWeight: AppFontWeights.bold),
                   ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: exercises.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.listItem),
                           child: ElevatedButton(
                             onPressed: () {
-                              logger.i(
+                              LoggingService.instance.i(
                                   'User selected exercise: ${exercises[index]}');
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: darkGreen,
+                              backgroundColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: AppGaps.gap16),
                             ),
                             child: Row(
                               children: [
                                 const SizedBox(width: 12),
                                 Text('${index + 1}',
                                     style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold)),
+                                        color: AppColors.onPrimary,
+                                        fontWeight: AppFontWeights.bold)),
                                 const SizedBox(width: 12),
                                 Container(
                                   width: 35,
                                   height: 35,
                                   decoration: const BoxDecoration(
-                                      color: green, shape: BoxShape.circle),
+                                      color: AppColors.secondary,
+                                      shape: BoxShape.circle),
                                   child: const Center(
                                     child: Icon(Icons.play_arrow,
-                                        size: 18, color: Color(0xFFDFEAE6)),
+                                        size: 18, color: AppColors.surface),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -133,9 +150,9 @@ class GymScreen extends StatelessWidget {
                                   child: Text(
                                     exercises[index],
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 16,
+                                      fontWeight: AppFontWeights.bold,
+                                      color: AppColors.onPrimary,
+                                      fontSize: AppFontSizes.body,
                                     ),
                                   ),
                                 ),
