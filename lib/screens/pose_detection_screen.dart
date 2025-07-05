@@ -8,6 +8,7 @@ import 'package:fitness_app/frosted_glasst_button.dart';
 import 'dart:async';
 import 'package:fitness_app/widgets/pose_painter.dart';
 import 'package:fitness_app/constants/constants.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:fitness_app/util/logging_service.dart';
 
 class PoseDetectionScreen extends StatefulWidget {
@@ -379,6 +380,7 @@ class _PoseCountOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Positioned(
       bottom: 100,
       left: 16,
@@ -393,7 +395,7 @@ class _PoseCountOverlay extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Poses: ${provider.poses.length}',
+              loc.pose_count(provider.poses.length),
               style: const TextStyle(
                 color: AppColors.onPrimary,
                 fontWeight: FontWeight.bold,
@@ -401,7 +403,8 @@ class _PoseCountOverlay extends StatelessWidget {
             ),
             if (provider.poses.isNotEmpty)
               Text(
-                'Confidence: ${(provider.poses.first.confidence * 100).toStringAsFixed(1)}%',
+                loc.pose_confidence(
+                    (provider.poses.first.confidence * 100).toStringAsFixed(1)),
                 style:
                     const TextStyle(color: AppColors.onPrimary, fontSize: 12),
               ),
@@ -417,7 +420,8 @@ class _PermissionDeniedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Camera permission required'));
+    final loc = AppLocalizations.of(context)!;
+    return Center(child: Text(loc.pose_permission_required));
   }
 }
 

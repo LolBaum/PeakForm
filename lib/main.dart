@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fitness_app/util/logging_service.dart';
 import 'package:fitness_app/util/custom_pretty_printer.dart';
+import 'l10n/app_localizations.dart';
 
 late final Logger logger;
 
@@ -74,6 +75,20 @@ class FitnessApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'LeagueSpartan',
       ),
+
+      // Localization
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (locale == null) return supportedLocales.first;
+        for (var supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale.languageCode) {
+            return supportedLocale;
+          }
+        }
+        return supportedLocales.first;
+      },
+      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       initialRoute: '/',
       routes: {
         '/': (context) =>

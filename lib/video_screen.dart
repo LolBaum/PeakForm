@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'constants/constants.dart';
 import 'package:fitness_app/util/logging_service.dart';
+import 'l10n/app_localizations.dart';
 
 class VideoScreen extends StatelessWidget {
   const VideoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     LoggingService.instance.i('VideoScreen displayed');
 
     return Scaffold(
@@ -39,39 +41,41 @@ class VideoScreen extends StatelessWidget {
                         size: 64)),
               ),
               const SizedBox(height: 16),
-              const Text('LAUFEN',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              Text(loc.video_running,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 10,
                 children: [
-                  _laufenTag('WADEN'),
-                  _laufenTag('OBERSCHENKEL'),
+                  _laufenTag(loc.video_calf),
+                  _laufenTag(loc.video_thigh),
                 ],
               ),
               const Divider(height: 32, thickness: 1),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Column(children: [
-                    Text('DURCH. ZEIT',
-                        style: TextStyle(
+                    Text(loc.video_duration,
+                        style: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text('20MIN', style: TextStyle(fontWeight: FontWeight.bold))
+                    Text(loc.video_duration_value,
+                        style: const TextStyle(fontWeight: FontWeight.bold))
                   ]),
                   Column(children: [
-                    Text('SCHWIERIGKEIT',
-                        style: TextStyle(
+                    Text(loc.video_difficulty,
+                        style: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text('EINFACH',
-                        style: TextStyle(fontWeight: FontWeight.bold))
+                    Text(loc.video_difficulty_value,
+                        style: const TextStyle(fontWeight: FontWeight.bold))
                   ]),
                   Column(children: [
-                    Text('INTENSITÄT',
-                        style: TextStyle(
+                    Text(loc.video_intensity,
+                        style: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text('NORMAL',
-                        style: TextStyle(fontWeight: FontWeight.bold))
+                    Text(loc.video_intensity_value,
+                        style: const TextStyle(fontWeight: FontWeight.bold))
                   ])
                 ],
               ),
@@ -87,16 +91,18 @@ class VideoScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30)),
                   minimumSize: const Size(double.infinity, 48),
                 ),
-                child: const Text('START',
-                    style: TextStyle(
+                child: Text(loc.video_start,
+                    style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white)),
               ),
               const SizedBox(height: 16),
-              const Text('SCHRITT 1 VON 3',
-                  style: TextStyle(
-                      color: Colors.grey, fontWeight: FontWeight.bold)),
+              Text(
+                loc.video_course_description,
+                style: const TextStyle(
+                    color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(16),
@@ -104,9 +110,9 @@ class VideoScreen extends StatelessWidget {
                   color: AppColors.primary.withAlpha((255 * 0.05).toInt()),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text(
-                  'TRAUST DU DAVON, MÜHELOSER, SCHNELLER UND VERLETZUNGSFREIER ZU LAUFEN? UNSER INNOVATIVER LAUFKURS MACHT ES MÖGLICH! WIR KOMBINIEREN PROFESSIONELLES COACHING MIT DER MODERNSTEN TECHNOLOGIE, UM DEIN LAUFTRAINING AUF EIN VÖLLIG NEUES NIVEAU ZU HEBEN.',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  loc.video_course_description,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],

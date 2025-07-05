@@ -4,6 +4,7 @@ import 'package:fitness_app/util/logging_service.dart';
 import 'constants/constants.dart';
 import 'screens/pose_detection_screen.dart';
 import 'providers/pose_detection_provider.dart';
+import 'l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
@@ -20,6 +21,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     _log('HomeScreen built for user: $userName');
 
     return Scaffold(
@@ -33,8 +35,8 @@ class HomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _circularIconButton(Icons.bar_chart),
-                    _circularIconButton(Icons.settings),
+                    _circularIconButton(Icons.bar_chart, loc),
+                    _circularIconButton(Icons.settings, loc),
                   ],
                 ),
               ),
@@ -62,20 +64,20 @@ class HomeScreen extends StatelessWidget {
                         backgroundColor: AppColors.accent,
                       ),
                       const SizedBox(height: 12),
-                      Text('Hi, $userName!',
+                      Text(loc.home_hi_user(userName),
                           style: const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.5)),
                       const SizedBox(height: 4),
-                      const Text('FORTSCHRITT',
-                          style: TextStyle(
+                      Text(loc.home_progress,
+                          style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: AppColors.darkGrey,
                               letterSpacing: 1.5)),
-                      const Text('LVL. 10',
-                          style: TextStyle(
+                      Text(loc.home_level,
+                          style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: AppColors.onSurface)),
@@ -135,8 +137,8 @@ class HomeScreen extends StatelessWidget {
                       Center(
                         child: Column(
                           children: [
-                            const Text('LETZTE AUFNAHME: TENNIS',
-                                style: TextStyle(
+                            Text(loc.home_last_recording,
+                                style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.darkGrey)),
@@ -156,48 +158,13 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 4, right: 8, top: 4, bottom: 4),
-                                      child: Container(
-                                        width: 35,
-                                        height: 35,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: AppColors.secondary,
-                                        ),
-                                        child: const Center(
-                                          child: SizedBox(
-                                            width: 15,
-                                            height: 15,
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: AppColors.onPrimary),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.only(right: 16),
-                                      child: Text('Aufnehmen',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.onPrimary)),
-                                    ),
-                                  ],
-                                ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: Text(loc.home_record,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.onPrimary)),
                               ),
                             ),
                           ],
@@ -214,10 +181,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _circularIconButton(IconData icon) {
+  Widget _circularIconButton(IconData icon, AppLocalizations loc) {
     return GestureDetector(
       onTap: () {
-        String buttonName = icon == Icons.bar_chart ? 'Charts' : 'Settings';
+        String buttonName =
+            icon == Icons.bar_chart ? loc.home_charts : loc.home_settings;
         _log('Circular icon button tapped: $buttonName');
       },
       child: Container(
@@ -232,6 +200,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _sportTile(BuildContext context, String title, String subtitle,
       String? route, String imagePath) {
+    final loc = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: route != null
           ? () {
@@ -257,7 +226,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 10),
             Text(
-              title,
+              loc.home_sport_tile_title(title),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.onPrimary,
@@ -266,7 +235,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              subtitle,
+              loc.home_sport_tile_subtitle(subtitle),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 12,

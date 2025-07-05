@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitness_app/util/logging_service.dart';
 import 'constants/constants.dart';
+import 'l10n/app_localizations.dart';
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
@@ -23,6 +24,7 @@ class GymScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     LoggingService.instance.i('GymScreen displayed');
 
     return Scaffold(
@@ -70,7 +72,7 @@ class GymScreen extends StatelessWidget {
                       final bool selected =
                           (label == 'Lower Body' || label == 'Equipment');
                       return Chip(
-                        label: Text(label,
+                        label: Text(loc.home_sport_tile_title(label),
                             style: TextStyle(
                                 color: selected
                                     ? AppColors.onPrimary
@@ -85,14 +87,16 @@ class GymScreen extends StatelessWidget {
                     }).toList(),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'VERBESSERN SIE FLEXIBILITÄT, STEIGERN\nSIE MOBILITÄT UND FÖRDERN SIE DAS\nWOHLBEFINDEN.',
-                    style: TextStyle(height: 1.4, fontWeight: FontWeight.bold),
+                  Text(
+                    loc.gym_improve_flexibility,
+                    style: const TextStyle(
+                        height: 1.4, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'EIN KURS, DER EFFEKTIVES FEEDBACK FÜR\nIHRE KNIEBEUGEN BIETET',
-                    style: TextStyle(height: 1.4, fontWeight: FontWeight.bold),
+                  Text(
+                    loc.gym_course_feedback,
+                    style: const TextStyle(
+                        height: 1.4, fontWeight: FontWeight.bold),
                   ),
                   Expanded(
                     child: ListView.builder(
