@@ -419,6 +419,7 @@ enum directionchange{updown, downup}
 
 class MovementReference {
   bool session_started = false;
+  List<List<dynamic>> feedbacks = [];
 
 
   SlidingAverage score = SlidingAverage(1000);
@@ -640,23 +641,26 @@ class MovementReference {
   //funktion die input image speichert zusätzlich zu negativem feedback wenn dieser eintritt
   //bei negativem feedback wird diese funktion aufgerufen und macht ein foto davon
   got_you_in_4k(InputImage inputImage){
-    //TODO:adden im speicher
+    //TODO:adden im speicher und probleme lösen
+    //problem verzögerung durch buffer average kann zu einem bild an falscher stelle führen
+    //Problem es sollen nicht durchgängig werte aufgenommen werden sonderneinmal pro problem
 
-    //liste erstellen
 
     //feedback liste erstellen mit jeweils fotos und werten
-    /*
-    das alles hier speichern
-    esh_dir_change_upper_feedback
-    esh_dir_change_downer_feedback
-    wes_angle_feedback
-    inputImage
+    feedbacks.add([
+      esh_buffer_average_l,
+      esh_buffer_average_r,
+      esh_dir_change_upper_feedback,
+      esh_dir_change_downer_feedback,
+      wes_buffer_average_l,
+      wes_buffer_average_r,
+      wes_angle_feedback,
+      inputImage
+    ]);
+    //timespamp ? auch abspeichern ?
 
-    esh_buffer_average_l
-    esh_buffer_average_r
-    wes_buffer_average_l
-    wes_buffer_average_r
-     */
+    //print(results[0][0]); // Lateral Raises
+    //results[0] ereignis
     return;
   }
 

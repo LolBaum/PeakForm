@@ -195,20 +195,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
 
 
-        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen und namen nennen so werden die variablen dann heißen oder ein struckt für diese wir bei feedback
-        //und stream erzeugen mit abgleich
+        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen und namen nennen so werden die variablen dann heißen oder ein struckt für diese wie bei der winkel zu string idee
+        //und stream erzeugen mit abgleich (von ideal und nachgemacht)
         //Curls auch machen als einheit erstmal durch stream und mit den veralgemeinerten klassen probieren
 
 
         jetzt:
-        //liste an feedback anfertigen und die pose die dazu da war also die durchschnittlichen esh und wes werte zu dem feedback ?
-
-
+        //klassen veralgemeinern
 
         //notes vom handy
-
-
-
 
         // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
         // also eine sequenz vin winkeln die gemacht werden muss
