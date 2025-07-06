@@ -83,7 +83,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                 ),
                 */
                 Text(
-                  "Score: ${(lateral_rises.score.average*100).toInt()} %",
+                  "Performance: ${(lateral_rises.score.average*100).toInt()} %",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
@@ -146,10 +146,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         analytics.get_lr_wesh_points();
         analytics.compute_wesh_joints();
 
-
-        //bei pausieren wieder in den init zustand bringen
+        //bei pausieren wieder t_posen zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
           t_pose.triggered = false;
+
         }
         if(analytics.is_wesh()) {
           t_pose.lar_init_pose(!camera_view.CameraView.pose_Stopwatch_activation_bool,
@@ -158,29 +158,56 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           camera_view.CameraView.pose_Stopwatch_activation_bool =
               t_pose.triggered;
         }
+        //TODO: speicher verbinden und session löschen (neue instanz ?)
         if(camera_view.CameraView.pose_Stopwatch_activation_bool){
-
+          //hier beginnt eine neue session
+          //neue werte abspeichern und feedbach abspeichern
+          lateral_rises.session_started = true;
           lateral_rises.update_esh_angles(analytics.l_esh_angl, analytics.r_esh_angl);
           lateral_rises.update_wes_angles(analytics.l_wes_angl, analytics.r_wes_angl);
 
           lateral_rises.checkElbowAngle();
-          lateral_rises.update_direction_lr('beide'); //name für feedback
+          lateral_rises.update_direction_lr('beide'); //richtigen namen für feedback
+
+          if(lateral_rises.neg_feedback){
+            lateral_rises.got_you_in_4k(inputImage);
+          }
+
+        } else {
+          if(lateral_rises.session_started == true){ // oder oben bei t_pose.triggered = false;
+            //sesion wurde beendet
+            //für den Score die letzten x sekunden entfernen die man zum abbrechen braucht;
+            // und die letzten feedbacks dazu auch
+            lateral_rises.session_started == false;
+            //score und so alles neu initialisieren hier //auch buffer und feedback list
+            //feedbackliste abspeichern
+            //TODO: camera_view.CameraView.pose_Stopwatch_activation_bool wechsel dann neue klasse erst initialisieren
+          } else {
+            //session wurde noch nicht gestartet
+          }
+
         }
 
         /*
         Todo:
+        bei der stunde: neu erzeugen der klasse wenn camera_view.CameraView.pose_Stopwatch_activation_bool
+        und dann auch die werte abspeichern in got you in 4k
+
+
+
+        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen und namen nennen so werden die variablen dann heißen oder ein struckt für diese wir bei feedback
+        //und stream erzeugen mit abgleich
+        //Curls auch machen als einheit erstmal durch stream und mit den veralgemeinerten klassen probieren
+
 
         jetzt:
         //liste an feedback anfertigen und die pose die dazu da war also die durchschnittlichen esh und wes werte zu dem feedback ?
 
 
-        //Klassen verallgemeinern
-        //notes vom handy holen
 
-        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen und namen nennen so werden die variablen dann heißen oder ein struckt für diese wir bei feedback
-        //und stream erzeugen mit abgleich
+        //notes vom handy
 
-        //Curls auch machen als einheit erstmal durch stream und mit den veralgemeinerten klassen probieren
+
 
 
         // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht

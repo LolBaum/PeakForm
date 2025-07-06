@@ -418,7 +418,12 @@ enum directionchange{updown, downup}
 //kopf bliebt grade
 
 class MovementReference {
+  bool session_started = false;
+
+
   SlidingAverage score = SlidingAverage(1000);
+
+  bool neg_feedback = false;
 
   double upperAngle;
   double lowerAngle;
@@ -431,6 +436,7 @@ class MovementReference {
 
   String esh_dir_change_upper_feedback = " ";
   String esh_dir_change_downer_feedback = " ";
+
   var esh_buffer_l = CircularBuffer<double>(7);
   var esh_buffer_r = CircularBuffer<double>(7);
   double esh_buffer_average_l = 0;
@@ -512,9 +518,11 @@ class MovementReference {
       bent_count = 0;
       bent = false;
       wes_angle_feedback = "good";
+      neg_feedback = false;
     }
     if(bent_count > 5){
       wes_angle_feedback = "not straight";
+      neg_feedback = true;
       bent = true;
     }
   }
@@ -556,36 +564,41 @@ class MovementReference {
 
       if(dirchange == directionchange.updown){
         //haltung ausgleichen mit guter wdh
-        score.add(scorewithTolerances(esh_max_angle, esh_buffer_average, 20.0), 8);
+        score.add(scorewithTolerances(esh_max_angle, esh_buffer_average, 20.0), 10);
         double esh_upper_diff = esh_max_angle - esh_buffer_average;
 
         //todo:werte tweaken
 
         if (esh_upper_diff < -6.0) {
           esh_dir_change_upper_feedback = side + " zu hoch!";
+          neg_feedback = true;
           score.add(0.8,2); //strafpunkt für die gesundheit
           reps++;
         } else
         if (esh_upper_diff < 2.0) {
           esh_dir_change_upper_feedback = side + " super";
+          neg_feedback = false;
           reps++;
         } else
         if (esh_upper_diff < 6.0) {
           esh_dir_change_upper_feedback = side + " gut";
+          neg_feedback = false;
           reps++;
         } else
         if (esh_upper_diff < 15.0) {
           esh_dir_change_upper_feedback = side + " noch etwas höher";
+          neg_feedback = false;
         } else
         if (esh_upper_diff < 17.0) {
           esh_dir_change_upper_feedback = side + " zu niedrig";
+          neg_feedback = true;
         }
       }
 
       if(dirchange == directionchange.downup){
 
-        score.add(scorewithTolerances(esh_min_angle, esh_buffer_average, 25.0), 8);
-        double esh_downer_diff = esh_buffer_average - esh_min_angle ;
+        score.add(scorewithTolerances(esh_min_angle, esh_buffer_average, 25.0), 10);
+        double esh_downer_diff = esh_buffer_average - esh_min_angle;
 
         //todo:werte tweaken
         //auswertung hier etwas langsamer
@@ -601,6 +614,7 @@ class MovementReference {
         } else
         if (esh_downer_diff < 25.0) {
           esh_dir_change_downer_feedback = side + " zu hoch";
+          neg_feedback = true;
         }
       }
       direction_changed = false;
@@ -618,6 +632,32 @@ class MovementReference {
         _lastActionTime = now;
       }
     }
+  }
+
+  // eine funktion die checkt ob es negatives feedback gibt und dann sagt
+
+
+  //funktion die input image speichert zusätzlich zu negativem feedback wenn dieser eintritt
+  //bei negativem feedback wird diese funktion aufgerufen und macht ein foto davon
+  got_you_in_4k(InputImage inputImage){
+    //TODO:adden im speicher
+
+    //liste erstellen
+
+    //feedback liste erstellen mit jeweils fotos und werten
+    /*
+    das alles hier speichern
+    esh_dir_change_upper_feedback
+    esh_dir_change_downer_feedback
+    wes_angle_feedback
+    inputImage
+
+    esh_buffer_average_l
+    esh_buffer_average_r
+    wes_buffer_average_l
+    wes_buffer_average_r
+     */
+    return;
   }
 
 }
