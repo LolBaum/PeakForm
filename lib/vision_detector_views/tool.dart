@@ -1,8 +1,8 @@
-import 'dart:ffi';
+//import 'dart:ffi';
 import 'dart:math';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
-import 'pose_detector_view.dart';
+//import 'pose_detector_view.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'package:circular_buffer/circular_buffer.dart';
 
@@ -101,9 +101,12 @@ Vector3? getLandmarkCoordinates_3d(List<MapEntry<PoseLandmarkType, PoseLandmark>
 }
 
 Vector2? getLandmarkCoordinates_2d(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, String name) {
+  //TODO
+
   try {
     final entry = entries.firstWhere((e) => e.key.name == name);
     final landmark = entry.value;
+    //print("fuck: " + name + landmark.likelihood.toString());
     return Vector2(landmark.x, landmark.y);
   } catch (e) {
     print(e);
@@ -136,16 +139,18 @@ class SlidingAverage {
       : _values = List.filled(windowSize, 1.0, growable: true),
         _sum = windowSize * 1.0;
 
-  void add(double value) {
-    // Ältesten Wert entfernen
-    _sum -= _values.removeAt(0);
+  void add(double value, int weight) {
+    for (int i = 0; i < weight; i++) {
+      // Ältesten Wert entfernen
+      _sum -= _values.removeAt(0);
 
-    // Neuen Wert hinzufügen
-    _values.add(value);
-    _sum += value;
+      // Neuen Wert hinzufügen
+      _values.add(value);
+      _sum += value;
 
-    if (_sum < 0){
-      _sum = 0;
+      if (_sum < 0){
+        _sum = 0;
+      }
     }
   }
 
@@ -317,15 +322,14 @@ class Pose_analytics {
 
     l_wsh_angl = computeJointAngle_2d(a: l_Hip, b: l_Shoulder, c: l_Wrist);
     r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
+
   }
 
 }
 
-// wie richtig machst du die übung ...
-class LAR_Evaluation {
+
+class Pose_init {
   bool triggered = false;
-  bool stoped = false;
-  bool init = false;
 
   //int angle_status = 0;
   //bool angle_up = false;
@@ -339,13 +343,12 @@ class LAR_Evaluation {
   double l_wes_score = 0.0;
   double l_esh_score = 0.0;
 
-  SlidingAverage score = SlidingAverage(100);
 
   //MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
 
-  session(bool init, r_wes_angl, r_esh_angl, l_wes_angl, l_esh_angl){
+  lar_init_pose(bool init, r_wes_angl, r_esh_angl, l_wes_angl, l_esh_angl){
     if (init) return intolerance_t_pose_starter(r_wes_angl: r_wes_angl, r_esh_angl: r_esh_angl, l_wes_angl: l_wes_angl, l_esh_angl: l_esh_angl);
-    return; //evaluation(r_wes_angl: r_wes_angl, r_esh_angl: r_esh_angl, l_wes_angl: l_wes_angl, l_esh_angl: l_esh_angl);
+    return;
   }
 
   bool intolerance_t_pose_starter({
@@ -370,49 +373,6 @@ class LAR_Evaluation {
     }
     return false;
 
-  }
-
-
-  //über die zeit verfolgen ob die arme richtig sind und dann wenn richtungswechsel ist ob dieser im richtigen winkel stattfand (mit einem faktor)
-  //auch arm veränderungen bestrafen
-  evaluation({
-    r_wsh_angl = 0.0,
-    r_wes_angl = 0.0,
-    r_esh_angl = 0.0,
-
-    l_wsh_angl = 0.0,
-    l_wes_angl = 0.0,
-    l_esh_angl = 0.0
-  }) {
-
-    //lateral_rises.update_direction();
-
-    //lateral_rises.checkLateralRaiseCycle(l_wsh_angl, r_wsh_angl);
-    //lateral_rises.checkElbowAngle(l_wes_angl, r_wes_angl);
-
-    //lateral_rises.update_angles(r_esh_angl, r_wes_angl);
-
-
-
-    //if(!started || !is_wesh()) return;
-    r_wes_score = scorewithTolerances(180, r_wes_angl, 25.0);
-    //r_esh_score = scorewithTolerances(lar_angels[angle_status], r_esh_angl, 45.0); //lar_angles war vorher 90.0
-    l_wes_score = scorewithTolerances(180, l_wes_angl, 25.0);
-    //l_esh_score = scorewithTolerances(lar_angels[angle_status], l_esh_angl, 45.0);
-
-    r_wesh_score = (r_wes_score + r_esh_score)/2;
-    l_wesh_score = (l_wes_score + l_esh_score)/2;
-
-    score.add(r_wesh_score);
-    score.add(l_wesh_score);
-
-    //print("P_Score: " + (score.average).toString());
-    //print("r_ARM (wes): " + r_wes_angl.toString());
-    //print("r_HIP (esh): " + r_esh_angl.toString());
-
-
-
-    return true;
   }
 
 
@@ -458,7 +418,7 @@ enum directionchange{updown, downup}
 //kopf bliebt grade
 
 class MovementReference {
-  SlidingAverage score = SlidingAverage(100);
+  SlidingAverage score = SlidingAverage(1000);
 
   double upperAngle;
   double lowerAngle;
@@ -483,6 +443,17 @@ class MovementReference {
   DateTime? _lastActionTime;
   final Duration _cooldown = Duration(milliseconds: 125); //vorher 250
 
+
+  int reps = 0;
+  int bent_count = 0;
+  bool bent = false;
+
+  bool armsUp = false;
+  bool leftArmUp = false;
+  bool rightArmUp = false;
+  bool leftArmDown = false;
+  bool rightArmDown = false;
+
   double wes_max_angle = 180.0;
   double wes_min_angle = 165.0;
   var wes_buffer_l = CircularBuffer<double>(7);
@@ -490,24 +461,11 @@ class MovementReference {
   double wes_buffer_average_l = 0;
   double wes_buffer_average_r = 0;
 
-  double min_r = 180;
-  double max_r = 0;
-
-
-  int bent_count = 0;
-  bool bent = false;
-  int reps = 0;
-  bool armsUp = false;
-
-
-  bool leftArmUp = false;
-  bool rightArmUp = false;
-  bool leftArmDown = false;
-  bool rightArmDown = false;
-
+  double min_esh_angle = 180;
+  double max_esh_angle = 0;
+  String wes_angle_feedback = " ";
 
   MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime);
-
 
 
   //fragen warum secundary angle und warum vorher esh und wes
@@ -530,44 +488,33 @@ class MovementReference {
     return;
   }
 
-  /*
-  void checkLateralRaiseCycle(double leftAngle, double rightAngle) {
-
-    leftArmUp = leftAngle > esh_max_angle;
-    rightArmUp = rightAngle > esh_max_angle;
-    leftArmDown = leftAngle < esh_min_angle;
-    rightArmDown = rightAngle < esh_min_angle;
-
-    if (!armsUp && leftArmUp && rightArmUp) {
-      armsUp = true;
-      reps++;
-      //print("Beide Arme oben angekommen!");
-    }
-
-    if (armsUp && leftArmDown && rightArmDown) {
-      armsUp = false;
-      //print("Arme unten! Wiederholung gezählt! Gesamt: $reps");
-    }
-  }*/
-
   //eigentlich leicht anwinkeln
-  void checkElbowAngle(double leftAngle, double rightAngle){
+  void checkElbowAngle(){
+    double leftAngle = wes_buffer_average_l;
+    double rightAngle = wes_buffer_average_r;
+
     double tolerance = 30.0;
     double lowerTolerance = 180.0 - tolerance;
 
-    score.add(scorewithTolerances(wes_max_angle, leftAngle, 30.0));
-    score.add(scorewithTolerances(wes_max_angle, rightAngle, 30.0));
+    score.add(scorewithTolerances(wes_max_angle, leftAngle, 80.0), 1); //voirher 30
+    score.add(scorewithTolerances(wes_max_angle, rightAngle, 80.0), 1);
+    //oder diskret punkte geben wenn feedback kommt
 
+    //score add toleranter machen
+
+
+    print("elbow_score: " + scorewithTolerances(wes_max_angle, leftAngle, 30.0).toString());
+    print("elbow_score: " + scorewithTolerances(wes_max_angle, rightAngle, 30.0).toString());
 
     if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
       bent_count++;
     } else{
       bent_count = 0;
       bent = false;
+      wes_angle_feedback = "good";
     }
-
-    if(bent_count > 30){
-      print("Arm is not straight");
+    if(bent_count > 5){
+      wes_angle_feedback = "not straight";
       bent = true;
     }
   }
@@ -575,37 +522,49 @@ class MovementReference {
 
   //gilt erstmal für beide arme zusammen aber update_angles und direktion am bestem pro arm
   //reps anpassen wenn es rechts und links gezählt werden (oder sich nur auf das höhere beziehen)
-  void update_direction_lr(String side, double esh_buffer_average){
+  void update_direction_lr(String side){
+    double esh_buffer_average = 0.0;
+    if (side == 'l') {
+      esh_buffer_average = esh_buffer_average_l;
+    } else
+    if (side == 'r') {
+      esh_buffer_average = esh_buffer_average_r;
+    } else {
+      esh_buffer_average = (esh_buffer_average_l + esh_buffer_average_r)/2;
+    }
+
     if(dir == direction.down){ // Down -> Up
-      if (min_r < esh_buffer_average){ //größer werdende entfernung zum minimum
+      if (min_esh_angle < esh_buffer_average){ //größer werdende entfernung zum minimum
         direction_changed = true;
         dirchange = directionchange.downup;
-        min_r = 180;
+        min_esh_angle = 180;
       }else{
-        min_r = esh_buffer_average;
+        min_esh_angle = esh_buffer_average;
       }
     }
     else{ // up -> down
-      if (max_r > esh_buffer_average){ //größer werdende entfernung zum maximum
+      if (max_esh_angle > esh_buffer_average){ //größer werdende entfernung zum maximum
         direction_changed = true;
         dirchange = directionchange.updown;
-        max_r = 0;
+        max_esh_angle = 0;
       }else{
-        max_r = esh_buffer_average;
+        max_esh_angle = esh_buffer_average;
       }
     }
 
     if (direction_changed == true){
 
       if(dirchange == directionchange.updown){
-
-        score.add(scorewithTolerances(esh_max_angle, esh_buffer_average, 20.0));
+        //haltung ausgleichen mit guter wdh
+        score.add(scorewithTolerances(esh_max_angle, esh_buffer_average, 20.0), 8);
         double esh_upper_diff = esh_max_angle - esh_buffer_average;
 
         //todo:werte tweaken
 
         if (esh_upper_diff < -6.0) {
           esh_dir_change_upper_feedback = side + " zu hoch!";
+          score.add(0.8,2); //strafpunkt für die gesundheit
+          reps++;
         } else
         if (esh_upper_diff < 2.0) {
           esh_dir_change_upper_feedback = side + " super";
@@ -621,13 +580,11 @@ class MovementReference {
         if (esh_upper_diff < 17.0) {
           esh_dir_change_upper_feedback = side + " zu niedrig";
         }
-
-
       }
 
       if(dirchange == directionchange.downup){
 
-        score.add(scorewithTolerances(esh_min_angle, esh_buffer_average, 25.0));
+        score.add(scorewithTolerances(esh_min_angle, esh_buffer_average, 25.0), 8);
         double esh_downer_diff = esh_buffer_average - esh_min_angle ;
 
         //todo:werte tweaken
@@ -647,7 +604,6 @@ class MovementReference {
         }
       }
       direction_changed = false;
-
 
       //zu schnelle wechsel nicht anerkennen
       final now = DateTime.now();

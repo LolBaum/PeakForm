@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-import 'package:circular_buffer/circular_buffer.dart';
+//import 'package:circular_buffer/circular_buffer.dart';
 
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
@@ -22,13 +22,11 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
-  //var _cameraLensDirection = CameraLensDirection.back;
-  var _cameraLensDirection = CameraLensDirection.front;
+  var _cameraLensDirection = CameraLensDirection.front; //richtung geändert
 
 
   Pose_analytics analytics = Pose_analytics();
-  LAR_Evaluation eval = LAR_Evaluation();
-
+  Pose_init t_pose = Pose_init();
   MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
 
 
@@ -55,19 +53,22 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         Center(
           child: Container(
             padding: EdgeInsets.all(8),
-            color: Colors.black.withOpacity(0.5),
+            //color: Colors.black.withOpacity(0.5),
+            color: Color.fromARGB(128, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                /*
                 Text(
                   lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+                ),*/
                 SizedBox(height: 8),
                 Text(
                   "Wiederholungen: ${lateral_rises.reps}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
+                /*
                 Text(
                   "Elbow Angle: ${lateral_rises.wes_buffer_average_l}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
@@ -77,7 +78,12 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
-                  "average: ${lateral_rises.esh_buffer_average_l}",
+                  "esh_average: ${lateral_rises.esh_buffer_average_l}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                */
+                Text(
+                  "Score: ${(lateral_rises.score.average*100).toInt()} %",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 Text(
@@ -86,6 +92,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                 ),
                 Text(
                   "dFB: ${lateral_rises.esh_dir_change_downer_feedback}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "arms: ${lateral_rises.wes_angle_feedback}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 /*
@@ -116,6 +126,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
     //final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
 
+
+
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
       final painter = PosePainter(
@@ -137,51 +149,56 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //bei pausieren wieder in den init zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
-          eval.triggered = false;
+          t_pose.triggered = false;
         }
         if(analytics.is_wesh()) {
-          eval.session(!camera_view.CameraView.pose_Stopwatch_activation_bool,
+          t_pose.lar_init_pose(!camera_view.CameraView.pose_Stopwatch_activation_bool,
               analytics.r_wes_angl, analytics.r_esh_angl, analytics.l_wes_angl,
               analytics.l_esh_angl);
           camera_view.CameraView.pose_Stopwatch_activation_bool =
-              eval.triggered;
+              t_pose.triggered;
         }
-
         if(camera_view.CameraView.pose_Stopwatch_activation_bool){
-          //lateral_rises.update_direction_lr('l', lateral_rises.esh_buffer_average_l);
-          //lateral_rises.update_direction_lr('r', lateral_rises.esh_buffer_average_r);
-          lateral_rises.update_direction_lr('beide', (lateral_rises.esh_buffer_average_l + lateral_rises.esh_buffer_average_r)/2);
-
-          //lateral_rises.checkLateralRaiseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
-          lateral_rises.checkElbowAngle(analytics.l_wes_angl, analytics.r_wes_angl);
 
           lateral_rises.update_esh_angles(analytics.l_esh_angl, analytics.r_esh_angl);
+          lateral_rises.update_wes_angles(analytics.l_wes_angl, analytics.r_wes_angl);
+
+          lateral_rises.checkElbowAngle();
+          lateral_rises.update_direction_lr('beide'); //name für feedback
         }
 
         /*
         Todo:
-        //durchgängige arm kontrolle und score
+
+        jetzt:
+        //liste an feedback anfertigen und die pose die dazu da war also die durchschnittlichen esh und wes werte zu dem feedback ?
+
+
+        //Klassen verallgemeinern
         //notes vom handy holen
 
-        //full into KI mit bewegungsablauf oder noch kontrolle haben ?
+        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen und namen nennen so werden die variablen dann heißen oder ein struckt für diese wir bei feedback
+        //und stream erzeugen mit abgleich
 
-        //nicht nur wrist zu elbow to shoulder sondern auch richtigen winkel zum oberkörper finden (der wird vlt immer über 100 sein)
+        //Curls auch machen als einheit erstmal durch stream und mit den veralgemeinerten klassen probieren
+
+
         // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
         // also eine sequenz vin winkeln die gemacht werden muss
 
         //pro übung eine liste an toleranzen und winkel erstellen
-        //unterscheidung linker und rechter arm
+
+
+
         //klassen so verallgemeinern das man mehrere übungen damit machen kann
 
-
+        //full into KI mit bewegungsablauf oder noch kontrolle haben ?
         */
 
-        //score wird erst berechnet wenn initial pose gefunden wird
-        //scores einfluss kann hier mit der certenty gewichtet werden
-        //scoreForLAt rise zu score with tolerances ersätzen
-        // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
-        // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
 
+        //scores einfluss kann hier mit der certenty gewichtet werden
+        //bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
+        //likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
 
 
         //todo store min / max average angle.
