@@ -53,6 +53,8 @@ class PoseDetectionProvider extends ChangeNotifier {
   bool _isModelLoaded = false;
   String _detectionStatus = 'Initializing...';
   bool _isProcessing = false;
+  XFile? _recordedVideoFile;
+  bool _isRecording = false;
 
   // TensorFlow Lite
   Interpreter? _interpreter;
@@ -85,6 +87,10 @@ class PoseDetectionProvider extends ChangeNotifier {
   bool get isModelLoaded => _isModelLoaded;
   String get detectionStatus => _detectionStatus;
   bool get isPlatformSupported => !kIsWeb;
+
+  // Video recording getters
+  XFile? get recordedVideoFile => _recordedVideoFile;
+  bool get isRecording => _isRecording;
 
   // Initialize camera and load MoveNet model
   Future<void> initializeCamera() async {
@@ -463,6 +469,37 @@ class PoseDetectionProvider extends ChangeNotifier {
     final angle = math.acos(cosAngle.clamp(-1.0, 1.0));
 
     return angle * 180 / math.pi;
+  }
+
+  // Start video recording
+  Future<void> startVideoRecording() async {
+    if (_cameraController != null && !_isRecording) {
+      try {
+        await _cameraController!.startVideoRecording();
+        _isRecording = true;
+        notifyListeners();
+      } catch (e, stack) {
+        _log('Failed to start video recording: $e');
+        debugPrint('Failed to start video recording: $e\n$stack');
+      }
+    }
+  }
+
+  // Stop video recording
+  Future<XFile?> stopVideoRecording() async {
+    if (_cameraController != null && _isRecording) {
+      try {
+        final file = await _cameraController!.stopVideoRecording();
+        _isRecording = false;
+        _recordedVideoFile = file;
+        notifyListeners();
+        return file;
+      } catch (e, stack) {
+        _log('Failed to stop video recording: $e');
+        debugPrint('Failed to stop video recording: $e\n$stack');
+      }
+    }
+    return null;
   }
 
   @override

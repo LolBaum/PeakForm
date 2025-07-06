@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'video_screen.dart' show VideoScreen;
+import 'excercise_screen.dart' show ExcerciseScreen;
 import 'gym_screen.dart' show GymScreen;
 import 'result_screen.dart';
 import 'package:logger/logger.dart';
@@ -10,6 +10,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fitness_app/util/logging_service.dart';
 import 'package:fitness_app/util/custom_pretty_printer.dart';
 import 'l10n/app_localizations.dart';
+import 'screens/pose_detection_screen.dart' show PoseDetectionScreen;
+import 'package:provider/provider.dart';
+import 'package:fitness_app/providers/pose_detection_provider.dart';
 
 late final Logger logger;
 
@@ -93,9 +96,12 @@ class FitnessApp extends StatelessWidget {
       routes: {
         '/': (context) =>
             HomeScreen(userName: dotenv.env['USER_NAME'] ?? 'TestUser'),
-        '/video': (context) => const VideoScreen(),
+        '/video': (context) =>
+            const ExcerciseScreen(), // TODO: refactor Naming convention
         '/gym': (context) => const GymScreen(),
         '/result': (context) {
+          final videoPath =
+              ModalRoute.of(context)?.settings.arguments as String?;
           final translation = AppLocalizations.of(context)!;
           return ResultScreen(
             goodFeedback: [
@@ -115,8 +121,14 @@ class FitnessApp extends StatelessWidget {
               FeedbackItem(label: translation.result_tip_midfoot),
               FeedbackItem(label: translation.result_tip_arms),
             ],
+            videoPath: videoPath,
           );
         },
+        // TOOD: refactor naming
+        '/pose_detection': (context) => ChangeNotifierProvider(
+              create: (_) => PoseDetectionProvider(),
+              child: const PoseDetectionScreen(),
+            ),
       },
     );
   }

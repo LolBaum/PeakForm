@@ -101,6 +101,25 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
     LoggingService.instance.i('Camera initialization completed');
   }
 
+  Future<void> _onStartStopDetection(PoseDetectionProvider provider) async {
+    if (!provider.isCameraInitialized) return;
+    if (provider.isDetecting) {
+      provider.stopDetection();
+      final file = await provider.stopVideoRecording();
+      if (!mounted) return;
+      String? videoPath = file?.path;
+      Navigator.pushNamed(
+        context,
+        '/result',
+        arguments: videoPath,
+      );
+    } else {
+      provider.startDetection();
+      await provider.startVideoRecording();
+      if (!mounted) return;
+    }
+  }
+
   /// Build
   ///
   /// This method is responsible for building the Pose Detection Screen.
@@ -126,7 +145,10 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
                     _CameraPreviewWithOverlays(provider: provider),
                     if (!provider.isDetecting) _StatusBar(provider: provider),
                     const _CloseButton(),
-                    _StartStopButton(provider: provider),
+                    _StartStopButton(
+                      provider: provider,
+                      onStartStop: () => _onStartStopDetection(provider),
+                    ),
                   ],
                 );
               },
@@ -322,7 +344,8 @@ class _CloseButton extends StatelessWidget {
 
 class _StartStopButton extends StatelessWidget {
   final PoseDetectionProvider provider;
-  const _StartStopButton({required this.provider});
+  final VoidCallback onStartStop;
+  const _StartStopButton({required this.provider, required this.onStartStop});
 
   @override
   Widget build(BuildContext context) {
@@ -337,11 +360,7 @@ class _StartStopButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               FrostedGlassButton(
-                onTap: provider.isCameraInitialized
-                    ? (provider.isDetecting
-                        ? provider.stopDetection
-                        : provider.startDetection)
-                    : () {},
+                onTap: onStartStop,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24.0,
@@ -366,6 +385,27 @@ class _StartStopButton extends StatelessWidget {
                   ),
                 ),
               ),
+              if (kDebugMode) ...[
+                const SizedBox(width: 16),
+                FrostedGlassButton(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/result');
+                  },
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.bug_report, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text('Debug',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 16)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

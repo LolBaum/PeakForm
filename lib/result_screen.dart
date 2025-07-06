@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'constants/constants.dart';
 import 'l10n/app_localizations.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import 'dart:typed_data';
+import 'package:open_file/open_file.dart';
 
 class FeedbackItem {
   final String label;
@@ -8,17 +11,68 @@ class FeedbackItem {
   FeedbackItem({required this.label, this.timestamp});
 }
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final List<FeedbackItem> goodFeedback;
   final List<FeedbackItem> badFeedback;
   final List<FeedbackItem> tips;
+  final String? videoPath;
 
   const ResultScreen({
     super.key,
     required this.goodFeedback,
     required this.badFeedback,
     required this.tips,
+    this.videoPath,
   });
+
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  Uint8List? _thumbnailBytes;
+  bool _loadingThumbnail = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateThumbnail();
+  }
+
+  Future<void> _generateThumbnail() async {
+    if (widget.videoPath == null) return;
+    setState(() => _loadingThumbnail = true);
+    try {
+      final bytes = await VideoThumbnail.thumbnailData(
+        video: widget.videoPath!,
+        imageFormat: ImageFormat.PNG,
+        maxWidth: 400,
+        quality: 75,
+      );
+      if (mounted) {
+        setState(() {
+          _thumbnailBytes = bytes;
+        });
+      }
+    } catch (e) {
+      // ignore
+    } finally {
+      if (mounted) setState(() => _loadingThumbnail = false);
+    }
+  }
+
+  Future<void> _openVideoWithSystemPlayer() async {
+    if (widget.videoPath == null) return;
+    try {
+      await OpenFile.open(widget.videoPath!);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Konnte Video nicht öffnen: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,17 +108,67 @@ class ResultScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: double.infinity,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary
-                                  .withAlpha((255 * 0.1).toInt()),
+                          Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                            child: InkWell(
                               borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: const Center(
-                              child: Icon(Icons.directions_run,
-                                  size: 100, color: AppColors.primary),
+                              onTap: widget.videoPath != null
+                                  ? _openVideoWithSystemPlayer
+                                  : null,
+                              splashColor: AppColors.primary
+                                  .withAlpha((255 * 0.2).toInt()),
+                              highlightColor: AppColors.primary
+                                  .withAlpha((255 * 0.1).toInt()),
+                              child: Container(
+                                width: double.infinity,
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary
+                                      .withAlpha((255 * 0.1).toInt()),
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: widget.videoPath != null
+                                    ? (_loadingThumbnail
+                                        ? const Center(
+                                            child: CircularProgressIndicator())
+                                        : _thumbnailBytes != null
+                                            ? ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
+                                                child: Stack(
+                                                  fit: StackFit.expand,
+                                                  children: [
+                                                    Image.memory(
+                                                        _thumbnailBytes!,
+                                                        fit: BoxFit.cover),
+                                                    Container(
+                                                        color: Colors.black
+                                                            .withAlpha(
+                                                                (255 * 0.2)
+                                                                    .toInt())),
+                                                    const Center(
+                                                      child: Icon(
+                                                          Icons
+                                                              .play_circle_fill,
+                                                          color: Colors.white,
+                                                          size: 64),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : const Center(
+                                                child: Icon(
+                                                    Icons.play_circle_fill,
+                                                    color: Colors.white,
+                                                    size: 64),
+                                              ))
+                                    : const Center(
+                                        child: Icon(Icons.directions_run,
+                                            size: 100,
+                                            color: AppColors.primary),
+                                      ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -72,16 +176,16 @@ class ResultScreen extends StatelessWidget {
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                           _feedbackCard(context, translation.tooltip_good,
-                              AppColors.primary, goodFeedback),
+                              AppColors.primary, widget.goodFeedback),
                           const SizedBox(height: 12),
-                          _feedbackCard(
-                              context, "ffoo", AppColors.error, badFeedback),
+                          _feedbackCard(context, translation.tooltip_bad,
+                              AppColors.error, widget.badFeedback),
                           const SizedBox(height: 24),
                           Text(translation.result_tips,
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 12),
-                          _tipsCard(context, tips),
+                          _tipsCard(context, widget.tips),
                         ],
                       ),
                     ),
@@ -101,7 +205,9 @@ class ResultScreen extends StatelessWidget {
                       ),
                       child: Text(translation.result_continue,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                              color: AppColors.onPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16)),
                     ),
                   ),
                 ),

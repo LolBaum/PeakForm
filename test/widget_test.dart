@@ -103,12 +103,12 @@ void main() {
     });
   });*/
 /*
-  group('VideoScreen Tests', () {
-    testWidgets('VideoScreen displays correctly',
+  group('ExcerciseScreen Tests', () {
+    testWidgets('ExcerciseScreen displays correctly',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: VideoScreen(),
+          home: ExcerciseScreen(),
         ),
       );
 
@@ -120,11 +120,11 @@ void main() {
       expect(find.byIcon(Icons.play_circle_fill), findsOneWidget);
     });
 
-    testWidgets('VideoScreen has back button',
+    testWidgets('ExcerciseScreen has back button',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: VideoScreen(),
+          home: ExcerciseScreen(),
         ),
       );
 
@@ -133,11 +133,11 @@ void main() {
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     });
 
-    testWidgets('VideoScreen has exercise tags',
+    testWidgets('ExcerciseScreen has exercise tags',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: VideoScreen(),
+          home: ExcerciseScreen(),
         ),
       );
 
@@ -147,11 +147,11 @@ void main() {
       expect(find.text('OBERSCHENKEL'), findsOneWidget);
     });
 
-    testWidgets('VideoScreen START button is tappable',
+    testWidgets('ExcerciseScreen START button is tappable',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: VideoScreen(),
+          home: ExcerciseScreen(),
         ),
       );
 

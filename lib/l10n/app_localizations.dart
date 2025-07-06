@@ -257,7 +257,7 @@ abstract class AppLocalizations {
   /// No description provided for @result_continue.
   ///
   /// In en, this message translates to:
-  /// **'Continue'**
+  /// **'Complete'**
   String get result_continue;
 
   /// No description provided for @tooltip_good_posture.
