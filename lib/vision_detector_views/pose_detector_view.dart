@@ -7,6 +7,8 @@ import 'package:circular_buffer/circular_buffer.dart';
 
 import 'detector_view.dart';
 import 'painters/pose_painter.dart';
+import '../services/auto_save_service.dart';
+import '../services/performance_service.dart';
 
 import 'camera_view.dart' as camera_view;
 
@@ -43,6 +45,86 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: DetectorView(
+        title: 'Pose Detector',
+        customPaint: _customPaint,
+        text: _text,
+        onImage: _processImage,
+        initialCameraLensDirection: _cameraLensDirection,
+        onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _viewSavedScores,
+        child: Icon(Icons.history),
+        tooltip: 'View Performance History',
+        backgroundColor: Colors.blue,
+      ),
+    );
+  }
+
+  Future<void> _viewSavedScores() async {
+    double? latestScore = await PerformanceService.getLatestScore();
+    List<Map<String, dynamic>> allScoresWithTimestamps = await PerformanceService.getAllScoresWithTimestamps();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Performance History'),
+        content: Container(
+          width: double.maxFinite,
+          height: 300,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Latest Score: ${latestScore?.toStringAsFixed(2) ?? 'None'}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text('Total Sessions: ${allScoresWithTimestamps.length}'),
+              SizedBox(height: 10),
+              Expanded(
+                child: allScoresWithTimestamps.isEmpty
+                  ? Center(child: Text('No performance data yet.\n\nStart exercising to see your scores!'))
+                  : ListView.builder(
+                      itemCount: allScoresWithTimestamps.length,
+                      itemBuilder: (context, index) {
+                        final scoreData = allScoresWithTimestamps[index];
+                        final score = scoreData['score'] as double;
+                        final formattedTime = scoreData['formattedTime'] as String;
+
+                        final duration = scoreData['duration'] as String;
+
+                        return ListTile(
+                          leading: CircleAvatar(
+                            child: Text('${index + 1}'),
+                            backgroundColor: Colors.blue,
+                          ),
+                          title: Text('Score: ${score.toStringAsFixed(2)}'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('$formattedTime ${index == 0 ? '(Most Recent)' : ''}'),
+                              Text('Duration: $duration',
+                                   style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                          isThreeLine: true,
+                        );
+                      },
+                    ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Close'),
+          ),
+        ],
+      ),
     return Stack(
       children: [
         DetectorView(
@@ -165,10 +247,20 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         print(bufferShoulder_r);
         print(analytics.r_esh_angl);
 
+            print("P_Score: " + (Score.average).toString());
+            AutoSaveService.updateCurrentScore(Score.average); // Track current score
+            print("r_ARM (wes): " + r_wes_angl.toString());
+            print("r_HIP (esh): " + r_esh_angl.toString());
 
         lateral_rises.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
         lateral_rises.update_direction();
 
+            if (angle_status >= lar_angels.length-1){
+              angle_up = true;
+              wdhs++;
+            } else if (angle_status <= 0) {
+              angle_up = false;
+            }
 
 
         //todo store min / max average angle.
@@ -182,7 +274,33 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
         // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
 
+        /*
+          leftShoulder,
+          rightShoulder,
+          leftElbow,
+          rightElbow,
+          leftWrist,
+          rightWrist,
 
+          leftPinky,
+          rightPinky,
+          leftIndex,
+          rightIndex,
+          leftThumb,
+          rightThumb,
+
+          leftHip,
+          rightHip,
+          leftKnee,
+          rightKnee,
+          leftAnkle,
+          rightAnkle,
+          leftHeel,
+          rightHeel,
+          leftFootIndex,
+          rightFootIndex
+
+         */
 
       }
       //for(TimedPose p in recordedPoses){
