@@ -48,6 +48,7 @@ class _CameraViewState extends State<CameraView> {
   double _maxAvailableExposureOffset = 0.0;
   double _currentExposureOffset = 0.0;
   bool _changingCameraLens = false;
+  bool _isRecording = false;
 
   // FPS tracking variables
   int _frameCount = 0;
@@ -71,7 +72,7 @@ class _CameraViewState extends State<CameraView> {
     if (_cameras.isEmpty) {
       _cameras = await availableCameras();
     }
-    
+
     for (var i = 0; i < _cameras.length; i++) {
       if (_cameras[i].lensDirection == widget.initialCameraLensDirection) {
         _cameraIndex = i;
@@ -88,6 +89,12 @@ class _CameraViewState extends State<CameraView> {
   void dispose() {
     _stopLiveFeed();
     CameraView.stopwatchTimer?.cancel();
+    if (_controller != null) {
+      if (_controller!.value.isRecordingVideo) {
+        _controller!.stopVideoRecording();
+      }
+      _controller!.dispose();
+    }
     super.dispose();
   }
 
@@ -361,11 +368,11 @@ class _CameraViewState extends State<CameraView> {
   void _processCameraImage(CameraImage image) {
     final inputImage = _inputImageFromCameraImage(image);
     if (inputImage == null) return;
-    
+
     // Update FPS calculation
     _updateFps();
     _pose_Stopwatch_activation(); //vlt hier probieren ?
-    
+
     widget.onImage(inputImage);
   }
 
@@ -373,13 +380,13 @@ class _CameraViewState extends State<CameraView> {
     _frameCount++;
     final now = DateTime.now();
     final timeDiff = now.difference(_lastFpsUpdate).inMilliseconds;
-    
+
     // Update FPS every 500ms for smoother display
     if (timeDiff >= 500) {
       _currentFps = (_frameCount * 1000) / timeDiff;
       _frameCount = 0;
       _lastFpsUpdate = now;
-      
+
       // Update UI
       if (mounted) {
         setState(() {});
@@ -455,6 +462,42 @@ class _CameraViewState extends State<CameraView> {
     );
   }
 
+
+  Future<void> _startRecording() async {
+    print("DEBUG: starting Recording");
+    if (_controller == null || !_controller!.value.isInitialized) return;
+
+    if (_isRecording) return;
+
+    await _controller?.startVideoRecording();
+    setState(() {
+      _isRecording = true;
+    });
+
+    print("DEBUG: successfully started Recording");
+  }
+
+  Future<void> _stopRecording() async {
+
+    print("DEBUG: stopping Recording");
+    if (_controller == null || !_controller!.value.isRecordingVideo) return;
+
+    final XFile? file = await _controller?.stopVideoRecording();
+    setState(() {
+      _isRecording = false;
+    });
+
+    if (file == null){
+      print('Error Saving Video: file == null');
+      return;
+    }
+
+    // Save or use the recorded file
+    print('Video recorded to: ${file.path}');
+  }
+
+
+
   // Stopwatch methods
   void _startStopwatch() {
     if (!CameraView.isStopwatchRunning) {
@@ -467,6 +510,7 @@ class _CameraViewState extends State<CameraView> {
           });
         }
       });
+      _startRecording();
     }
   }
 
@@ -483,16 +527,17 @@ class _CameraViewState extends State<CameraView> {
       CameraView.stopwatch.stop();
       CameraView.isStopwatchRunning = false;
       CameraView.stopwatchTimer?.cancel();
-      
+
       // Save score when workout is paused
       _saveWorkoutScore();
+      _stopRecording();
     }
   }
-  
+
   void _saveWorkoutScore() async {
     print('💾 Attempting to save workout score...');
     print('Current tracked score: ${AutoSaveService.getCurrentScore()}');
-    
+
     // Save the workout score with duration when stopwatch is paused
     try {
       await AutoSaveService.saveScoreOnPause(CameraView.stopwatch.elapsed);
@@ -508,7 +553,7 @@ class _CameraViewState extends State<CameraView> {
       print('Saving score before reset...');
       _saveWorkoutScore();
     }
-    
+
     CameraView.stopwatch.reset();
     CameraView.isStopwatchRunning = false;
     CameraView.stopwatchTimer?.cancel();
