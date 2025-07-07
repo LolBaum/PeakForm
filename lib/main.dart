@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'excercise_screen.dart' show ExcerciseScreen;
+import 'exercise_screen.dart' show ExerciseScreen;
 import 'result_screen.dart';
 import 'package:logger/logger.dart';
 import 'package:fitness_app/util/axiom_log_output.dart';
@@ -109,16 +109,20 @@ class FitnessApp extends StatelessWidget {
                     body: Center(child: CircularProgressIndicator()),
                   );
                 }
-                return ExcerciseScreen(
-                  title: 'Running',
+                //excercise_running_title excercise_running_tagOne, excercise_running_tagTwo, excercise_running_executionSteps_One, excercise_running_executionSteps_Two, excercise_running_executionSteps_Three, excercise_running_executionSteps_Four
+                return ExerciseScreen(
+                  title: AppLocalizations.of(context)!.excercise_running_title,
                   videoAsset: 'assets/videos/running/running.mov',
                   thumbnailBytes: snapshot.data!,
-                  exerciseTags: const ['Waden', 'Oberschenkel'],
-                  executionSteps: const [
-                    'Start with a hip-width stance',
-                    'Your toes point slightly outwards',
-                    'Always keep your back straight',
-                    'Your hands do not touch your head',
+                  exerciseTags: [
+                    AppLocalizations.of(context)!.excercise_running_tagOne,
+                    AppLocalizations.of(context)!.excercise_running_tagTwo
+                  ],
+                  executionSteps: [
+                    AppLocalizations.of(context)!
+                        .excercise_running_executionSteps_One,
+                    AppLocalizations.of(context)!
+                        .excercise_running_executionSteps_Two
                   ],
                   onPlayVideo: () async {
                     final byteData = await DefaultAssetBundle.of(context)
@@ -142,19 +146,23 @@ class FitnessApp extends StatelessWidget {
                     body: Center(child: CircularProgressIndicator()),
                   );
                 }
-                //TODO: Translations of title and execution steps
-                return ExcerciseScreen(
-                  title: 'Dumbbell Lateral Raises',
+                return ExerciseScreen(
+                  title: AppLocalizations.of(context)!.excercise_gym_title,
                   videoAsset: 'assets/videos/gym/Dumbbell-Lateral-Raises.mov',
                   thumbnailBytes: snapshot.data!,
-                  exerciseTags: const ['Arme', 'Trizeps'],
-                  executionSteps: const [
-                    'Stand with feet shoulder-width apart',
-                    'Hold dumbbells at your sides',
-                    'Keep your elbows close to your body',
-                    'Raise the dumbbells to shoulder height',
-                    'Lower the dumbbells back to the starting position',
-                    'Repeat for the desired number of reps',
+                  exerciseTags: [
+                    AppLocalizations.of(context)!.excercise_gym_tagOne,
+                    AppLocalizations.of(context)!.excercise_gym_tagTwo
+                  ],
+                  executionSteps: [
+                    AppLocalizations.of(context)!
+                        .excercise_gym_executionSteps_One,
+                    AppLocalizations.of(context)!
+                        .excercise_gym_executionSteps_Two,
+                    AppLocalizations.of(context)!
+                        .excercise_gym_executionSteps_Three,
+                    AppLocalizations.of(context)!
+                        .excercise_gym_executionSteps_Four,
                   ],
                   onPlayVideo: () async {
                     final byteData = await DefaultAssetBundle.of(context)

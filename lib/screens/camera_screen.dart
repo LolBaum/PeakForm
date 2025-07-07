@@ -32,16 +32,22 @@ class _CameraScreenState extends State<CameraScreen> {
   void initState() {
     super.initState();
     LoggingService.instance.i('CameraScreen initialized');
+    // Reset detection state so the button always shows 'Start Recording'
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider =
+          Provider.of<PoseDetectionProvider>(context, listen: false);
+      provider.stopDetection();
+    });
     if (defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS) {
-      _requestPermissions();
+      _requestPermissions(context);
     }
   }
 
   /// Request Permissions
   ///
   /// This method is responsible for requesting permissions to use the camera.
-  Future<void> _requestPermissions() async {
+  Future<void> _requestPermissions(BuildContext context) async {
     LoggingService.instance.i('Requesting camera permissions');
     final status = await Permission.camera.request();
     if (status.isGranted) {
@@ -61,13 +67,14 @@ class _CameraScreenState extends State<CameraScreen> {
   /// This method is responsible for showing a dialog to the user to request permissions.
   /// It uses the PermissionHandler to request permissions.
   void _showPermissionDialog() {
+    final translation = AppLocalizations.of(context)!;
     LoggingService.instance.i('Showing permission dialog to user');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Camera Permission Required'),
-        content: const Text(
-          'This app needs camera access to detect poses using MoveNet. Please grant camera permission in settings.',
+        title: Text(translation.camera_permission_required),
+        content: Text(
+          translation.camera_permission_required_description,
         ),
         actions: [
           TextButton(
@@ -355,6 +362,7 @@ class _StartStopButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final translation = AppLocalizations.of(context)!;
     return Positioned(
       left: 0,
       right: 0,
@@ -365,8 +373,9 @@ class _StartStopButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: FrostedGlassButton(
             onTap: onStartStop,
-            label:
-                provider.isDetecting ? 'Finish Recording' : 'Start Recording',
+            label: provider.isDetecting
+                ? translation.recording_finish
+                : translation.recording_start,
           ),
         ),
       ),

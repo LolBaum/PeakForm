@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'constants/constants.dart';
 import 'package:fitness_app/util/logging_service.dart';
 import 'package:flutter/services.dart';
+import 'l10n/app_localizations.dart';
 
-class ExcerciseScreen extends StatefulWidget {
+class ExerciseScreen extends StatefulWidget {
   final String title;
   final String videoAsset;
   final Uint8List? thumbnailBytes;
@@ -11,7 +12,7 @@ class ExcerciseScreen extends StatefulWidget {
   final List<String> exerciseTags;
   final Future<void> Function()? onPlayVideo;
 
-  const ExcerciseScreen({
+  const ExerciseScreen({
     super.key,
     required this.title,
     required this.videoAsset,
@@ -22,16 +23,16 @@ class ExcerciseScreen extends StatefulWidget {
   });
 
   @override
-  State<ExcerciseScreen> createState() => _ExcerciseScreenState();
+  State<ExerciseScreen> createState() => _ExerciseScreenState();
 }
 
-class _ExcerciseScreenState extends State<ExcerciseScreen> {
+class _ExerciseScreenState extends State<ExerciseScreen> {
   bool _loadingVideo = false;
 
   @override
   Widget build(BuildContext context) {
     LoggingService.instance.i('Excercise detail screen displayed');
-
+    final translation = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -41,14 +42,33 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                    onPressed: () {
-                      LoggingService.instance
-                          .i('User navigated back from video screen');
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.arrow_back)),
-                const SizedBox(height: AppGaps.gap16),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        LoggingService.instance
+                            .i('User navigated back from video screen');
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          translation.exercise_screen_title,
+                          style: const TextStyle(
+                            fontSize: AppFontSizes.headline,
+                            fontWeight: AppFontWeights.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 48),
+                  ],
+                ),
+                const SizedBox(height: AppGaps.gap8),
                 Stack(
                   children: [
                     GestureDetector(
@@ -114,7 +134,7 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
                       ),
                   ],
                 ),
-                const SizedBox(height: AppGaps.gap16),
+                const SizedBox(height: AppGaps.gap8),
                 Text(widget.title,
                     style: const TextStyle(
                         fontSize: AppFontSizes.headline,
@@ -139,15 +159,15 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
                         borderRadius: BorderRadius.circular(30)),
                     minimumSize: const Size(double.infinity, 48),
                   ),
-                  child: const Text('START',
-                      style: TextStyle(
+                  child: Text(translation.video_start,
+                      style: const TextStyle(
                           fontSize: AppFontSizes.title,
                           fontWeight: AppFontWeights.bold,
                           color: Colors.white)),
                 ),
                 const SizedBox(height: AppGaps.gap16),
                 ExecutionSteps(
-                  title: 'Execution',
+                  title: translation.exercise_screen_execution_subtitle,
                   steps: widget.executionSteps,
                 ),
               ],
@@ -186,16 +206,16 @@ class ExecutionSteps extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 98,
+          width: double.infinity - 15,
           height: 24,
           child: Stack(
             children: [
-              const Positioned(
-                left: 5,
+              Positioned(
+                left: 20,
                 top: 0,
                 child: Text(
-                  'Execution',
-                  style: TextStyle(
+                  title,
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontFamily: 'LeagueSpartan',
@@ -226,47 +246,40 @@ class ExecutionSteps extends StatelessWidget {
         const SizedBox(height: 8),
         ...List.generate(steps.length, (i) {
           return Container(
-            width: 320,
-            height: 30,
             margin: const EdgeInsets.only(bottom: 6),
-            child: Stack(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Positioned(
-                  left: 41,
-                  top: 5,
-                  child: Text(
-                    steps[i],
-                    style: const TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 16,
-                      fontFamily: 'LeagueSpartan',
-                      fontWeight: AppFontWeights.medium,
-                    ),
+                Container(
+                  width: 29,
+                  height: 30,
+                  decoration: const ShapeDecoration(
+                    color: Color(0x1E767680),
+                    shape: OvalBorder(),
                   ),
-                ),
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  child: Container(
-                    width: 29,
-                    height: 30,
-                    decoration: const ShapeDecoration(
-                      color: Color(0x1E767680),
-                      shape: OvalBorder(),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 9,
-                  top: 4,
+                  alignment: Alignment.center,
                   child: Text(
                     '${i + 1}',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 20,
                       fontFamily: 'LeagueSpartan',
                       fontWeight: FontWeight.w700,
                     ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    steps[i],
+                    style: const TextStyle(
+                      color: AppColors.onSurface,
+                      fontSize: 16,
+                      fontFamily: 'LeagueSpartan',
+                      fontWeight: AppFontWeights.medium,
+                    ),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
                   ),
                 ),
               ],

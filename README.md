@@ -7,6 +7,7 @@ PeakForm is a cross-platform Flutter fitness application that leverages real-tim
 ## Features
 
 - **Multi-Screen UI:** Includes Home, Gym, Video, Pose Detection, Camera, and Result screens, each with a modern, responsive design.
+- **Modular Exercise Screens:** Exercise screens are fully modular, supporting dynamic titles, video assets, thumbnails, and execution steps passed from parent screens.
 - **Real-Time Pose Detection:** Uses TensorFlow Lite (MoveNet SinglePose Lightning) for real-time pose estimation via the device camera with 17 keypoint detection.
 - **Advanced Camera Integration:** Full camera control with zoom, focus, and gesture support for optimal pose detection.
 - **Feedback System:** Provides dynamic, categorized feedback (good, bad, tips) after each session, with visually distinct tooltips and cards.
@@ -26,13 +27,11 @@ PeakForm is a cross-platform Flutter fitness application that leverages real-tim
 lib/
   main.dart                    # App entry point, routing, theming, localization
   home_screen.dart             # Home screen UI and navigation
-  gym_screen.dart              # Gym feature screen
-  video_screen.dart            # Video/recording screen
+  exercise_screen.dart         # Modular exercise screen (dynamic title, video, thumbnail, steps)
   result_screen.dart           # Result/feedback screen
   frosted_glasst_button.dart   # Custom frosted glass button component
   screens/                     # Screen components
-    camera_screen.dart         # Camera functionality screen
-    camera_screen.dart # Main pose detection interface
+    camera_screen.dart         # Camera functionality & pose detection
   widgets/                     # Reusable widgets
     pose_painter.dart          # Custom painter for pose visualization
   providers/                   # State management
@@ -46,7 +45,9 @@ lib/
 assets/
   fonts/                       # League Spartan font (Regular, Medium, SemiBold, Bold, Variable)
   models/3.tflite              # MoveNet SinglePose Lightning model
-  *.jpg, *.png                 # App images
+  images/                      # App images and thumbnails
+  videos/                      # Exercise videos
+  ...
 test/                          # Unit and widget tests
   widget_test.dart             # Main widget tests
   pose_detection_provider_test.dart # Provider tests
@@ -99,11 +100,16 @@ test/                          # Unit and widget tests
 
 The app follows a clean architecture pattern with clear separation of concerns:
 
-- **UI Layer:** Stateless and stateful widgets for screens and components.
+- **UI Layer:** Stateless and stateful widgets for screens and components. ExerciseScreen is modular and receives all content (title, video, thumbnail, steps) via constructor.
 - **Business Logic Layer:** Providers for state management and business logic (e.g., pose detection).
 - **Data Layer:** Services and utilities for data handling and logging.
 - **Utilities:** Logging, constants, and helper functions.
 - **Internationalization:** ARB files and generated Dart code for i18n.
+
+### UI/UX Highlights
+- **Centered Titles:** All major screens use a centered title in the app bar, with the exercise name shown below the video on exercise screens.
+- **Flexible Execution Steps:** Execution steps are rendered in a row with a number and text that wraps to multiple lines as needed, never overflowing.
+- **Dynamic Thumbnails & Videos:** ExerciseScreen supports dynamic asset passing for both video and thumbnail.
 
 ### Architecture Diagram
 
@@ -112,7 +118,7 @@ flowchart TD
   subgraph UI_Layer[UI Layer]
     HomeScreen["HomeScreen"]
     GymScreen["GymScreen"]
-    ExcerciseScreen["ExcerciseScreen"]
+    ExerciseScreen["ExerciseScreen"]
     ResultScreen["ResultScreen"]
     CameraScreen["CameraScreen"]
     Widgets["Widgets/Custom Components"]
@@ -135,16 +141,17 @@ flowchart TD
     Fonts["Fonts (League Spartan)"]
     Images["Images"]
     Model["TFLite Model (MoveNet)"]
+    Videos["Videos"]
   end
 
   HomeScreen -->|"uses"| PoseDetectionProvider
   GymScreen -->|"uses"| PoseDetectionProvider
-  ExcerciseScreen -->|"uses"| PoseDetectionProvider
+  ExerciseScreen -->|"uses"| PoseDetectionProvider
   ResultScreen -->|"uses"| PoseDetectionProvider
   CameraScreen -->|"uses"| PoseDetectionProvider
   Widgets -->|"used by"| HomeScreen
   Widgets -->|"used by"| GymScreen
-  Widgets -->|"used by"| ExcerciseScreen
+  Widgets -->|"used by"| ExerciseScreen
   Widgets -->|"used by"| ResultScreen
   Widgets -->|"used by"| CameraScreen
   FrostedGlassButton -->|"used by"| CameraScreen
@@ -153,24 +160,29 @@ flowchart TD
   LoggingService -->|"uses"| CustomPrettyPrinter
   HomeScreen -->|"uses"| Constants
   GymScreen -->|"uses"| Constants
-  ExcerciseScreen -->|"uses"| Constants
+  ExerciseScreen -->|"uses"| Constants
   ResultScreen -->|"uses"| Constants
   CameraScreen -->|"uses"| Constants
   HomeScreen -->|"uses"| L10nGen
   GymScreen -->|"uses"| L10nGen
-  ExcerciseScreen -->|"uses"| L10nGen
+  ExerciseScreen -->|"uses"| L10nGen
   ResultScreen -->|"uses"| L10nGen
   CameraScreen -->|"uses"| L10nGen
   L10nGen -->|"generated from"| L10nFiles
   PoseDetectionProvider -->|"uses"| Model
   HomeScreen -->|"uses"| Images
   GymScreen -->|"uses"| Images
-  ExcerciseScreen -->|"uses"| Images
+  ExerciseScreen -->|"uses"| Images
   ResultScreen -->|"uses"| Images
   CameraScreen -->|"uses"| Images
+  HomeScreen -->|"uses"| Videos
+  GymScreen -->|"uses"| Videos
+  ExerciseScreen -->|"uses"| Videos
+  ResultScreen -->|"uses"| Videos
+  CameraScreen -->|"uses"| Videos
   HomeScreen -->|"uses"| Fonts
   GymScreen -->|"uses"| Fonts
-  ExcerciseScreen -->|"uses"| Fonts
+  ExerciseScreen -->|"uses"| Fonts
   ResultScreen -->|"uses"| Fonts
   CameraScreen -->|"uses"| Fonts
 ```
@@ -300,6 +312,7 @@ USER_NAME=your_username
 - **Fonts:** League Spartan (all weights)
 - **Images:** Gym, tennis, golf, running, etc.
 - **Model:** MoveNet SinglePose Lightning (`3.tflite`)
+- **Videos:** Exercise demonstration videos
 
 ---
 

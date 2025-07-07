@@ -68,6 +68,7 @@ class _ResultScreenState extends State<ResultScreen> {
       await OpenFile.open(widget.videoPath!);
     } catch (e) {
       if (mounted) {
+        // TODO: translation
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Konnte Video nicht öffnen: $e')),
         );
@@ -312,13 +313,13 @@ class _ResultScreenState extends State<ResultScreen> {
       padding: const EdgeInsets.symmetric(vertical: AppGaps.gap4),
       child: Row(
         children: [
-          const Icon(Icons.circle, size: 8, color: AppColors.onSurface),
+          const Icon(Icons.circle, size: 16, color: AppColors.onSurface),
           const SizedBox(width: 8),
           Expanded(
               child: Text(text,
                   style: const TextStyle(
-                      fontSize: AppFontSizes.subtitle,
-                      fontWeight: AppFontWeights.medium))),
+                      fontSize: AppFontSizes.body,
+                      fontWeight: AppFontWeights.bold))),
         ],
       ),
     );
