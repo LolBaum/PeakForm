@@ -32,7 +32,7 @@ lib/
   frosted_glasst_button.dart   # Custom frosted glass button component
   screens/                     # Screen components
     camera_screen.dart         # Camera functionality screen
-    pose_detection_screen.dart # Main pose detection interface
+    camera_screen.dart # Main pose detection interface
   widgets/                     # Reusable widgets
     pose_painter.dart          # Custom painter for pose visualization
   providers/                   # State management
@@ -114,7 +114,6 @@ flowchart TD
     GymScreen["GymScreen"]
     ExcerciseScreen["ExcerciseScreen"]
     ResultScreen["ResultScreen"]
-    PoseDetectionScreen["PoseDetectionScreen"]
     CameraScreen["CameraScreen"]
     Widgets["Widgets/Custom Components"]
     FrostedGlassButton["FrostedGlassButton"]
@@ -142,14 +141,13 @@ flowchart TD
   GymScreen -->|"uses"| PoseDetectionProvider
   ExcerciseScreen -->|"uses"| PoseDetectionProvider
   ResultScreen -->|"uses"| PoseDetectionProvider
-  PoseDetectionScreen -->|"uses"| PoseDetectionProvider
   CameraScreen -->|"uses"| PoseDetectionProvider
   Widgets -->|"used by"| HomeScreen
   Widgets -->|"used by"| GymScreen
   Widgets -->|"used by"| ExcerciseScreen
   Widgets -->|"used by"| ResultScreen
-  Widgets -->|"used by"| PoseDetectionScreen
-  FrostedGlassButton -->|"used by"| PoseDetectionScreen
+  Widgets -->|"used by"| CameraScreen
+  FrostedGlassButton -->|"used by"| CameraScreen
   PoseDetectionProvider -->|"logs to"| LoggingService
   LoggingService -->|"uses"| AxiomLogOutput
   LoggingService -->|"uses"| CustomPrettyPrinter
@@ -157,24 +155,24 @@ flowchart TD
   GymScreen -->|"uses"| Constants
   ExcerciseScreen -->|"uses"| Constants
   ResultScreen -->|"uses"| Constants
-  PoseDetectionScreen -->|"uses"| Constants
+  CameraScreen -->|"uses"| Constants
   HomeScreen -->|"uses"| L10nGen
   GymScreen -->|"uses"| L10nGen
   ExcerciseScreen -->|"uses"| L10nGen
   ResultScreen -->|"uses"| L10nGen
-  PoseDetectionScreen -->|"uses"| L10nGen
+  CameraScreen -->|"uses"| L10nGen
   L10nGen -->|"generated from"| L10nFiles
   PoseDetectionProvider -->|"uses"| Model
   HomeScreen -->|"uses"| Images
   GymScreen -->|"uses"| Images
   ExcerciseScreen -->|"uses"| Images
   ResultScreen -->|"uses"| Images
-  PoseDetectionScreen -->|"uses"| Images
+  CameraScreen -->|"uses"| Images
   HomeScreen -->|"uses"| Fonts
   GymScreen -->|"uses"| Fonts
   ExcerciseScreen -->|"uses"| Fonts
   ResultScreen -->|"uses"| Fonts
-  PoseDetectionScreen -->|"uses"| Fonts
+  CameraScreen -->|"uses"| Fonts
 ```
 
 ---
