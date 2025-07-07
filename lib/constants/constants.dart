@@ -15,6 +15,7 @@ class AppColors {
   static const Color accent = Color(0xFFB8FF7B); // Example: accent green
   static const Color background =
       Color(0xFFF2F2F2); // Example: light background
+  static const Color backgroundSecondary = Color(0xFF0B2938);
   static const Color surface = Color(0xFFFFFFFF); // white
   static const Color error = Color(0xFFCB5D4E); // red
   static const Color onPrimary = Color(0xFFFFFFFF); // white
