@@ -224,6 +224,90 @@ abstract class AppLocalizations {
   /// **'A COURSE THAT PROVIDES EFFECTIVE FEEDBACK FOR YOUR SQUATS'**
   String get gym_course_feedback;
 
+  /// No description provided for @exercise_screen_execution_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Execution'**
+  String get exercise_screen_execution_subtitle;
+
+  /// No description provided for @exercise_screen_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Execution in Detail'**
+  String get exercise_screen_title;
+
+  /// No description provided for @excercise_running_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get excercise_running_title;
+
+  /// No description provided for @excercise_running_tagOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Calves'**
+  String get excercise_running_tagOne;
+
+  /// No description provided for @excercise_running_tagTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Thighs'**
+  String get excercise_running_tagTwo;
+
+  /// No description provided for @excercise_running_executionSteps_One.
+  ///
+  /// In en, this message translates to:
+  /// **'Fluid movements, regular strides.'**
+  String get excercise_running_executionSteps_One;
+
+  /// No description provided for @excercise_running_executionSteps_Two.
+  ///
+  /// In en, this message translates to:
+  /// **'Use handles for balance, do not lean heavily.'**
+  String get excercise_running_executionSteps_Two;
+
+  /// No description provided for @excercise_gym_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Dumbbell'**
+  String get excercise_gym_title;
+
+  /// No description provided for @excercise_gym_tagOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Arms'**
+  String get excercise_gym_tagOne;
+
+  /// No description provided for @excercise_gym_tagTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Triceps'**
+  String get excercise_gym_tagTwo;
+
+  /// No description provided for @excercise_gym_executionSteps_One.
+  ///
+  /// In en, this message translates to:
+  /// **'Start in an upright position with a dumbbell in each hand, your arms hanging at your sides'**
+  String get excercise_gym_executionSteps_One;
+
+  /// No description provided for @excercise_gym_executionSteps_Two.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your core engaged at all times'**
+  String get excercise_gym_executionSteps_Two;
+
+  /// No description provided for @excercise_gym_executionSteps_Three.
+  ///
+  /// In en, this message translates to:
+  /// **'Your arms remain extended.'**
+  String get excercise_gym_executionSteps_Three;
+
+  /// No description provided for @excercise_gym_executionSteps_Four.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise your arms sideways to shoulder height'**
+  String get excercise_gym_executionSteps_Four;
+
   /// No description provided for @result_title.
   ///
   /// In en, this message translates to:
@@ -410,11 +494,29 @@ abstract class AppLocalizations {
   /// **'Confidence: {confidence}%'**
   String pose_confidence(Object confidence);
 
+  /// No description provided for @recording_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Recording'**
+  String get recording_start;
+
   /// No description provided for @recording_finish.
   ///
   /// In en, this message translates to:
   /// **'Finish Recording'**
   String get recording_finish;
+
+  /// No description provided for @camera_permission_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission required'**
+  String get camera_permission_required;
+
+  /// No description provided for @camera_permission_required_description.
+  ///
+  /// In en, this message translates to:
+  /// **'This app needs camera access to function. Please grant permission in settings.'**
+  String get camera_permission_required_description;
 }
 
 class _AppLocalizationsDelegate

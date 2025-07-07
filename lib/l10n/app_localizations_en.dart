@@ -76,6 +76,53 @@ class AppLocalizationsEn extends AppLocalizations {
       'A COURSE THAT PROVIDES EFFECTIVE FEEDBACK FOR YOUR SQUATS';
 
   @override
+  String get exercise_screen_execution_subtitle => 'Execution';
+
+  @override
+  String get exercise_screen_title => 'Execution in Detail';
+
+  @override
+  String get excercise_running_title => 'Running';
+
+  @override
+  String get excercise_running_tagOne => 'Calves';
+
+  @override
+  String get excercise_running_tagTwo => 'Thighs';
+
+  @override
+  String get excercise_running_executionSteps_One =>
+      'Fluid movements, regular strides.';
+
+  @override
+  String get excercise_running_executionSteps_Two =>
+      'Use handles for balance, do not lean heavily.';
+
+  @override
+  String get excercise_gym_title => 'Dumbbell';
+
+  @override
+  String get excercise_gym_tagOne => 'Arms';
+
+  @override
+  String get excercise_gym_tagTwo => 'Triceps';
+
+  @override
+  String get excercise_gym_executionSteps_One =>
+      'Start in an upright position with a dumbbell in each hand, your arms hanging at your sides';
+
+  @override
+  String get excercise_gym_executionSteps_Two =>
+      'Keep your core engaged at all times';
+
+  @override
+  String get excercise_gym_executionSteps_Three => 'Your arms remain extended.';
+
+  @override
+  String get excercise_gym_executionSteps_Four =>
+      'Raise your arms sideways to shoulder height';
+
+  @override
   String get result_title => 'Result';
 
   @override
@@ -176,5 +223,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get recording_start => 'Start Recording';
+
+  @override
   String get recording_finish => 'Finish Recording';
+
+  @override
+  String get camera_permission_required => 'Camera permission required';
+
+  @override
+  String get camera_permission_required_description =>
+      'This app needs camera access to function. Please grant permission in settings.';
 }

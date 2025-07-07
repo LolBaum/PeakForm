@@ -76,6 +76,54 @@ class AppLocalizationsDe extends AppLocalizations {
       'EIN KURS, DER EFFEKTIVES FEEDBACK FÜR\nIHRE KNIEBEUGEN BIETET';
 
   @override
+  String get exercise_screen_execution_subtitle => 'Ausführung';
+
+  @override
+  String get exercise_screen_title => 'Ausführung in Detail';
+
+  @override
+  String get excercise_running_title => 'Laufen';
+
+  @override
+  String get excercise_running_tagOne => 'Waden';
+
+  @override
+  String get excercise_running_tagTwo => 'Oberschenkel';
+
+  @override
+  String get excercise_running_executionSteps_One =>
+      'Fließende Bewegungen, regelmäßige Schritte.';
+
+  @override
+  String get excercise_running_executionSteps_Two =>
+      'Griffe zur Gleichgewichtshilfe nutzen, nicht abstützen.';
+
+  @override
+  String get excercise_gym_title => 'Dumbell Lateral Raises-Ausführung';
+
+  @override
+  String get excercise_gym_tagOne => 'Arme';
+
+  @override
+  String get excercise_gym_tagTwo => 'Trizeps';
+
+  @override
+  String get excercise_gym_executionSteps_One =>
+      '⁠Beginne im aufrechten Stand mit einer Kurzhantel in jeder Hand, deine Arme hängen seitlich neben dem Körper';
+
+  @override
+  String get excercise_gym_executionSteps_Two =>
+      'Spanne dem Rumpf die ganze Zeit über an';
+
+  @override
+  String get excercise_gym_executionSteps_Three =>
+      'Deine Arme bleiben ausgestreckt.';
+
+  @override
+  String get excercise_gym_executionSteps_Four =>
+      'Hebe die Arme seitlich auf Schulterhöhe';
+
+  @override
   String get result_title => 'Ergebnis';
 
   @override
@@ -177,5 +225,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get recording_finish => 'Aufnahme beenden';
+  String get recording_start => 'Aufnahme Starten';
+
+  @override
+  String get recording_finish => 'Aufnahme Beenden';
+
+  @override
+  String get camera_permission_required => 'Kameraberechtigung erforderlich';
+
+  @override
+  String get camera_permission_required_description =>
+      'Diese App benötigt Zugriff auf die Kamera. Bitte erteile die Berechtigung in den Einstellungen.';
 }
