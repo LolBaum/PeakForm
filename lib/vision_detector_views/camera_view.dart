@@ -500,8 +500,17 @@ class _CameraViewState extends State<CameraView> {
         return;
       }
 
-      // Save or use the recorded file
-      print('### Video recorded to: ${file.path}');
+    // Save or use the recorded file
+    print('### Video recorded to: ${file.path}');
+    final File videoFile = File(file.path);
+    final bool exists = await videoFile.exists();
+
+    if (exists) {
+      print('✅ File exists at: ${videoFile.path}');
+    } else {
+      print('❌ File does not exist.');
+    }
+
     }
 
 
