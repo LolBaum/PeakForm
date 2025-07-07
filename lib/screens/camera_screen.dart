@@ -67,14 +67,13 @@ class _CameraScreenState extends State<CameraScreen> {
   /// This method is responsible for showing a dialog to the user to request permissions.
   /// It uses the PermissionHandler to request permissions.
   void _showPermissionDialog() {
-    final translation = AppLocalizations.of(context)!;
     LoggingService.instance.i('Showing permission dialog to user');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(translation.camera_permission_required),
+        title: Text(AppLocalizations.of(context)!.camera_permission_required),
         content: Text(
-          translation.camera_permission_required_description,
+          AppLocalizations.of(context)!.camera_permission_required_description,
         ),
         actions: [
           TextButton(
