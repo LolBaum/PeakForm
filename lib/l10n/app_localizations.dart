@@ -254,11 +254,11 @@ abstract class AppLocalizations {
   /// **'Tips'**
   String get result_tips;
 
-  /// No description provided for @result_continue.
+  /// No description provided for @primary_button_close.
   ///
   /// In en, this message translates to:
   /// **'Complete'**
-  String get result_continue;
+  String get primary_button_close;
 
   /// No description provided for @tooltip_good_posture.
   ///

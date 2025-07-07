@@ -91,7 +91,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get result_tips => 'Tipps';
 
   @override
-  String get result_continue => 'Beenden';
+  String get primary_button_close => 'Beenden';
 
   @override
   String get tooltip_good_posture =>

@@ -7,31 +7,32 @@ import 'package:fitness_app/constants/constants.dart';
 /// and text that can be used to provide real-time feedback during pose detection
 /// or exercise guidance.
 ///
+/// Attention: The tooltip is positioned relative to the parent widget.
+/// The parent widget must be a Positioned widget!
+///
 /// Example usage:
 /// ```dart
-/// PoseFeedbackTooltip(
-///   title: "Good form!",
-///   color: Colors.green,
-/// )
+/// Positioned(
+///   left: x,
+///   top: y,
+///   child: PoseFeedbackTooltip(
+///     title: "Good form!",
+///     color: Colors.green,
+///   ),
+/// ),
 /// ```
 ///
 /// Parameters:
 /// - [title]: The text to display in the tooltip
 /// - [color]: The color of the text
-/// - [x]: The x position of the tooltip
-/// - [y]: The y position of the tooltip
 class PoseFeedbackTooltip extends StatelessWidget {
   final String title;
   final Color color;
-  final double x;
-  final double y;
 
   const PoseFeedbackTooltip({
     super.key,
     required this.title,
     required this.color,
-    required this.x,
-    required this.y,
   });
 
   @override

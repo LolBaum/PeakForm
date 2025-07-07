@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fitness_app/providers/pose_detection_provider.dart';
-import 'package:fitness_app/frosted_glasst_button.dart';
+import 'package:fitness_app/widgets/frosted_glasst_button.dart';
 
 void main() {
   group('HomeScreen Tests', () {
@@ -365,7 +365,7 @@ void main() {
             home: Scaffold(
               body: FrostedGlassButton(
                 onTap: () {},
-                child: const Text('Test Button'),
+                label: 'Test Button',
               ),
             ),
           ),
@@ -387,7 +387,7 @@ void main() {
                 onTap: () {
                   tapped = true;
                 },
-                child: const Text('Test Button'),
+                label: 'Test Button',
               ),
             ),
           ),
@@ -408,7 +408,8 @@ void main() {
             home: Scaffold(
               body: FrostedGlassButton(
                 onTap: () {},
-                child: const Icon(Icons.close),
+                label: '',
+                icon: const Icon(Icons.close),
               ),
             ),
           ),

@@ -25,7 +25,7 @@
   "tooltip_good": "GUT",
   "tooltip_bad": "SCHLECHT",
   "result_tips": "Tipps",
-  "result_continue": "Beenden",
+  "primary_button_close": "Beenden",
   "tooltip_good_posture": "Aufrechte, nach vorn gerichtete Körperhaltung",
   "tooltip_good_breathing": "Regelmäßige stabile Atmung",
   "result_bad_arms": "Arme zu steif oder überschlagen vor dem Körper",

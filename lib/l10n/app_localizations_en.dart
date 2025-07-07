@@ -91,7 +91,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get result_tips => 'Tips';
 
   @override
-  String get result_continue => 'Complete';
+  String get primary_button_close => 'Complete';
 
   @override
   String get tooltip_good_posture => 'Upright, forward-facing posture';

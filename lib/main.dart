@@ -10,7 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fitness_app/util/logging_service.dart';
 import 'package:fitness_app/util/custom_pretty_printer.dart';
 import 'l10n/app_localizations.dart';
-import 'screens/pose_detection_screen.dart' show PoseDetectionScreen;
+import 'screens/camera_screen.dart' show CameraScreen;
 import 'package:provider/provider.dart';
 import 'package:fitness_app/providers/pose_detection_provider.dart';
 
@@ -127,7 +127,7 @@ class FitnessApp extends StatelessWidget {
         // TOOD: refactor naming
         '/pose_detection': (context) => ChangeNotifierProvider(
               create: (_) => PoseDetectionProvider(),
-              child: const PoseDetectionScreen(),
+              child: const CameraScreen(),
             ),
       },
     );
