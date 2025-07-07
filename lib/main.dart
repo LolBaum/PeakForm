@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'excercise_screen.dart' show ExcerciseScreen;
-import 'gym_screen.dart' show GymScreen;
 import 'result_screen.dart';
 import 'package:logger/logger.dart';
 import 'package:fitness_app/util/axiom_log_output.dart';
@@ -13,6 +12,9 @@ import 'l10n/app_localizations.dart';
 import 'screens/camera_screen.dart' show CameraScreen;
 import 'package:provider/provider.dart';
 import 'package:fitness_app/providers/pose_detection_provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart';
+import 'dart:io';
 
 late final Logger logger;
 
@@ -96,9 +98,76 @@ class FitnessApp extends StatelessWidget {
       routes: {
         '/': (context) =>
             HomeScreen(userName: dotenv.env['USER_NAME'] ?? 'TestUser'),
-        '/video': (context) =>
-            const ExcerciseScreen(), // TODO: refactor Naming convention
-        '/gym': (context) => const GymScreen(),
+        // TODO: refactor naming for running route
+        '/video': (context) => FutureBuilder<Uint8List>(
+              future: DefaultAssetBundle.of(context)
+                  .load('assets/images/thumbnail/thumbnail-running.jpeg')
+                  .then((bd) => bd.buffer.asUint8List()),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                return ExcerciseScreen(
+                  title: 'Running',
+                  videoAsset: 'assets/videos/running/running.mov',
+                  thumbnailBytes: snapshot.data!,
+                  exerciseTags: const ['Waden', 'Oberschenkel'],
+                  executionSteps: const [
+                    'Start with a hip-width stance',
+                    'Your toes point slightly outwards',
+                    'Always keep your back straight',
+                    'Your hands do not touch your head',
+                  ],
+                  onPlayVideo: () async {
+                    final byteData = await DefaultAssetBundle.of(context)
+                        .load('assets/videos/running/running.mov');
+                    final tempDir = await getTemporaryDirectory();
+                    final file = File('${tempDir.path}/running.mov');
+                    await file.writeAsBytes(byteData.buffer.asUint8List());
+                    await OpenFile.open(file.path);
+                  },
+                );
+              },
+            ),
+        '/gym': (context) => FutureBuilder<Uint8List>(
+              future: DefaultAssetBundle.of(context)
+                  .load(
+                      'assets/images/thumbnail/thumbnail-dumbbell-lateral-raises.jpeg')
+                  .then((bd) => bd.buffer.asUint8List()),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                //TODO: Translations of title and execution steps
+                return ExcerciseScreen(
+                  title: 'Dumbbell Lateral Raises',
+                  videoAsset: 'assets/videos/gym/Dumbbell-Lateral-Raises.mov',
+                  thumbnailBytes: snapshot.data!,
+                  exerciseTags: const ['Arme', 'Trizeps'],
+                  executionSteps: const [
+                    'Stand with feet shoulder-width apart',
+                    'Hold dumbbells at your sides',
+                    'Keep your elbows close to your body',
+                    'Raise the dumbbells to shoulder height',
+                    'Lower the dumbbells back to the starting position',
+                    'Repeat for the desired number of reps',
+                  ],
+                  onPlayVideo: () async {
+                    final byteData = await DefaultAssetBundle.of(context)
+                        .load('assets/videos/gym/Dumbbell-Lateral-Raises.mov');
+                    final tempDir = await getTemporaryDirectory();
+                    final file =
+                        File('${tempDir.path}/Dumbbell-Lateral-Raises.mov');
+                    await file.writeAsBytes(byteData.buffer.asUint8List());
+                    await OpenFile.open(file.path);
+                  },
+                );
+              },
+            ),
         '/result': (context) {
           final videoPath =
               ModalRoute.of(context)?.settings.arguments as String?;

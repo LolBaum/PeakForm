@@ -283,7 +283,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 timestamp,
                 style: const TextStyle(
                   color: AppColors.darkGrey,
-                  fontSize: AppFontSizes.small,
+                  fontSize: AppFontSizes.subtitle,
                   fontWeight: AppFontWeights.medium,
                 ),
               ),
@@ -316,7 +316,9 @@ class _ResultScreenState extends State<ResultScreen> {
           const SizedBox(width: 8),
           Expanded(
               child: Text(text,
-                  style: const TextStyle(fontWeight: FontWeight.bold))),
+                  style: const TextStyle(
+                      fontSize: AppFontSizes.subtitle,
+                      fontWeight: AppFontWeights.medium))),
         ],
       ),
     );

@@ -68,4 +68,7 @@ flutter:
     - assets/tennis.png
     - assets/videos/
     - assets/videos/gym/Dumbbell-Lateral-Raises.mov
+    - assets/videos/running/running.mov
+    - assets/images/thumbnail/thumbnail-running.jpeg
+    - assets/images/thumbnail/thumbnail-dumbbell-lateral-raises.jpeg
   generate: true

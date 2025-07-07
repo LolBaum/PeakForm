@@ -1,74 +1,35 @@
 import 'package:flutter/material.dart';
 import 'constants/constants.dart';
 import 'package:fitness_app/util/logging_service.dart';
-import 'l10n/app_localizations.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 
 class ExcerciseScreen extends StatefulWidget {
-  const ExcerciseScreen({super.key});
+  final String title;
+  final String videoAsset;
+  final Uint8List? thumbnailBytes;
+  final List<String> executionSteps;
+  final List<String> exerciseTags;
+  final Future<void> Function()? onPlayVideo;
+
+  const ExcerciseScreen({
+    super.key,
+    required this.title,
+    required this.videoAsset,
+    required this.thumbnailBytes,
+    required this.executionSteps,
+    required this.exerciseTags,
+    this.onPlayVideo,
+  });
 
   @override
   State<ExcerciseScreen> createState() => _ExcerciseScreenState();
 }
 
 class _ExcerciseScreenState extends State<ExcerciseScreen> {
-  Uint8List? _thumbnailBytes;
-  bool _loadingThumbnail = false;
-  final String videoAsset = 'assets/videos/gym/Dumbbell-Lateral-Raises.mov';
-
-  @override
-  void initState() {
-    super.initState();
-    _generateThumbnail();
-  }
-
-  Future<void> _generateThumbnail() async {
-    setState(() => _loadingThumbnail = true);
-    try {
-      final bytes = await VideoThumbnail.thumbnailData(
-        video: videoAsset,
-        imageFormat: ImageFormat.PNG,
-        maxWidth: 400,
-        quality: 75,
-      );
-      if (mounted) {
-        setState(() {
-          _thumbnailBytes = bytes;
-        });
-      }
-    } catch (e, stack) {
-      LoggingService.instance
-          .e('Failed to generate video thumbnail', error: e, stackTrace: stack);
-    } finally {
-      if (mounted) setState(() => _loadingThumbnail = false);
-    }
-  }
-
-  Future<void> _openVideoWithSystemPlayer() async {
-    try {
-      final byteData = await rootBundle.load(videoAsset);
-      final tempDir = await getTemporaryDirectory();
-      final file = File('${tempDir.path}/Dumbbell-Lateral-Raises.mov');
-      await file.writeAsBytes(byteData.buffer.asUint8List());
-      await OpenFile.open(file.path);
-    } catch (e, stack) {
-      LoggingService.instance.e('Konnte Video nicht mit Systemplayer öffnen',
-          error: e, stackTrace: stack);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Konnte Video nicht öffnen: $e')),
-        );
-      }
-    }
-  }
+  bool _loadingVideo = false;
 
   @override
   Widget build(BuildContext context) {
-    final translation = AppLocalizations.of(context)!;
     LoggingService.instance.i('Excercise detail screen displayed');
 
     return Scaffold(
@@ -88,24 +49,31 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
                     },
                     icon: const Icon(Icons.arrow_back)),
                 const SizedBox(height: AppGaps.gap16),
-                GestureDetector(
-                  onTap: _openVideoWithSystemPlayer,
-                  child: Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: AppColors.primary.withAlpha((255 * 0.1).toInt()),
-                    ),
-                    child: _loadingThumbnail
-                        ? const Center(child: CircularProgressIndicator())
-                        : _thumbnailBytes != null
+                Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        if (widget.onPlayVideo != null) {
+                          setState(() => _loadingVideo = true);
+                          await widget.onPlayVideo!();
+                          if (mounted) setState(() => _loadingVideo = false);
+                        }
+                      },
+                      child: Container(
+                        height: 200,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color:
+                              AppColors.primary.withAlpha((255 * 0.1).toInt()),
+                        ),
+                        child: widget.thumbnailBytes != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
                                 child: Stack(
                                   fit: StackFit.expand,
                                   children: [
-                                    Image.memory(_thumbnailBytes!,
+                                    Image.memory(widget.thumbnailBytes!,
                                         fit: BoxFit.cover),
                                     Container(
                                       color: Colors.black
@@ -130,53 +98,33 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
                                     child: Icon(Icons.play_circle_fill,
                                         color: Colors.white54, size: 64)),
                               ),
-                  ),
+                      ),
+                    ),
+                    if (_loadingVideo)
+                      Positioned.fill(
+                        child: Container(
+                          color:
+                              AppColors.primary.withAlpha((255 * 0.3).toInt()),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: AppGaps.gap16),
-                Text(translation.video_running,
+                Text(widget.title,
                     style: const TextStyle(
                         fontSize: AppFontSizes.headline,
                         fontWeight: AppFontWeights.bold)),
                 const SizedBox(height: AppGaps.gap8),
                 Wrap(
                   spacing: AppSpacing.icon,
-                  children: [
-                    _laufenTag(translation.video_calf),
-                    _laufenTag(translation.video_thigh),
-                  ],
-                ),
-                const Divider(height: 32, thickness: 1),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(children: [
-                      Text(translation.video_duration,
-                          style: const TextStyle(
-                              fontSize: AppFontSizes.small,
-                              fontWeight: AppFontWeights.bold)),
-                      Text(translation.video_duration_value,
-                          style:
-                              const TextStyle(fontWeight: AppFontWeights.bold))
-                    ]),
-                    Column(children: [
-                      Text(translation.video_difficulty,
-                          style: const TextStyle(
-                              fontSize: AppFontSizes.small,
-                              fontWeight: AppFontWeights.bold)),
-                      Text(translation.video_difficulty_value,
-                          style:
-                              const TextStyle(fontWeight: AppFontWeights.bold))
-                    ]),
-                    Column(children: [
-                      Text(translation.video_intensity,
-                          style: const TextStyle(
-                              fontSize: AppFontSizes.small,
-                              fontWeight: AppFontWeights.bold)),
-                      Text(translation.video_intensity_value,
-                          style:
-                              const TextStyle(fontWeight: AppFontWeights.bold))
-                    ])
-                  ],
+                  children: widget.exerciseTags
+                      .map((tag) => _exerciseTag(tag))
+                      .toList(),
                 ),
                 const SizedBox(height: AppGaps.gap16),
                 ElevatedButton(
@@ -191,29 +139,16 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
                         borderRadius: BorderRadius.circular(30)),
                     minimumSize: const Size(double.infinity, 48),
                   ),
-                  child: Text(translation.video_start,
-                      style: const TextStyle(
+                  child: const Text('START',
+                      style: TextStyle(
                           fontSize: AppFontSizes.title,
                           fontWeight: AppFontWeights.bold,
                           color: Colors.white)),
                 ),
                 const SizedBox(height: AppGaps.gap16),
-                Text(
-                  translation.video_course_description,
-                  style: const TextStyle(
-                      color: Colors.grey, fontWeight: AppFontWeights.bold),
-                ),
-                const SizedBox(height: AppGaps.gap8),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withAlpha((255 * 0.05).toInt()),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    translation.video_course_description,
-                    style: const TextStyle(fontWeight: AppFontWeights.bold),
-                  ),
+                ExecutionSteps(
+                  title: 'Execution',
+                  steps: widget.executionSteps,
                 ),
               ],
             ),
@@ -223,7 +158,7 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
     );
   }
 
-  Widget _laufenTag(String text) {
+  Widget _exerciseTag(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.icon, vertical: AppGaps.gap6),
@@ -236,6 +171,109 @@ class _ExcerciseScreenState extends State<ExcerciseScreen> {
         style: const TextStyle(
             fontWeight: AppFontWeights.bold, color: Colors.white),
       ),
+    );
+  }
+}
+
+class ExecutionSteps extends StatelessWidget {
+  final String title;
+  final List<String> steps;
+  const ExecutionSteps({super.key, required this.title, required this.steps});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 98,
+          height: 24,
+          child: Stack(
+            children: [
+              const Positioned(
+                left: 5,
+                top: 0,
+                child: Text(
+                  'Execution',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontFamily: 'LeagueSpartan',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                top: 18.06,
+                child: Container(
+                  transform: Matrix4.identity()..rotateZ(-1.57),
+                  width: 16.12,
+                  decoration: const ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 4,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFFD9D9D9),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...List.generate(steps.length, (i) {
+          return Container(
+            width: 320,
+            height: 30,
+            margin: const EdgeInsets.only(bottom: 6),
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 41,
+                  top: 5,
+                  child: Text(
+                    steps[i],
+                    style: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                      fontFamily: 'LeagueSpartan',
+                      fontWeight: AppFontWeights.medium,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  child: Container(
+                    width: 29,
+                    height: 30,
+                    decoration: const ShapeDecoration(
+                      color: Color(0x1E767680),
+                      shape: OvalBorder(),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 9,
+                  top: 4,
+                  child: Text(
+                    '${i + 1}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontFamily: 'LeagueSpartan',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 }
