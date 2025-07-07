@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'vision_detector_views/pose_detector_view.dart';
-
+import 'vision_detector_views/exerciseType.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +37,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Google ML Kit Demo App'),
+        title: Text('PeakForm'),
         centerTitle: true,
         elevation: 0,
       ),
@@ -45,7 +45,8 @@ class Home extends StatelessWidget {
         child: Center(
               child: Column(
                 children: [
-                      CustomCard('Pose Detection', PoseDetectorView()),
+                      CustomCard(exerciseTypeToString(ExerciseType.lateralRaises), PoseDetectorView(exerciseName: ExerciseType.lateralRaises,)),
+                      CustomCard( exerciseTypeToString(ExerciseType.bicepCurls), PoseDetectorView(exerciseName: ExerciseType.bicepCurls,)),
                 ],
               ),
 

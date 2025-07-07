@@ -1,23 +1,32 @@
 import 'package:camera/camera.dart';
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit_example/vision_detector_views/exercises/bicep_curls.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:circular_buffer/circular_buffer.dart';
 
 import 'detector_view.dart';
+import 'exercises/lateral_raise.dart';
+import 'movement_reference.dart';
 import 'painters/pose_painter.dart';
 import '../services/auto_save_service.dart';
 import '../services/performance_service.dart';
 
+import 'exerciseType.dart';
 import 'camera_view.dart' as camera_view;
+import 'direction.dart';
 
 class PoseDetectorView extends StatefulWidget {
+  final ExerciseType exerciseName;
+  PoseDetectorView({required this.exerciseName});
+
   @override
   State<StatefulWidget> createState() => _PoseDetectorViewState();
 }
 
 class _PoseDetectorViewState extends State<PoseDetectorView> {
+
   final PoseDetector _poseDetector =
       PoseDetector(options: PoseDetectorOptions());
   bool _canProcess = true;
@@ -25,16 +34,24 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   CustomPaint? _customPaint;
   String? _text;
   //var _cameraLensDirection = CameraLensDirection.back;
-  var _cameraLensDirection = CameraLensDirection.front;
-
+  var _cameraLensDirection = CameraLensDirection.back;
 
   Pose_analytics analytics = Pose_analytics();
   LAR_Evaluation eval = LAR_Evaluation();
 
-
-
   var bufferShoulder_r = CircularBuffer<double>(10);
-  MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
+  late MovementReference movement;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.exerciseName == ExerciseType.lateralRaises) {
+      movement = LateralRaiseReference(180, 10, 10, 1.0);
+    } else if(widget.exerciseName == ExerciseType.bicepCurls){
+      movement = BicepCurlReference(180, 10, 10, 1.0);
+    }
+  }
 
   @override
   void dispose() async {
@@ -44,24 +61,59 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: DetectorView(
-        title: 'Pose Detector',
-        customPaint: _customPaint,
-        text: _text,
-        onImage: _processImage,
-        initialCameraLensDirection: _cameraLensDirection,
-        onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _viewSavedScores,
-        child: Icon(Icons.history),
-        tooltip: 'View Performance History',
-        backgroundColor: Colors.blue,
-      ),
-    );
-  }
+    Widget build(BuildContext context) {
+      return Scaffold(
+        body: Stack(
+          children: [
+            DetectorView(
+              title: 'Pose Detector',
+              customPaint: _customPaint,
+              text: _text,
+              onImage: _processImage,
+              initialCameraLensDirection: _cameraLensDirection,
+              onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
+            ),
+            Center(
+              child: Container(
+                padding: EdgeInsets.all(8),
+                color: Colors.black.withOpacity(0.5),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Wiederholungen: ${movement.reps}",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    Text(
+                      "Straight Arm Angle: ${movement.secondary_angle}",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    Text(
+                      "Right Lateral Angle: ${movement.angle}",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    Text(
+                      "Moving Direction: ${movement.dir}",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    Text(
+                      "Arms bent: ${movement.armsBent}",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _viewSavedScores,
+          child: Icon(Icons.history),
+          tooltip: 'View Performance History',
+          backgroundColor: Colors.blue,
+        ),
+      );
+    }
 
   Future<void> _viewSavedScores() async {
     double? latestScore = await PerformanceService.getLatestScore();
@@ -124,55 +176,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             child: Text('Close'),
           ),
         ],
-      ),
-    return Stack(
-      children: [
-        DetectorView(
-          title: 'Pose Detector',
-          customPaint: _customPaint,
-          text: _text,
-          onImage: _processImage,
-          initialCameraLensDirection: _cameraLensDirection,
-          onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
-        ),
-        Center(
-          child: Container(
-            padding: EdgeInsets.all(8),
-            color: Colors.black.withOpacity(0.5),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  "Wiederholungen: ${lateral_rises.reps}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "Elbow Angle: ${lateral_rises.secondary_angle}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "Right Lateral Angle: ${lateral_rises.angle}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "Moving Direction: ${lateral_rises.dir}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                lateral_rises.dir == direction.up ? Text(
-                  "Arm ist not straight!",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ) : SizedBox.shrink(),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+      ));
   }
 
   Future<void> _processImage(InputImage inputImage) async {
@@ -239,28 +243,29 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //scores einfluss kann hier mit der certenty gewichtet werden
         //scoreForLAt rise zu score with tolerances ersätzen
 
+        movement.checkExerciseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
 
-        lateral_rises.checkLateralRaiseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
-        lateral_rises.checkElbowAngle(analytics.l_wes_angl, analytics.r_wes_angl);
+
+        movement.checkElbowAngle(analytics.l_wes_angl, analytics.r_wes_angl);
 
         bufferShoulder_r.add(analytics.r_esh_angl);
         print(bufferShoulder_r);
         print(analytics.r_esh_angl);
 
-            print("P_Score: " + (Score.average).toString());
+           /* print("P_Score: " + (Score.average).toString());
             AutoSaveService.updateCurrentScore(Score.average); // Track current score
             print("r_ARM (wes): " + r_wes_angl.toString());
-            print("r_HIP (esh): " + r_esh_angl.toString());
+            print("r_HIP (esh): " + r_esh_angl.toString());*/
 
-        lateral_rises.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
-        lateral_rises.update_direction();
+        movement.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
+        movement.update_direction();
 
-            if (angle_status >= lar_angels.length-1){
+            /*if (angle_status >= lar_angels.length-1){
               angle_up = true;
               wdhs++;
             } else if (angle_status <= 0) {
               angle_up = false;
-            }
+            }*/
 
 
         //todo store min / max average angle.
@@ -273,34 +278,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //wrist unter ellenbogeen für winkelunterscheideung
         // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
         // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
-
-        /*
-          leftShoulder,
-          rightShoulder,
-          leftElbow,
-          rightElbow,
-          leftWrist,
-          rightWrist,
-
-          leftPinky,
-          rightPinky,
-          leftIndex,
-          rightIndex,
-          leftThumb,
-          rightThumb,
-
-          leftHip,
-          rightHip,
-          leftKnee,
-          rightKnee,
-          leftAnkle,
-          rightAnkle,
-          leftHeel,
-          rightHeel,
-          leftFootIndex,
-          rightFootIndex
-
-         */
 
       }
       //for(TimedPose p in recordedPoses){

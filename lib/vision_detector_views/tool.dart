@@ -5,8 +5,6 @@ import 'pose_detector_view.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'package:circular_buffer/circular_buffer.dart';
 
-enum direction{up, down}
-
 
 //pro übung eine liste an toleranzen und winkel erstellen
 
@@ -83,9 +81,6 @@ double scoreForLateralRaise_Hip(double angle) {
   if (angle >= 60 && angle <= 120) return 0.0;
   return 0.0;
 }
-
-
-
 
 Vector3? getLandmarkCoordinates_3d(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, String name) {
   try {
@@ -164,8 +159,6 @@ double scorewithTolerances(double target_degree, double real_degree, double tole
   return cos(radians(difference*(90/tolerance)));
 }
 
-
-
 class TimedPose {
   final String pose;
   final Duration timestamp;
@@ -173,6 +166,7 @@ class TimedPose {
   TimedPose(this.pose, this.timestamp);
 }
 
+/*
 class MovementReference {
   double upperAngle;
   double lowerAngle;
@@ -197,8 +191,6 @@ class MovementReference {
   bool rightArmUp = false;
   bool leftArmDown = false;
   bool rightArmDown = false;
-
-
 
   MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime);
 
@@ -286,10 +278,7 @@ class MovementReference {
   }
 
 }
-
-
-
-
+*/
 
 //klasse zum lesen und Aktualliseren der Daten für die Lateral rises
 class Pose_analytics {
