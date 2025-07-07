@@ -190,19 +190,21 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         /*
         Todo:
+        //klassen veralgemeinern
+        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen
+        und namen nennen so werden die variablen dann heißen oder ein struckt für diese wie bei der winkel zu string idee
+        //klassen so verallgemeinern das man mehrere übungen damit machen kann
+
+
+
         bei der stunde: neu erzeugen der klasse wenn camera_view.CameraView.pose_Stopwatch_activation_bool
         und dann auch die werte abspeichern in got you in 4k
 
-
-
-        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen und namen nennen so werden die variablen dann heißen oder ein struckt für diese wie bei der winkel zu string idee
         //und stream erzeugen mit abgleich (von ideal und nachgemacht)
         //Curls auch machen als einheit erstmal durch stream und mit den veralgemeinerten klassen probieren
 
 
         jetzt:
-        //klassen veralgemeinern
-
         //notes vom handy
 
         // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
@@ -211,8 +213,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //pro übung eine liste an toleranzen und winkel erstellen
 
 
-
-        //klassen so verallgemeinern das man mehrere übungen damit machen kann
 
         //full into KI mit bewegungsablauf oder noch kontrolle haben ?
         */

@@ -167,8 +167,6 @@ double scorewithTolerances(double target_degree, double real_degree, double tole
   return cos(radians(difference*(90/tolerance)));
 }
 
-
-
 class TimedPose {
   final String pose;
   final Duration timestamp;
@@ -450,7 +448,6 @@ class MovementReference {
   DateTime? _lastActionTime;
   final Duration _cooldown = Duration(milliseconds: 125); //vorher 250
 
-
   int reps = 0;
   int bent_count = 0;
   bool bent = false;
@@ -505,8 +502,6 @@ class MovementReference {
 
     score.add(scorewithTolerances(wes_max_angle, leftAngle, 80.0), 1); //voirher 30
     score.add(scorewithTolerances(wes_max_angle, rightAngle, 80.0), 1);
-    //oder diskret punkte geben wenn feedback kommt
-
     //score add toleranter machen
 
 
@@ -636,8 +631,6 @@ class MovementReference {
   }
 
   // eine funktion die checkt ob es negatives feedback gibt und dann sagt
-
-
   //funktion die input image speichert zusätzlich zu negativem feedback wenn dieser eintritt
   //bei negativem feedback wird diese funktion aufgerufen und macht ein foto davon
   got_you_in_4k(InputImage inputImage){
@@ -663,5 +656,156 @@ class MovementReference {
     //results[0] ereignis
     return;
   }
+}
+
+/*
+
+class Pose_analytics {
+  late Pose pose; // wird immer aktualisert
+
+  late Vector2 r_Shoulder;
+  late Vector2 r_Elbow;
+  late Vector2 r_Wrist;
+  late Vector2 r_Hip;
+
+  late Vector2 l_Wrist;
+  late Vector2 l_Elbow;
+  late Vector2 l_Shoulder;
+  late Vector2 l_Hip;
+
+  bool r_w = false;
+  bool r_e = false;
+  bool r_s = false;
+  bool r_h = false;
+
+  bool l_w = false;
+  bool l_e = false;
+  bool l_s = false;
+  bool l_h = false;
+
+  late double r_wes_angl;
+  late double r_esh_angl;
+  late double l_wes_angl;
+  late double l_esh_angl;
+
+  late double l_wsh_angl;
+  late double r_wsh_angl;
+
+
+  //immer aktualisieren
+  set_new_pose(Pose p) {
+    this.pose = p;
+  }
+
+  /*
+  Vector2 getLandmarkOrError(String landmarkName, String errorText) {
+    Vector2? vec = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), landmarkName);
+    if (vec == null) {
+      throw Exception(errorText);
+    }
+    return vec;
+  }*/
+
+  get_lr_wesh_points() {
+    Vector2? vec_rWrist = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightWrist");
+    if (vec_rWrist != null) {
+      r_Wrist = Vector2(vec_rWrist.x, vec_rWrist.y);
+      r_w = true;
+    } else {
+      print("Fehler beim erkennen des r Handgelenks");
+      r_w = false;
+    }
+    Vector2? vec_rElbow = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightElbow");
+    if (vec_rElbow != null) {
+      r_Elbow = Vector2(vec_rElbow.x, vec_rElbow.y);
+      r_e = true;
+    } else {
+      print("Fehler beim erkennen des r Ellenbogens");
+      r_e = false;
+    }
+    Vector2? vec_rShoulder = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightShoulder");
+    if (vec_rShoulder != null) {
+      r_Shoulder = Vector2(vec_rShoulder.x, vec_rShoulder.y);
+      r_s = true;
+    } else {
+      print("Fehler beim erkennen der r Schulter");
+      r_s = false;
+    }
+    Vector2? vec_rHip = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "rightHip");
+    if (vec_rHip != null) {
+      r_Hip = Vector2(vec_rHip.x, vec_rHip.y);
+      r_h = true;
+    } else {
+      print("Fehler beim erkennen der r Hüfte");
+      r_h = false;
+    }
+
+    Vector2? vec_lWrist = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftWrist");
+    if (vec_lWrist != null) {
+      l_Wrist = Vector2(vec_lWrist.x, vec_lWrist.y);
+      l_w = true;
+    } else {
+      print("Fehler beim erkennen des l Handgelenks");
+      l_w = false;
+    }
+
+    Vector2? vec_lElbow = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftElbow");
+    if (vec_lElbow != null) {
+      l_Elbow = Vector2(vec_lElbow.x, vec_lElbow.y);
+      l_e = true;
+    } else {
+      print("Fehler beim erkennen des l Ellenbogens");
+      l_e = false;
+    }
+
+    Vector2? vec_lShoulder = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftShoulder");
+    if (vec_lShoulder != null) {
+      l_Shoulder = Vector2(vec_lShoulder.x, vec_lShoulder.y);
+      l_s = true;
+    } else {
+      print("Fehler beim erkennen der l Schulter");
+      l_s = false;
+    }
+
+    Vector2? vec_lHip = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), "leftHip");
+    if (vec_lHip != null) {
+      l_Hip = Vector2(vec_lHip.x, vec_lHip.y);
+      l_h = true;
+    } else {
+      print("Fehler beim erkennen der l Hüfte");
+      l_h = false;
+    }
+  }
+
+  // muss this. davor oder geht es auch so ?
+  bool is_wesh() {
+    if (r_w && r_e && r_s && r_h && l_w && l_e && l_s && l_h) {
+      return true;
+    }
+    return false;
+  }
+
+  compute_wesh_joints() {
+    if (!is_wesh()) {
+      return;
+    }
+    r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
+    r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
+    l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
+    l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
+
+    l_wsh_angl = computeJointAngle_2d(a: l_Hip, b: l_Shoulder, c: l_Wrist);
+    r_wsh_angl = computeJointAngle_2d(a: r_Hip, b: r_Shoulder, c: r_Wrist);
+
+  }
 
 }
+*/
