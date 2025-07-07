@@ -464,7 +464,7 @@ class _CameraViewState extends State<CameraView> {
 
 
   Future<void> _startRecording() async {
-    print("DEBUG: starting Recording");
+    print("###: starting Recording");
     if (_controller == null || !_controller!.value.isInitialized) return;
 
     if (_isRecording) return;
@@ -474,27 +474,36 @@ class _CameraViewState extends State<CameraView> {
       _isRecording = true;
     });
 
-    print("DEBUG: successfully started Recording");
+    print("###: successfully started Recording");
   }
 
   Future<void> _stopRecording() async {
 
-    print("DEBUG: stopping Recording");
-    if (_controller == null || !_controller!.value.isRecordingVideo) return;
-
-    final XFile? file = await _controller?.stopVideoRecording();
-    setState(() {
-      _isRecording = false;
-    });
-
-    if (file == null){
-      print('Error Saving Video: file == null');
+    print("###: stopping Recording");
+    if (_controller == null) {
+      print('### ERROR _controller == null');
+      return;
+    }
+    if (!_controller!.value.isRecordingVideo) {
+      print('### ERROR _controller.value.isRecordingVideo == false');
       return;
     }
 
-    // Save or use the recorded file
-    print('Video recorded to: ${file.path}');
-  }
+    print("###: stopping Recording 2");
+      final XFile? file = await _controller?.stopVideoRecording();
+      setState(() {
+        _isRecording = false;
+      });
+
+      if (file == null){
+        print('### Error Saving Video: file == null');
+        return;
+      }
+
+      // Save or use the recorded file
+      print('### Video recorded to: ${file.path}');
+    }
+
 
 
 
@@ -530,7 +539,6 @@ class _CameraViewState extends State<CameraView> {
 
       // Save score when workout is paused
       _saveWorkoutScore();
-      _stopRecording();
     }
   }
 
@@ -544,6 +552,8 @@ class _CameraViewState extends State<CameraView> {
     } catch (e) {
       print('❌ Could not save workout score: $e');
     }
+
+    _stopRecording();
   }
 
   void _resetStopwatch() {
