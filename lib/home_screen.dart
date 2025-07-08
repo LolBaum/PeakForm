@@ -5,6 +5,7 @@ import 'constants/constants.dart';
 import 'screens/camera_screen.dart';
 import 'providers/pose_detection_provider.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/auth_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
@@ -22,10 +23,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final translation = AppLocalizations.of(context)!;
+    final userName = Provider.of<AuthProvider>(context).userName ?? 'User';
     _log('HomeScreen built for user: $userName');
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text(translation.appTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () =>
+                Provider.of<AuthProvider>(context, listen: false).signOut(),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [

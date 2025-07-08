@@ -24,9 +24,9 @@ android {
         applicationId = "com.example.fitness_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        minSdk = localProperties.getProperty('flutter.minSdkVersion').toInteger()
+        targetSdk = localProperties.getProperty('flutter.targetSdkVersion').toInteger()
+        versionCode = flutter.versionCode.toInteger()
         versionName = flutter.versionName
     }
 

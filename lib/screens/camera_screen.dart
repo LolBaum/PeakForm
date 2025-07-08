@@ -90,6 +90,7 @@ class _CameraScreenState extends State<CameraScreen> {
               Navigator.pop(context);
               openAppSettings();
             },
+            // TODO: Add translation
             child: const Text('Settings'),
           ),
         ],
