@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:fitness_app/providers/pose_detection_provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import 'screens/gym_screen.dart' show GymScreen;
 import 'dart:io';
 
 late final Logger logger;
@@ -135,10 +136,9 @@ class FitnessApp extends StatelessWidget {
                 );
               },
             ),
-        '/gym': (context) => FutureBuilder<Uint8List>(
+        '/lunges': (context) => FutureBuilder<Uint8List>(
               future: DefaultAssetBundle.of(context)
-                  .load(
-                      'assets/images/thumbnail/thumbnail-dumbbell-lateral-raises.jpeg')
+                  .load('assets/images/thumbnail/thumbnail-lunges.jpeg')
                   .then((bd) => bd.buffer.asUint8List()),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -147,35 +147,75 @@ class FitnessApp extends StatelessWidget {
                   );
                 }
                 return ExerciseScreen(
-                  title: AppLocalizations.of(context)!.excercise_gym_title,
-                  videoAsset: 'assets/videos/gym/Dumbbell-Lateral-Raises.mov',
+                  title: AppLocalizations.of(context)!.excercise_lunges_title,
+                  videoAsset: 'assets/videos/lunges/lunges.mov',
                   thumbnailBytes: snapshot.data!,
                   exerciseTags: [
-                    AppLocalizations.of(context)!.excercise_gym_tagOne,
-                    AppLocalizations.of(context)!.excercise_gym_tagTwo
+                    AppLocalizations.of(context)!.excercise_lunges_tagOne,
+                    AppLocalizations.of(context)!.excercise_lunges_tagTwo,
+                    AppLocalizations.of(context)!.excercise_lunges_tagThree
                   ],
                   executionSteps: [
                     AppLocalizations.of(context)!
-                        .excercise_gym_executionSteps_One,
+                        .excercise_lunges_executionSteps_One,
                     AppLocalizations.of(context)!
-                        .excercise_gym_executionSteps_Two,
+                        .excercise_lunges_executionSteps_Two,
                     AppLocalizations.of(context)!
-                        .excercise_gym_executionSteps_Three,
+                        .excercise_lunges_executionSteps_Three,
                     AppLocalizations.of(context)!
-                        .excercise_gym_executionSteps_Four,
+                        .excercise_lunges_executionSteps_Four,
+                    AppLocalizations.of(context)!
+                        .excercise_lunges_executionSteps_Five,
+                    AppLocalizations.of(context)!
+                        .excercise_lunges_executionSteps_Six,
                   ],
                   onPlayVideo: () async {
                     final byteData = await DefaultAssetBundle.of(context)
-                        .load('assets/videos/gym/Dumbbell-Lateral-Raises.mov');
+                        .load('assets/videos/lunges/lunges.mov');
                     final tempDir = await getTemporaryDirectory();
-                    final file =
-                        File('${tempDir.path}/Dumbbell-Lateral-Raises.mov');
+                    final file = File('${tempDir.path}/lunges.mov');
                     await file.writeAsBytes(byteData.buffer.asUint8List());
                     await OpenFile.open(file.path);
                   },
                 );
               },
             ),
+        '/planks': (context) => FutureBuilder<Uint8List>(
+              future: DefaultAssetBundle.of(context)
+                  .load('assets/images/thumbnail/thumbnail-planks.jpeg')
+                  .then((bd) => bd.buffer.asUint8List()),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                return ExerciseScreen(
+                  title: AppLocalizations.of(context)!.excercise_plank_title,
+                  videoAsset: 'assets/videos/planks/planks.mov',
+                  thumbnailBytes: snapshot.data!,
+                  exerciseTags: [
+                    AppLocalizations.of(context)!.excercise_plank_tagOne,
+                    AppLocalizations.of(context)!.excercise_plank_tagTwo
+                  ],
+                  executionSteps: [
+                    AppLocalizations.of(context)!
+                        .excercise_plank_executionSteps_One,
+                    AppLocalizations.of(context)!
+                        .excercise_plank_executionSteps_Two,
+                  ],
+                  onPlayVideo: () async {
+                    final byteData = await DefaultAssetBundle.of(context)
+                        .load('assets/videos/planks/planks.mov');
+                    final tempDir = await getTemporaryDirectory();
+                    final file = File('${tempDir.path}/planks.mov');
+                    await file.writeAsBytes(byteData.buffer.asUint8List());
+                    await OpenFile.open(file.path);
+                  },
+                );
+              },
+            ),
+        '/gym': (context) => const GymScreen(),
         '/result': (context) {
           final videoPath =
               ModalRoute.of(context)?.settings.arguments as String?;
@@ -199,6 +239,7 @@ class FitnessApp extends StatelessWidget {
               FeedbackItem(label: translation.result_tip_arms),
             ],
             videoPath: videoPath,
+            score: 5,
           );
         },
         // TOOD: refactor naming

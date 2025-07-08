@@ -3,6 +3,9 @@ import 'constants/constants.dart';
 import 'package:fitness_app/util/logging_service.dart';
 import 'package:flutter/services.dart';
 import 'l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:fitness_app/providers/pose_detection_provider.dart';
+import 'package:fitness_app/screens/camera_screen.dart';
 
 class ExerciseScreen extends StatefulWidget {
   final String title;
@@ -11,6 +14,7 @@ class ExerciseScreen extends StatefulWidget {
   final List<String> executionSteps;
   final List<String> exerciseTags;
   final Future<void> Function()? onPlayVideo;
+  final int? exerciseType;
 
   const ExerciseScreen({
     super.key,
@@ -20,6 +24,7 @@ class ExerciseScreen extends StatefulWidget {
     required this.executionSteps,
     required this.exerciseTags,
     this.onPlayVideo,
+    this.exerciseType,
   });
 
   @override
@@ -151,7 +156,16 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                   onPressed: () {
                     LoggingService.instance
                         .i('User pressed START button on video screen');
-                    Navigator.pushNamed(context, '/pose_detection');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChangeNotifierProvider(
+                          create: (_) => PoseDetectionProvider(),
+                          child:
+                              CameraScreen(exerciseType: widget.exerciseType),
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.secondary,

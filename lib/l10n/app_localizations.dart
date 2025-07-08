@@ -224,6 +224,96 @@ abstract class AppLocalizations {
   /// **'A COURSE THAT PROVIDES EFFECTIVE FEEDBACK FOR YOUR SQUATS'**
   String get gym_course_feedback;
 
+  /// No description provided for @excercise_lunges_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunges'**
+  String get excercise_lunges_title;
+
+  /// No description provided for @excercise_lunges_tagOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Core'**
+  String get excercise_lunges_tagOne;
+
+  /// No description provided for @excercise_lunges_tagTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Quadtriceps'**
+  String get excercise_lunges_tagTwo;
+
+  /// No description provided for @excercise_lunges_tagThree.
+  ///
+  /// In en, this message translates to:
+  /// **'Hamstrings'**
+  String get excercise_lunges_tagThree;
+
+  /// No description provided for @excercise_lunges_executionSteps_One.
+  ///
+  /// In en, this message translates to:
+  /// **'Start in a standing position, with your feet wider than shoulder-width apart.'**
+  String get excercise_lunges_executionSteps_One;
+
+  /// No description provided for @excercise_lunges_executionSteps_Two.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your legs straight and your upper body upright.'**
+  String get excercise_lunges_executionSteps_Two;
+
+  /// No description provided for @excercise_lunges_executionSteps_Three.
+  ///
+  /// In en, this message translates to:
+  /// **'Ensure your hands are not touching your body.'**
+  String get excercise_lunges_executionSteps_Three;
+
+  /// No description provided for @excercise_lunges_executionSteps_Four.
+  ///
+  /// In en, this message translates to:
+  /// **'Bend your knees and move into a wide side lunge, keeping the other leg straight.'**
+  String get excercise_lunges_executionSteps_Four;
+
+  /// No description provided for @excercise_lunges_executionSteps_Five.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower your hips to knee height.'**
+  String get excercise_lunges_executionSteps_Five;
+
+  /// No description provided for @excercise_lunges_executionSteps_Six.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the leg after each repetition'**
+  String get excercise_lunges_executionSteps_Six;
+
+  /// No description provided for @excercise_plank_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Plank Hold'**
+  String get excercise_plank_title;
+
+  /// No description provided for @excercise_plank_tagOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Core'**
+  String get excercise_plank_tagOne;
+
+  /// No description provided for @excercise_plank_tagTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Basin'**
+  String get excercise_plank_tagTwo;
+
+  /// No description provided for @excercise_plank_executionSteps_One.
+  ///
+  /// In en, this message translates to:
+  /// **'The elbows are under the shoulders'**
+  String get excercise_plank_executionSteps_One;
+
+  /// No description provided for @excercise_plank_executionSteps_Two.
+  ///
+  /// In en, this message translates to:
+  /// **'Head, shoulders, hips and knees form a line'**
+  String get excercise_plank_executionSteps_Two;
+
   /// No description provided for @exercise_screen_execution_subtitle.
   ///
   /// In en, this message translates to:

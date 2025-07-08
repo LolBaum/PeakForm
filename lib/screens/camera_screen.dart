@@ -13,7 +13,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key});
+  final int? exerciseType;
+  const CameraScreen({super.key, this.exerciseType});
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
