@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:fitness_app/util/logging_service.dart';
 import 'constants/constants.dart';
-import 'screens/pose_detection_screen.dart';
+import 'screens/camera_screen.dart';
 import 'providers/pose_detection_provider.dart';
-import 'main.dart';
+import 'l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
 
   void _log(String message) {
     try {
-      logger.i(message);
+      LoggingService.instance.i(message);
     } catch (e) {
       debugPrint('HomeScreen: $message');
     }
@@ -21,210 +21,222 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final translation = AppLocalizations.of(context)!;
     _log('HomeScreen built for user: $userName');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
+      backgroundColor: AppColors.background,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _circularIconButton(Icons.bar_chart),
-                    _circularIconButton(Icons.settings),
+                    _circularIconButton(Icons.bar_chart, translation),
+                    _circularIconButton(Icons.settings, translation),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withAlpha((255 * 0.1).toInt()),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      const CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Color(0xFFB8FF7B),
-                      ),
-                      const SizedBox(height: 12),
-                      Text('Hi, $userName!',
-                          style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5)),
-                      const SizedBox(height: 4),
-                      Text('FORTSCHRITT',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[700],
-                              letterSpacing: 1.5)),
-                      const Text('LVL. 10',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87)),
-                    ],
-                  ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: AppGaps.gap20),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.lightGrey.withAlpha((255 * 0.1).toInt()),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: AppColors.accent,
+                    ),
+                    const SizedBox(height: AppGaps.gap12),
+                    Text(translation.home_hi_user(userName),
+                        style: const TextStyle(
+                            fontSize: AppFontSizes.headline,
+                            fontWeight: AppFontWeights.extraBold,
+                            letterSpacing: 0.5)),
+                    const SizedBox(height: AppGaps.gap4),
+                    Text(translation.home_progress,
+                        style: const TextStyle(
+                            fontSize: AppFontSizes.small,
+                            fontWeight: AppFontWeights.semiBold,
+                            color: AppColors.darkGrey,
+                            letterSpacing: 1.5)),
+                    Text(translation.home_level,
+                        style: const TextStyle(
+                            fontSize: AppFontSizes.body,
+                            fontWeight: AppFontWeights.bold,
+                            color: AppColors.onSurface)),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 24.0, left: 16, right: 16, bottom: 24),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withAlpha((255 * 0.1).toInt()),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Wähle deinen Sport',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black)),
-                      const SizedBox(height: 16),
-                      GridView.count(
-                        shrinkWrap: true,
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        physics: const NeverScrollableScrollPhysics(),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 24.0, left: 16, right: 16, bottom: 24),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.lightGrey.withAlpha((255 * 0.1).toInt()),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Wähle deinen Sport',
+                        style: TextStyle(
+                            fontSize: AppFontSizes.title,
+                            fontWeight: AppFontWeights.bold,
+                            color: AppColors.onSurface)),
+                    GridView.count(
+                      shrinkWrap: true,
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        _sportTile(
+                            context,
+                            translation.home_sport_tile_title_tennis,
+                            translation.home_sport_tile_subtitle_tennis,
+                            null,
+                            'assets/tennis.png'),
+                        _sportTile(
+                            context,
+                            translation.home_sport_tile_title_running,
+                            translation.home_sport_tile_subtitle_running,
+                            '/video',
+                            'assets/laufen.jpg'),
+                        _sportTile(
+                            context,
+                            translation.home_sport_tile_title_gym,
+                            translation.home_sport_tile_subtitle_gym,
+                            '/gym',
+                            'assets/gym.jpg'),
+                        _sportTile(
+                            context,
+                            translation.home_sport_tile_title_golf,
+                            translation.home_sport_tile_subtitle_golf,
+                            null,
+                            'assets/golf.jpg'),
+                      ],
+                    ),
+                    Center(
+                      child: Column(
                         children: [
-                          _sportTile(context, 'TENNIS', 'TECHNIK', null,
-                              'assets/tennis.png'),
-                          _sportTile(
-                              context,
-                              'LAUFEN',
-                              'LAUFÖKONOMIE UND DRILLS',
-                              '/video',
-                              'assets/laufen.jpg'),
-                          _sportTile(context, 'GYM', 'TECHNIK', '/gym',
-                              'assets/gym.jpg'),
-                          _sportTile(context, 'GOLF', 'AUFSCHLÄGE', null,
-                              'assets/golf.jpg'),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Center(
-                        child: Column(
-                          children: [
-                            Text('LETZTE AUFNAHME: TENNIS',
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey[700])),
-                            const SizedBox(height: 6),
-                            GestureDetector(
-                              onTap: () {
-                                _log(
-                                    'Aufnehmen button tapped - starting pose detection');
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        ChangeNotifierProvider(
-                                      create: (_) => PoseDetectionProvider(),
-                                      child: const PoseDetectionScreen(),
-                                    ),
+                          Text(translation.home_last_recording,
+                              style: const TextStyle(
+                                  fontSize: AppFontSizes.small,
+                                  fontWeight: AppFontWeights.regular,
+                                  color: AppColors.darkGrey)),
+                          const SizedBox(height: AppGaps.gap6),
+                          GestureDetector(
+                            onTap: () {
+                              _log(
+                                  'Aufnehmen button tapped - starting pose detection');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChangeNotifierProvider(
+                                    create: (_) => PoseDetectionProvider(),
+                                    child: const CameraScreen(),
                                   ),
-                                );
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: darkGreen,
-                                  borderRadius: BorderRadius.circular(40),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 4, right: 8, top: 4, bottom: 4),
-                                      child: Container(
-                                        width: 35,
-                                        height: 35,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: green,
-                                        ),
-                                        child: const Center(
-                                          child: SizedBox(
-                                            width: 15,
-                                            height: 15,
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Colors.white),
-                                            ),
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 8),
+                                    child: Container(
+                                      width: 35,
+                                      height: 35,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: green,
+                                      ),
+                                      child: const Center(
+                                        child: SizedBox(
+                                          width: 15,
+                                          height: 15,
+                                          child: DecoratedBox(
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.white),
                                           ),
                                         ),
                                       ),
                                     ),
-                                    const Padding(
-                                      padding: EdgeInsets.only(right: 16),
-                                      child: Text('Aufnehmen',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white)),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 16),
+                                    child: Text('Aufnehmen',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _circularIconButton(IconData icon) {
+  Widget _circularIconButton(IconData icon, AppLocalizations translation) {
     return GestureDetector(
       onTap: () {
-        String buttonName = icon == Icons.bar_chart ? 'Charts' : 'Settings';
+        String buttonName = icon == Icons.bar_chart
+            ? translation.home_charts
+            : translation.home_settings;
         _log('Circular icon button tapped: $buttonName');
       },
       child: Container(
         width: 44,
         height: 44,
-        decoration:
-            const BoxDecoration(color: darkGreen, shape: BoxShape.circle),
-        child: Icon(icon, color: Colors.white),
+        decoration: const BoxDecoration(
+            color: AppColors.primary, shape: BoxShape.circle),
+        child: Icon(icon, color: AppColors.onPrimary),
       ),
     );
   }
@@ -245,32 +257,56 @@ class HomeScreen extends StatelessWidget {
             image: AssetImage(imagePath),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withAlpha((255 * 0.4).toInt()),
+              AppColors.lightGrey.withAlpha((255 * 0.4).toInt()),
               BlendMode.darken,
             ),
           ),
         ),
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 16,
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromARGB(0, 255, 255, 255), // very light white top
+                      Color.fromARGB(135, 0, 0, 0), // very light black bottom
+                    ],
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: AppGaps.gap10),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: AppFontWeights.bold,
+                        color: AppColors.onPrimary,
+                        fontSize: AppFontSizes.title,
+                      ),
+                    ),
+                    const SizedBox(height: AppGaps.gap4),
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: AppFontSizes.subtitle,
+                        fontWeight: AppFontWeights.regular,
+                        color: AppColors.onPrimary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
