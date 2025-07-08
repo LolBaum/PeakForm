@@ -315,6 +315,7 @@ class Pose_analytics {
     }
     r_wes_angl = computeJointAngle_2d(a: r_Shoulder, b: r_Elbow, c: r_Wrist);
     r_esh_angl = computeJointAngle_2d(a: r_Elbow, b: r_Shoulder, c: r_Hip);
+
     l_wes_angl = computeJointAngle_2d(a: l_Shoulder, b: l_Elbow, c: l_Wrist);
     l_esh_angl = computeJointAngle_2d(a: l_Elbow, b: l_Shoulder, c: l_Hip);
 
@@ -419,7 +420,6 @@ class MovementReference {
   bool session_started = false;
   List<List<dynamic>> feedbacks = [];
 
-
   SlidingAverage score = SlidingAverage(1000);
 
   bool neg_feedback = false;
@@ -500,7 +500,7 @@ class MovementReference {
     double tolerance = 30.0;
     double lowerTolerance = 180.0 - tolerance;
 
-    score.add(scorewithTolerances(wes_max_angle, leftAngle, 80.0), 1); //voirher 30
+    score.add(scorewithTolerances(wes_max_angle, leftAngle, 80.0), 1); //vorher 30
     score.add(scorewithTolerances(wes_max_angle, rightAngle, 80.0), 1);
     //score add toleranter machen
 
@@ -658,8 +658,59 @@ class MovementReference {
   }
 }
 
-/*
+class Joint_Angle {
+  final String first;
+  final String second;
+  final String third;
 
+  late double angle;
+
+  Joint_Angle({required this.first, required this.second, required this.third});
+}
+
+class General_pose_analytics{
+  get_angles(Pose pose, String name) {
+    Vector2 point_1;
+    Vector2 point_2;
+    Vector2 point_3;
+
+    Vector2? vec_1 = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), name);
+    if (vec_1 != null) {
+      point_1 = Vector2(vec_1.x, vec_1.y);
+    } else {
+      print("Fehler beim erkennen des " + name);
+      return;
+    }
+
+    Vector2? vec_2 = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), name);
+    if (vec_2 != null) {
+      point_2 = Vector2(vec_2.x, vec_2.y);
+    } else {
+      print("Fehler beim erkennen des " + name);
+      return;
+    }
+
+    Vector2? vec_3 = getLandmarkCoordinates_2d(
+        pose.landmarks.entries.toList(), name);
+    if (vec_3 != null) {
+      point_3 = Vector2(vec_3.x, vec_3.y);
+    } else {
+      print("Fehler beim erkennen des " + name);
+      return;
+    }
+
+    return computeJointAngle_2d(a: point_1, b: point_2, c: point_3);
+  }
+
+
+  //"elbowAngle": ["shoulderRight", "elbowRight", "wristRight"] input ?
+
+}
+
+
+/*
 class Pose_analytics {
   late Pose pose; // wird immer aktualisert
 
@@ -697,14 +748,7 @@ class Pose_analytics {
     this.pose = p;
   }
 
-  /*
-  Vector2 getLandmarkOrError(String landmarkName, String errorText) {
-    Vector2? vec = getLandmarkCoordinates_2d(pose.landmarks.entries.toList(), landmarkName);
-    if (vec == null) {
-      throw Exception(errorText);
-    }
-    return vec;
-  }*/
+
 
   get_lr_wesh_points() {
     Vector2? vec_rWrist = getLandmarkCoordinates_2d(

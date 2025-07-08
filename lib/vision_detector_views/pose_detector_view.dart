@@ -25,9 +25,45 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   var _cameraLensDirection = CameraLensDirection.front; //richtung geändert
 
 
+  /*
+  leftShoulder,
+  rightShoulder,
+  leftElbow,
+  rightElbow,
+  leftWrist,
+  rightWrist,
+
+  leftPinky,
+  rightPinky,
+  leftIndex,
+  rightIndex,
+  leftThumb,
+  rightThumb,
+
+  leftHip,
+  rightHip,
+  leftKnee,
+  rightKnee,
+  leftAnkle,
+  rightAnkle,
+  leftHeel,
+  rightHeel,
+  leftFootIndex,
+  rightFootIndex
+ */
+
   Pose_analytics analytics = Pose_analytics();
   Pose_init t_pose = Pose_init();
   MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
+  General_pose_analytics general_analytics = General_pose_analytics();
+  Joint_Angle r_wes = Joint_Angle(first: "rightShoulder", second: "rightElbow", third: "rightWrist");
+  Joint_Angle r_esh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightElbow");
+  Joint_Angle r_wsh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightWrist");
+
+  Joint_Angle l_wes = Joint_Angle(first: "leftShoulder", second: "leftElbow", third: "leftWrist");
+  Joint_Angle l_esh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftElbow");
+  Joint_Angle l_wsh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftWrist");
+
 
 
 
@@ -142,6 +178,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
 
+
         analytics.set_new_pose(pose);
         analytics.get_lr_wesh_points();
         analytics.compute_wesh_joints();
@@ -202,7 +239,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //und stream erzeugen mit abgleich (von ideal und nachgemacht)
         //Curls auch machen als einheit erstmal durch stream und mit den veralgemeinerten klassen probieren
-
 
         jetzt:
         //notes vom handy
