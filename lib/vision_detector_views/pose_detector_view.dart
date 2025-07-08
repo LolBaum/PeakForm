@@ -1,5 +1,5 @@
 import 'package:camera/camera.dart';
-//import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/exercises/bicep_curls.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
@@ -252,10 +252,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         print(bufferShoulder_r);
         print(analytics.r_esh_angl);
 
-           /* print("P_Score: " + (Score.average).toString());
-            AutoSaveService.updateCurrentScore(Score.average); // Track current score
-            print("r_ARM (wes): " + r_wes_angl.toString());
-            print("r_HIP (esh): " + r_esh_angl.toString());*/
+            //print("P_Score: " + (Score.average).toString());
+            AutoSaveService.updateCurrentScore(10); // Todo: Track current score
+            //print("r_ARM (wes): " + r_wes_angl.toString());
+            //print("r_HIP (esh): " + r_esh_angl.toString());
 
         movement.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
         movement.update_direction();
