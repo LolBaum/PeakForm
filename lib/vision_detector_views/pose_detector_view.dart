@@ -52,10 +52,11 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   rightFootIndex
  */
 
-  Pose_analytics analytics = Pose_analytics();
+  //Pose_analytics analytics = Pose_analytics();
   Pose_init t_pose = Pose_init();
   MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
   General_pose_analytics general_analytics = General_pose_analytics();
+
   Joint_Angle r_wes = Joint_Angle(first: "rightShoulder", second: "rightElbow", third: "rightWrist");
   Joint_Angle r_esh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightElbow");
   Joint_Angle r_wsh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightWrist");
@@ -64,8 +65,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   Joint_Angle l_esh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftElbow");
   Joint_Angle l_wsh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftWrist");
 
-
-
+  bool all_angls = false;
 
   @override
   void dispose() async {
@@ -178,20 +178,33 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
 
+        //analytics.set_new_pose(pose);
+        //analytics.get_lr_wesh_points();
+        //analytics.compute_wesh_joints();
+        //analytics.r_wes_angl
 
-        analytics.set_new_pose(pose);
-        analytics.get_lr_wesh_points();
-        analytics.compute_wesh_joints();
+
+        //TODO was ist wenn kein wert raus kommt sondern nur fehler ?
+        //lauras klasse generalisieren ? oder als lar einheit aufstellen
+        r_wes.angle = general_analytics.get_angles(pose, r_wes); //wert actuallisieren
+        r_esh.angle = general_analytics.get_angles(pose, r_esh);
+        r_wsh.angle = general_analytics.get_angles(pose, r_wsh);
+
+        l_wes.angle = general_analytics.get_angles(pose, l_wes);
+        l_esh.angle = general_analytics.get_angles(pose, l_esh);
+        l_wsh.angle = general_analytics.get_angles(pose, l_wsh);
+
+        all_angls = r_wes.detected & r_esh.detected & r_wsh.detected & l_wes.detected & l_esh.detected & l_wsh.detected;
+
+        print("DEBUG: " + (r_wes.angle.toString()));
 
         //bei pausieren wieder t_posen zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
           t_pose.triggered = false;
-
         }
-        if(analytics.is_wesh()) {
+        if(all_angls) {
           t_pose.lar_init_pose(!camera_view.CameraView.pose_Stopwatch_activation_bool,
-              analytics.r_wes_angl, analytics.r_esh_angl, analytics.l_wes_angl,
-              analytics.l_esh_angl);
+              r_wes.angle, r_esh.angle, l_wes.angle, l_esh.angle);
           camera_view.CameraView.pose_Stopwatch_activation_bool =
               t_pose.triggered;
         }
@@ -200,8 +213,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           //hier beginnt eine neue session
           //neue werte abspeichern und feedbach abspeichern
           lateral_rises.session_started = true;
-          lateral_rises.update_esh_angles(analytics.l_esh_angl, analytics.r_esh_angl);
-          lateral_rises.update_wes_angles(analytics.l_wes_angl, analytics.r_wes_angl);
+          lateral_rises.update_esh_angles(l_esh.angle, r_esh.angle);
+          lateral_rises.update_wes_angles(l_wes.angle, r_wes.angle);
 
           lateral_rises.checkElbowAngle();
           lateral_rises.update_direction_lr('beide'); //richtigen namen für feedback

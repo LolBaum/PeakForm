@@ -7,10 +7,6 @@ import 'package:vector_math/vector_math_64.dart';
 import 'package:circular_buffer/circular_buffer.dart';
 
 
-
-
-
-
 class Vector3 {
   final double x, y, z;
 
@@ -86,8 +82,6 @@ double scoreForLateralRaise_Hip(double angle) {
 }
 
 
-
-
 Vector3? getLandmarkCoordinates_3d(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, String name) {
   try {
     final entry = entries.firstWhere((e) => e.key.name == name);
@@ -101,12 +95,10 @@ Vector3? getLandmarkCoordinates_3d(List<MapEntry<PoseLandmarkType, PoseLandmark>
 }
 
 Vector2? getLandmarkCoordinates_2d(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, String name) {
-  //TODO
-
   try {
     final entry = entries.firstWhere((e) => e.key.name == name);
     final landmark = entry.value;
-    //print("fuck: " + name + landmark.likelihood.toString());
+    //print("fuck: " + name + landmark.likelihood.toString()); //likelyhood übergeben ?
     return Vector2(landmark.x, landmark.y);
   } catch (e) {
     print(e);
@@ -126,8 +118,6 @@ String getPoseName(List<MapEntry<PoseLandmarkType, PoseLandmark>> entries, Strin
     return "";
   }
 }
-
-
 
 
 class SlidingAverage {
@@ -173,7 +163,6 @@ class TimedPose {
 
   TimedPose(this.pose, this.timestamp);
 }
-
 
 
 class Pose_analytics {
@@ -448,11 +437,12 @@ class MovementReference {
   DateTime? _lastActionTime;
   final Duration _cooldown = Duration(milliseconds: 125); //vorher 250
 
+  bool was_it_down = false;
+
   int reps = 0;
   int bent_count = 0;
   bool bent = false;
 
-  bool armsUp = false;
   bool leftArmUp = false;
   bool rightArmUp = false;
   bool leftArmDown = false;
@@ -470,7 +460,6 @@ class MovementReference {
   String wes_angle_feedback = " ";
 
   MovementReference(this.upperAngle, this.lowerAngle, this.tolerance, this.minTime);
-
 
   //fragen warum secundary angle und warum vorher esh und wes
   //secondary wird nicht genutzt da die einträge von a geglättet werden
@@ -500,13 +489,13 @@ class MovementReference {
     double tolerance = 30.0;
     double lowerTolerance = 180.0 - tolerance;
 
-    score.add(scorewithTolerances(wes_max_angle, leftAngle, 80.0), 1); //vorher 30
-    score.add(scorewithTolerances(wes_max_angle, rightAngle, 80.0), 1);
+    score.add(scorewithTolerances(wes_max_angle, leftAngle, 85.0), 1); //vorher 30
+    score.add(scorewithTolerances(wes_max_angle, rightAngle, 85.0), 1);
     //score add toleranter machen
 
 
-    print("elbow_score: " + scorewithTolerances(wes_max_angle, leftAngle, 30.0).toString());
-    print("elbow_score: " + scorewithTolerances(wes_max_angle, rightAngle, 30.0).toString());
+    //print("elbow_score: " + scorewithTolerances(wes_max_angle, leftAngle, 30.0).toString());
+    //print("elbow_score: " + scorewithTolerances(wes_max_angle, rightAngle, 30.0).toString());
 
     if(leftAngle < lowerTolerance || rightAngle < lowerTolerance){
       bent_count++;
@@ -565,21 +554,33 @@ class MovementReference {
 
         //todo:werte tweaken
 
+        //TUDO wasit down wäre überschreibar wenn es gesetzt wurde oder nicht gesezt wurde
+        //testen ob gesetzt wurde vorm setzen bei down up
+
         if (esh_upper_diff < -6.0) {
           esh_dir_change_upper_feedback = side + " zu hoch!";
           neg_feedback = true;
           score.add(0.8,2); //strafpunkt für die gesundheit
-          reps++;
+           //TODO: problem das wenn man oben hält das es nur countet !!!!!
+          if (was_it_down){
+            reps++;
+          }
         } else
         if (esh_upper_diff < 2.0) {
           esh_dir_change_upper_feedback = side + " super";
           neg_feedback = false;
-          reps++;
+          if (was_it_down){
+            was_it_down = false;
+            reps++;
+          }
         } else
         if (esh_upper_diff < 6.0) {
           esh_dir_change_upper_feedback = side + " gut";
           neg_feedback = false;
-          reps++;
+          if (was_it_down){
+            was_it_down = false;
+            reps++;
+          }
         } else
         if (esh_upper_diff < 15.0) {
           esh_dir_change_upper_feedback = side + " noch etwas höher";
@@ -601,16 +602,22 @@ class MovementReference {
 
         if (esh_downer_diff < 10.0) {
           esh_dir_change_downer_feedback = side + " super";
+          if(!was_it_down){
+            was_it_down = true;
+          }
         } else
         if (esh_downer_diff < 15.0) {
           esh_dir_change_downer_feedback = side + " gut";
+          if(!was_it_down){
+            was_it_down = true;
+          }
         } else
         if (esh_downer_diff < 20.0) {
           esh_dir_change_downer_feedback = side + " weiter runter";
         } else
         if (esh_downer_diff < 25.0) {
           esh_dir_change_downer_feedback = side + " zu hoch";
-          neg_feedback = true;
+          neg_feedback = false;
         }
       }
       direction_changed = false;
@@ -629,7 +636,6 @@ class MovementReference {
       }
     }
   }
-
   // eine funktion die checkt ob es negatives feedback gibt und dann sagt
   //funktion die input image speichert zusätzlich zu negativem feedback wenn dieser eintritt
   //bei negativem feedback wird diese funktion aufgerufen und macht ein foto davon
@@ -663,41 +669,48 @@ class Joint_Angle {
   final String second;
   final String third;
 
-  late double angle;
+  final double certainty = 1.0; //später über Vector2 ausgabe machen
+  bool detected = false;
+  late double angle = 0.0;
 
   Joint_Angle({required this.first, required this.second, required this.third});
 }
 
 class General_pose_analytics{
-  get_angles(Pose pose, String name) {
+  get_angles(Pose pose, Joint_Angle angl) {
     Vector2 point_1;
     Vector2 point_2;
     Vector2 point_3;
 
+    angl.detected = true;
+
     Vector2? vec_1 = getLandmarkCoordinates_2d(
-        pose.landmarks.entries.toList(), name);
+        pose.landmarks.entries.toList(), angl.first);
     if (vec_1 != null) {
       point_1 = Vector2(vec_1.x, vec_1.y);
     } else {
-      print("Fehler beim erkennen des " + name);
+      print("General_analysis_Error: Fehler beim erkennen des " + angl.first);
+      angl.detected = angl.detected & false;
       return;
     }
 
     Vector2? vec_2 = getLandmarkCoordinates_2d(
-        pose.landmarks.entries.toList(), name);
+        pose.landmarks.entries.toList(), angl.second);
     if (vec_2 != null) {
       point_2 = Vector2(vec_2.x, vec_2.y);
     } else {
-      print("Fehler beim erkennen des " + name);
+      print("General_analysis_Error: Fehler beim erkennen des " + angl.second);
+      angl.detected = angl.detected & false;
       return;
     }
 
     Vector2? vec_3 = getLandmarkCoordinates_2d(
-        pose.landmarks.entries.toList(), name);
+        pose.landmarks.entries.toList(), angl.third);
     if (vec_3 != null) {
       point_3 = Vector2(vec_3.x, vec_3.y);
     } else {
-      print("Fehler beim erkennen des " + name);
+      print("General_analysis_Error: Fehler beim erkennen des " + angl.third);
+      angl.detected = angl.detected & false;
       return;
     }
 
