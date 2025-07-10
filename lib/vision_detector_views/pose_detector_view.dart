@@ -52,10 +52,11 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   rightFootIndex
  */
 
-  //Pose_analytics analytics = Pose_analytics();
-  Pose_init t_pose = Pose_init();
+  //Pose_init t_pose = Pose_init();
   MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
   General_pose_analytics general_analytics = General_pose_analytics();
+  General_Pose_init t_pose = General_Pose_init(0.8);
+
 
   Joint_Angle r_wes = Joint_Angle(first: "rightShoulder", second: "rightElbow", third: "rightWrist");
   Joint_Angle r_esh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightElbow");
@@ -196,17 +197,26 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
         all_angls = r_wes.detected & r_esh.detected & r_wsh.detected & l_wes.detected & l_esh.detected & l_wsh.detected;
 
-        print("DEBUG: " + (r_wes.angle.toString()));
+
 
         //bei pausieren wieder t_posen zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
           t_pose.triggered = false;
         }
-        if(all_angls) {
-          t_pose.lar_init_pose(!camera_view.CameraView.pose_Stopwatch_activation_bool,
-              r_wes.angle, r_esh.angle, l_wes.angle, l_esh.angle);
-          camera_view.CameraView.pose_Stopwatch_activation_bool =
-              t_pose.triggered;
+        if(all_angls && camera_view.CameraView.pose_Stopwatch_activation_bool) {
+          //t_pose.intolerance_t_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_wes_angl: r_wes.angle, r_esh_angl: r_esh.angle, l_wes_angl: l_wes.angle, l_esh_angl: l_esh.angle);
+
+          t_pose.pose_detected = true; //fals es mal false war soll es testen
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_wes.angle, 180, 25);
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_esh.angle, 95, 20);
+
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_wes.angle, 180, 25);
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_esh.angle, 95, 20);
+          t_pose.apply();
+
+
+
+          camera_view.CameraView.pose_Stopwatch_activation_bool = t_pose.triggered;
         }
         //TODO: speicher verbinden und session löschen (neue instanz ?)
         if(camera_view.CameraView.pose_Stopwatch_activation_bool){
