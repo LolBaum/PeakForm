@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'backend/vision_detector_views/pose_detector_view.dart';
 import 'constants/constants.dart';
 import 'package:fitness_app/util/logging_service.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +8,7 @@ import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness_app/providers/pose_detection_provider.dart';
 import 'package:fitness_app/screens/camera_screen.dart';
+import 'backend/vision_detector_views/exerciseType.dart';
 
 class ExerciseScreen extends StatefulWidget {
   final String title;
@@ -14,7 +17,7 @@ class ExerciseScreen extends StatefulWidget {
   final List<String> executionSteps;
   final List<String> exerciseTags;
   final Future<void> Function()? onPlayVideo;
-  final int? exerciseType;
+final ExerciseType exerciseType;
 
   const ExerciseScreen({
     super.key,
@@ -24,7 +27,7 @@ class ExerciseScreen extends StatefulWidget {
     required this.executionSteps,
     required this.exerciseTags,
     this.onPlayVideo,
-    this.exerciseType,
+    required this.exerciseType,
   });
 
   @override
@@ -162,7 +165,9 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                         builder: (context) => ChangeNotifierProvider(
                           create: (_) => PoseDetectionProvider(),
                           child:
-                              CameraScreen(exerciseType: widget.exerciseType),
+                              //TODO OOOOOOOOO
+                          PoseDetectorView(exerciseType: widget.exerciseType),
+//                              CameraScreen(exerciseType: widget.exerciseType),
                         ),
                       ),
                     );

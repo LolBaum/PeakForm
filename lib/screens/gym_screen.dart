@@ -7,13 +7,19 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
+import '../backend/vision_detector_views/exerciseType.dart';
+
 class GymExercise {
+
+  final ExerciseType exerciseType;
   final String label;
   final String videoPath;
   final String thumbnailPath;
   final List<String> exerciseTags;
   final List<String> executionSteps;
+
   const GymExercise({
+    required this.exerciseType,
     required this.label,
     required this.videoPath,
     required this.thumbnailPath,
@@ -24,7 +30,7 @@ class GymExercise {
 
 class GymScreen extends StatelessWidget {
   const GymScreen({super.key});
-  // TODOD: Localize
+  // TODO: Localize
   final List<String> filters = const [
     'Core',
     'Freihanteln',
@@ -39,6 +45,7 @@ class GymScreen extends StatelessWidget {
   // TODOD: Localize
   final List<GymExercise> exercises = const [
     GymExercise(
+      exerciseType: ExerciseType.lateralRaises,
       label: 'Dumbbell Lateral Raises',
       videoPath: 'assets/videos/gym/Dumbbell-Lateral-Raises.mov',
       thumbnailPath:
@@ -51,6 +58,8 @@ class GymScreen extends StatelessWidget {
       ],
     ),
     GymExercise(
+      //TODO
+      exerciseType: ExerciseType.lateralRaises,
       label: 'Planks',
       videoPath: 'assets/videos/planks/planks.mov',
       thumbnailPath: 'assets/images/thumbnail/thumbnail-planks.jpeg',
@@ -62,6 +71,8 @@ class GymScreen extends StatelessWidget {
       ],
     ),
     GymExercise(
+      //TODO
+      exerciseType: ExerciseType.lateralRaises,
       label: 'Lunges',
       videoPath: 'assets/videos/lunges/lunges.mov',
       thumbnailPath: 'assets/images/thumbnail/thumbnail-lunges.jpeg',
@@ -197,7 +208,7 @@ class GymScreen extends StatelessWidget {
                                   thumbnailBytes: bytes.buffer.asUint8List(),
                                   executionSteps: exercise.executionSteps,
                                   exerciseTags: exercise.exerciseTags,
-                                  exerciseType: index,
+                                  exerciseType: exercise.exerciseType, //index
                                   onPlayVideo: () async {
                                     final scaffoldContext = context;
                                     try {

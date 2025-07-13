@@ -18,8 +18,8 @@ import 'camera_view.dart' as camera_view;
 import 'direction.dart';
 
 class PoseDetectorView extends StatefulWidget {
-  final ExerciseType exerciseName;
-  PoseDetectorView({required this.exerciseName});
+  final ExerciseType exerciseType;
+  PoseDetectorView({required this.exerciseType});
 
   @override
   State<StatefulWidget> createState() => _PoseDetectorViewState();
@@ -46,9 +46,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   void initState() {
     super.initState();
 
-    if (widget.exerciseName == ExerciseType.lateralRaises) {
+    if (widget.exerciseType == ExerciseType.lateralRaises) {
       movement = LateralRaiseReference(180, 10, 10, 1.0);
-    } else if(widget.exerciseName == ExerciseType.bicepCurls){
+    } else if(widget.exerciseType == ExerciseType.bicepCurls){
       movement = BicepCurlReference(180, 10, 10, 1.0);
     }
   }

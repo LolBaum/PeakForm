@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'screens/gym_screen.dart' show GymScreen;
 import 'dart:io';
+import 'backend/vision_detector_views/exerciseType.dart';
 
 late final Logger logger;
 
@@ -112,6 +113,7 @@ class FitnessApp extends StatelessWidget {
                 }
                 //excercise_running_title excercise_running_tagOne, excercise_running_tagTwo, excercise_running_executionSteps_One, excercise_running_executionSteps_Two, excercise_running_executionSteps_Three, excercise_running_executionSteps_Four
                 return ExerciseScreen(
+                  exerciseType: ExerciseType.running,
                   title: AppLocalizations.of(context)!.excercise_running_title,
                   videoAsset: 'assets/videos/running/running.mov',
                   thumbnailBytes: snapshot.data!,
@@ -147,6 +149,7 @@ class FitnessApp extends StatelessWidget {
                   );
                 }
                 return ExerciseScreen(
+                  exerciseType: ExerciseType.lunges,
                   title: AppLocalizations.of(context)!.excercise_lunges_title,
                   videoAsset: 'assets/videos/lunges/lunges.mov',
                   thumbnailBytes: snapshot.data!,
@@ -191,6 +194,7 @@ class FitnessApp extends StatelessWidget {
                   );
                 }
                 return ExerciseScreen(
+                  exerciseType: ExerciseType.planks,
                   title: AppLocalizations.of(context)!.excercise_plank_title,
                   videoAsset: 'assets/videos/planks/planks.mov',
                   thumbnailBytes: snapshot.data!,
