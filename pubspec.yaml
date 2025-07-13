@@ -30,7 +30,8 @@ dependencies:
   circular_buffer: ^0.12.0
   native_device_orientation: ^1.1.0
 
-  camera: any
+  camera: ^0.11.1
+  camera_android: ^0.10.10+1
   provider: any
   permission_handler: any
   tflite_flutter: any
