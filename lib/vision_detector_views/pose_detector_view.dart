@@ -52,11 +52,12 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   rightFootIndex
  */
 
-  //Pose_init t_pose = Pose_init();
-  MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
-  General_pose_analytics general_analytics = General_pose_analytics();
-  General_Pose_init t_pose = General_Pose_init(0.8);
 
+  General_pose_analytics general_analytics = General_pose_analytics();
+  General_Pose_init t_pose = General_Pose_init(0.7);
+  //MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
+  General_MovementReference lar = General_MovementReference(1.0, ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh']);
+  //liste zum adden hier einfügen... vlt beim init nur feedback ändern...
 
   Joint_Angle r_wes = Joint_Angle(first: "rightShoulder", second: "rightElbow", third: "rightWrist");
   Joint_Angle r_esh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightElbow");
@@ -66,7 +67,13 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   Joint_Angle l_esh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftElbow");
   Joint_Angle l_wsh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftWrist");
 
+
+
+
+
+
   bool all_angls = false;
+
 
   @override
   void dispose() async {
@@ -100,6 +107,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),*/
+
+                /*
                 SizedBox(height: 8),
                 Text(
                   "Wiederholungen: ${lateral_rises.reps}",
@@ -140,8 +149,33 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   "Arm ist not straight!",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ) : SizedBox.shrink(),
-
                  */
+                 */
+                Text(
+                  "name: ${lar.debug_name}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "angle: ${lar.debug_angle}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "count: ${lar.debug_counter}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "down?: ${lar.debug_was_it_down}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "Feedback: ${lar.debug_feedback}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "dir: ${lar.debug_dir}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+
               ],
             ),
           ),
@@ -158,12 +192,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       _text = '';
     });
 
-    //List<TimedPose> recordedPoses = []; // for timestamps
-
     final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
-    //final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;
-
-
 
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
@@ -177,16 +206,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
       for (Pose pose in poses) {
 
-        //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
-
-        //analytics.set_new_pose(pose);
-        //analytics.get_lr_wesh_points();
-        //analytics.compute_wesh_joints();
-        //analytics.r_wes_angl
 
 
-        //TODO was ist wenn kein wert raus kommt sondern nur fehler ?
-        //lauras klasse generalisieren ? oder als lar einheit aufstellen
+        //wenn kein fehler denn kein posenet und kein score
         r_wes.angle = general_analytics.get_angles(pose, r_wes); //wert actuallisieren
         r_esh.angle = general_analytics.get_angles(pose, r_esh);
         r_wsh.angle = general_analytics.get_angles(pose, r_wsh);
@@ -198,13 +220,12 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         all_angls = r_wes.detected & r_esh.detected & r_wsh.detected & l_wes.detected & l_esh.detected & l_wsh.detected;
 
 
-
         //bei pausieren wieder t_posen zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
           t_pose.triggered = false;
         }
-        if(all_angls && camera_view.CameraView.pose_Stopwatch_activation_bool) {
-          //t_pose.intolerance_t_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_wes_angl: r_wes.angle, r_esh_angl: r_esh.angle, l_wes_angl: l_wes.angle, l_esh_angl: l_esh.angle);
+        //initialisierung am anfang oder wenn noch nicht
+        if(all_angls && !t_pose.triggered) {
 
           t_pose.pose_detected = true; //fals es mal false war soll es testen
           t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_wes.angle, 180, 25);
@@ -214,14 +235,35 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_esh.angle, 95, 20);
           t_pose.apply();
 
-
-
           camera_view.CameraView.pose_Stopwatch_activation_bool = t_pose.triggered;
+
+          if(t_pose.triggered){
+            //lateral_rises = MovementReference(180, 10, 10, 1.0);
+            lar = General_MovementReference(1.0, ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh']);
+          }
         }
-        //TODO: speicher verbinden und session löschen (neue instanz ?)
         if(camera_view.CameraView.pose_Stopwatch_activation_bool){
           //hier beginnt eine neue session
           //neue werte abspeichern und feedbach abspeichern
+
+          lar.session_started = true;
+          lar.update_joint_Buffer('r_wes', r_wes.angle);
+          lar.update_joint_Buffer('r_esh', r_esh.angle);
+          //lar.update_joint_Buffer('r_wsh', r_wes.angle);
+          lar.update_joint_Buffer('l_wes', l_wes.angle);
+          lar.update_joint_Buffer('l_esh', l_esh.angle);
+          //lar.update_joint_Buffer('l_wsh', l_wes.angle);
+
+          lar.checkStatic_execution('r_wes', 180, 30, 5, 85, 1);
+          lar.checkStatic_execution('l_wes', 180, 30, 5, 85, 1);
+
+          //mischregister für repeating machen
+          //lar.checkRepeating_execution('r_esh', 85, 20, 20, 25, 10);
+          lar.checkRepeating_execution('l_esh', 85, 20, 20, 25, 10);
+
+          //updown geht noch nicht
+
+          /*
           lateral_rises.session_started = true;
           lateral_rises.update_esh_angles(l_esh.angle, r_esh.angle);
           lateral_rises.update_wes_angles(l_wes.angle, r_wes.angle);
@@ -232,24 +274,30 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           if(lateral_rises.neg_feedback){
             lateral_rises.got_you_in_4k(inputImage);
           }
+          */
+
 
         } else {
-          if(lateral_rises.session_started == true){ // oder oben bei t_pose.triggered = false;
+          //camera detection ist aus und eine session war noch an => abgeschlossen
+          //if(lateral_rises.session_started == true){ // oder oben bei t_pose.triggered = false;
+          if(lar.session_started == true){
             //sesion wurde beendet
             //für den Score die letzten x sekunden entfernen die man zum abbrechen braucht;
             // und die letzten feedbacks dazu auch
-            lateral_rises.session_started == false;
-            //score und so alles neu initialisieren hier //auch buffer und feedback list
-            //feedbackliste abspeichern
-            //TODO: camera_view.CameraView.pose_Stopwatch_activation_bool wechsel dann neue klasse erst initialisieren
-          } else {
-            //session wurde noch nicht gestartet
+            //feedbackliste abspeichern und score und so
+            //lateral_rises.session_started == false;
+            lar.session_started == false;
           }
-
         }
+
+
 
         /*
         Todo:
+        //sachen vereinfachen
+        //lauras klasse generalisieren ? oder als lar einheit aufstellen
+
+        //farben bei neg feedback
         //klassen veralgemeinern
         //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen
         und namen nennen so werden die variablen dann heißen oder ein struckt für diese wie bei der winkel zu string idee

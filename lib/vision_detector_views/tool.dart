@@ -151,39 +151,16 @@ enum direction{up, down}
 enum directionchange{updown, downup}
 
 
-// pose als input geben welcher winkel soll in welcher pose sein mit welcher toleranz
-
-//der winkel... und der winkel ... soll diesen Wert in dieser Toleranz haben
-//am ende muss eine liste von winkeln true ausgeben
-
-//eine growable ist von winkeln wird übergeben und dann wird die
-//funktion auf alle winkeln angewendet die kommen und für die muss alles stimmen
-
-
-//liste von winkeln und konfig (winkel, Target wert, toleranz)
-//wenn auf dem winkel der richtige wert kommt 0.85 dann true
-//true werte miteinander verunden
-//wenn einmal false gleich abbrechen = und false wird ausgegeben
-
-//scorewithTolerances(target_wes, r_wes_angl, tolerance_wes)
-
-//über add gleich vergleichen und gucken ob geckecket ist
-
-//TODO: Sachen adden und dann apply nutzen mit den werden die man kennt
-//und einmal starten lassen
-
+//am anfang jeder detection soll es true sein und sich über die zeit ändern
+//vor aufruf der adds einmal pose detected auf true machen
+//dann adds durchlaufen lassen
 class General_Pose_init {
 
-  bool triggered = false;
   final double treshold;
+  bool triggered = false;
   bool pose_detected = false;
 
   General_Pose_init(this.treshold);
-
-  //am anfang jeder detection soll es true sein und sich über die zeit ändern
-  //vor aufruf der adds einmal pose detected auf true machen
-  //dann adds durchlaufen lassen
-
 
   bool add_values_4_init_pose_starter(bool init, double angle, double target, double tolerance) {
     if (!init) {
@@ -206,56 +183,471 @@ class General_Pose_init {
 
 
 
+//veralgemeinern das wird nicht genutzt
 
+class General_MovementReference {
 
-class Pose_init {
-  bool triggered = false;
+  double minTime;
+  bool session_started = false;
+  SlidingAverage score = SlidingAverage(1000);
 
-  double r_wesh_score = 0.0;
-  double l_wesh_score = 0.0;
+  bool neg_feedback = false;
 
-  double r_wes_score = 0.0;
-  double r_esh_score = 0.0;
-  double l_wes_score = 0.0;
-  double l_esh_score = 0.0;
+  DateTime? _lastActionTime;
+  final Duration _cooldown = Duration(milliseconds: 125); //vorher 250
 
+  //List<List<dynamic>> feedbacks = [];
 
-  //MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
+  //ab hier debug
+  String debug_name = " ";
+  String debug_counter = " ";
+  String debug_was_it_down = " ";
+  String debug_feedback = " ";
+  String debug_angle = " ";
+  String debug_dir = " ";
+  //bis hier debug!
 
   /*
-  lar_init_pose(bool init, r_wes_angl, r_esh_angl, l_wes_angl, l_esh_angl){
-    if (init) return intolerance_t_pose_starter(r_wes_angl: r_wes_angl, r_esh_angl: r_esh_angl, l_wes_angl: l_wes_angl, l_esh_angl: l_esh_angl);
+  double wes_max_angle = 180.0;
+  double wes_min_angle = 165.0;
+
+  double min_esh_angle = 180;
+  double max_esh_angle = 0;
+
+   */
+
+
+  //final hier ?
+  final Map<String, CircularBuffer<double>> body_joint_buffers = {};
+  final Map<String, String> body_joint_feedbacks = {};
+  final Map<String, int> body_joint_counter = {};
+  final Map<String, double> body_joint_max_movement = {};
+  final Map<String, double> body_joint_min_movement = {};
+  final Map<String, direction> body_joint_movement_dir = {};
+  final Map<String, bool> body_joint_was_it_down = {};
+
+
+  General_MovementReference(this.minTime, List<String> items){
+    for (String name in items){
+      if (body_joint_buffers.containsKey(name) && body_joint_feedbacks.containsKey(name) && body_joint_counter.containsKey(name)) {
+        print("Buffer '$name' existiert bereits!");
+        return;
+      }
+      body_joint_buffers[name] = CircularBuffer<double>(7);
+      body_joint_feedbacks[name] = " ";
+      body_joint_counter[name] = 0;
+      if (true) {
+        body_joint_max_movement[name] = 0;
+        body_joint_min_movement[name] = 180;
+        body_joint_movement_dir[name] = direction.down;
+        body_joint_was_it_down[name] = false;
+      }
+    }
+  }
+
+
+  //Buffer anlegen pro beobachbarten körperteil //name des buffers zum ansteuern übergeben
+  //buffer durch init funktion erzeugen und auflisten //buffer über namen finden //buffer size setzen
+
+
+  //am anfang nutzen
+  //man könnte dafür sorgen das man sagt wecher Body_joint welche features bekommt (also ob min movement oder lieber nur dir und so)
+  void add_Body_joint_Buffer({
+    String name = "idle",
+    int size = 1,
+    bool movement_joint = false,
+  }) {
+
+    if (body_joint_buffers.containsKey(name) && body_joint_feedbacks.containsKey(name) && body_joint_counter.containsKey(name)) {
+      print("Buffer '$name' existiert bereits!");
+      return;
+    }
+    body_joint_buffers[name] = CircularBuffer<double>(size);
+    body_joint_feedbacks[name] = " ";
+    body_joint_counter[name] = 0;
+    if (movement_joint) {
+      body_joint_max_movement[name] = 0;
+      body_joint_min_movement[name] = 180;
+      body_joint_movement_dir[name] = direction.down;
+      body_joint_was_it_down[name] = false;
+    }
+  }
+
+  //zwischenschrittlich
+  void update_joint_Buffer(String name, double value) {
+    final buffer = body_joint_buffers[name];
+    if (buffer != null) {
+      buffer.add(value);
+    } else {
+      print("Kein Buffer mit Namen '$name' gefunden.");
+    }
+  }
+  void update_Buffer_feedback(String name, String feedback) {
+    final buffer = body_joint_feedbacks[name];
+    if (buffer != null) {
+      body_joint_feedbacks[name] = feedback;
+    } else {
+      print("Kein Buffer mit Namen '$name' gefunden.");
+    }
+  }
+  void update_Buffer_counter(String name, int value) {
+    final buffer = body_joint_counter[name];
+    if (buffer != null) {
+      body_joint_counter[name] = value;
+    } else {
+      print("Kein Buffer mit Namen '$name' gefunden.");
+    }
+  }
+  void update_Buffer_max_movement(String name, double value) {
+    final buffer = body_joint_max_movement[name];
+    if (buffer != null) {
+      body_joint_max_movement[name] = value;
+    } else {
+      print("Kein Buffer mit Namen '$name' gefunden.");
+    }
+  }
+  void update_Buffer_min_movement(String name, double value) {
+    final buffer = body_joint_min_movement[name];
+    if (buffer != null) {
+      body_joint_min_movement[name] = value;
+    } else {
+      print("Kein Buffer mit Namen '$name' gefunden.");
+    }
+  }
+  void update_joint_Buffer_movement_dir(String name, direction dir) {
+    final buffer = body_joint_movement_dir[name];
+    if (buffer != null) {
+      body_joint_movement_dir[name] = dir;
+    } else {
+      print("Kein Buffer mit Namen '$name' gefunden.");
+    }
+  }
+  void update_joint_Buffer_was_it_down(String name, bool down) {
+    final buffer = body_joint_was_it_down[name];
+    if (buffer != null) {
+      body_joint_was_it_down[name] = down;
+    } else {
+      print("Kein Buffer mit Namen '$name' gefunden.");
+    }
+  }
+
+  //zusammenfassen durch hyperfkt ?
+  //nur benutzen bei aufrufen die dann gewerten
+  double? getAverage_from_body_joint_buffer(String name) {
+    final buffer = body_joint_buffers[name];
+    if (buffer == null || buffer.isEmpty) return null; //oder problem printen
+    return buffer.toList().reduce((a, b) => a + b)/buffer.length;
+  }
+  String? getValue_from_body_joint_feedback(String name) {
+    final buffer = body_joint_feedbacks[name];
+    if (buffer == null) return null; //oder problem printen
+    return body_joint_feedbacks[name];
+  }
+  int? getValue_from_body_joint_counter(String name) {
+    final buffer = body_joint_counter[name];
+    if (buffer == null) return null; //oder problem printen
+    return body_joint_counter[name];
+  }
+  double? getValue_from_body_joint_max_movement(String name) {
+    final buffer = body_joint_max_movement[name];
+    if (buffer == null) return null; //oder problem printen
+    return body_joint_max_movement[name];
+  }
+  double? getValue_from_body_joint_min_movement(String name) {
+    final buffer = body_joint_min_movement[name];
+    if (buffer == null) return null; //oder problem printen
+    return body_joint_min_movement[name];
+  }
+  direction? getDirection_from_body_joint(String name) {
+    final buffer = body_joint_movement_dir[name];
+    if (buffer == null) return null; //oder problem printen
+    return body_joint_movement_dir[name];
+  }
+  bool? getValue_from_was_it_down(String name) {
+    final buffer = body_joint_was_it_down[name];
+    if (buffer == null) return null; //oder problem printen
+    return body_joint_was_it_down[name];
+  }
+
+
+
+  // beim printen der feedbacks über get darauf zugreifen
+  //für arme 180, 30, 5, 85, 1
+  //für wes links und rechts
+  void checkStatic_execution(String name, double target_angle, double tolerance, int counter_tolerance, double score_tolerance, int score_weight){
+
+    final average_angle_probably = getAverage_from_body_joint_buffer(name);
+    if (average_angle_probably == null) {
+      return;
+    }
+    double average_angle = average_angle_probably;
+
+    final bent_count_probably = getValue_from_body_joint_counter(name);
+    if (bent_count_probably == null) {
+      return;
+    }
+    int bent_count = bent_count_probably;
+
+    score.add(scorewithTolerances(target_angle, average_angle, score_tolerance), score_weight); //vorher 30
+
+    /*
+    final debug_feedback_probably = getValue_from_body_joint_feedback(name);
+    if (debug_feedback_probably == null) {
+      return;
+    }
+    String feedback = debug_feedback_probably;
+    debug_name = name;
+    debug_counter = bent_count.toString();
+    debug_feedback = feedback;
+    debug_angle = average_angle.toString();
+    */
+
+
+    if(average_angle < target_angle-tolerance){
+      update_Buffer_counter(name, bent_count+1);
+    } else{
+      update_Buffer_counter(name, 0);
+      update_Buffer_feedback(name, name + " good");
+      neg_feedback = false;
+      print("good");
+    }
+
+    if(bent_count > 5){
+      update_Buffer_feedback(name, name + " not straight");
+      neg_feedback = true;
+      print("not straight");
+    }
+  }
+
+
+  //variante für symetrische ausführung machen ?
+
+  //veralgemeinern
+  //gilt erstmal für beide arme zusammen aber update_angles und direktion am bestem pro arm
+  //reps anpassen wenn es rechts und links gezählt werden (oder sich nur auf das höhere beziehen)
+
+  /*
+  double max_angle = 85.0;
+  double min_angle = 20.0;
+  updown ist 20
+  downup ist 25
+  weight ist 10
+  */
+
+
+  //tolleranzen einstellbar machen ab wann etwas gut ist oder schlecht oder unzureichend
+  //wenn average zwischen links und rechts dann combined Buffer eintrag (also buffer für l und r machen und da denn den durchschnitt der werte rein machen) machen und dann auch feedback auf das eine bekommen
+  void checkRepeating_execution(String name, double max_angle, double min_angle, double score_updown_tolerance, double score_downup_tolerance, int score_weight){
+
+    final average_angle_probably = getAverage_from_body_joint_buffer(name);
+    if (average_angle_probably == null) {
+      return;
+    }
+    double average_angle = average_angle_probably;
+
+    final max_movement_angle_probably = getValue_from_body_joint_max_movement(name);
+    if (max_movement_angle_probably == null) {
+      return;
+    }
+    double max_movement_angle = max_movement_angle_probably;
+
+    final min_movement_angle_probably = getValue_from_body_joint_min_movement(name);
+    if (min_movement_angle_probably == null) {
+      return;
+    }
+    double min_movement_angle = min_movement_angle_probably;
+
+    final movement_dir_probably = getDirection_from_body_joint(name);
+    if (movement_dir_probably == null) {
+      return;
+    }
+    direction movement_dir = movement_dir_probably;
+
+    final counter_probably = getValue_from_body_joint_counter(name);
+    if (counter_probably == null) {
+      return;
+    }
+    int counter = counter_probably;
+
+    final was_it_down_probably = getValue_from_was_it_down(name);
+    if (was_it_down_probably == null) {
+      return;
+    }
+    bool was_it_down = was_it_down_probably;
+
+
+    bool direction_changed = false;
+    directionchange dirchange = directionchange.updown;
+
+
+    //ab hier debug!
+    final debug_feedback_probably = getValue_from_body_joint_feedback(name);
+    if (debug_feedback_probably == null) {
+      return;
+    }
+    String feedback = debug_feedback_probably;
+
+    debug_name = name;
+    debug_counter = counter.toString();
+    debug_was_it_down = was_it_down.toString();
+    debug_feedback = feedback;
+    debug_angle = min_movement_angle.toString();
+    debug_dir = movement_dir.toString();
+    //bis hier debug!
+
+
+    if(movement_dir == direction.down){ // Down -> Up
+      if (min_movement_angle < average_angle){ //größer werdende entfernung zum minimum
+        direction_changed = true;
+        dirchange = directionchange.downup;
+        update_Buffer_min_movement(name, 180);
+      }else{
+        update_Buffer_min_movement(name, average_angle);
+      }
+    }
+    else{ // up -> down
+      if (max_movement_angle > average_angle){ //größer werdende entfernung zum maximum
+        direction_changed = true;
+        dirchange = directionchange.updown;
+        update_Buffer_max_movement(name, 0);
+      }else{
+        update_Buffer_max_movement(name, average_angle);
+      }
+    }
+
+
+    if (direction_changed == true){
+
+      if(dirchange == directionchange.updown){
+        //haltung ausgleichen mit guter wdh
+        score.add(scorewithTolerances(max_angle, average_angle, score_updown_tolerance), score_weight);
+        double esh_upper_diff = max_angle - average_angle;
+        print("FUCK: " + esh_upper_diff.toString());
+        print("updown");
+        //todo:werte tweaken
+
+        //TUDO wasit down wäre überschreibar wenn es gesetzt wurde oder nicht gesezt wurde
+        //testen ob gesetzt wurde vorm setzen bei down up
+
+        //TODO: FEEDBACK ZUORDNEN und dann die tolleranzwerte -6 und so mit übergeben, strafpunkte ?
+        //neuen buffer dür was_it_down machen...
+        //reps ist counter jetzt !!
+
+        //(tolleranz -6, 2, 6, 15, 17)
+
+        if (esh_upper_diff < -6.0) {
+          update_Buffer_feedback(name, name + " zu hoch");
+          neg_feedback = true;
+          score.add(0.8,2); //strafpunkt für die gesundheit
+          if (was_it_down){
+            update_joint_Buffer_was_it_down(name, false);
+            update_Buffer_counter(name, counter+1);
+          }
+        } else
+        if (esh_upper_diff < 2.0) {
+          update_Buffer_feedback(name, name + " oben super");
+          neg_feedback = false;
+          if (was_it_down){
+            update_joint_Buffer_was_it_down(name, false);
+            update_Buffer_counter(name, counter+1);
+          }
+        } else
+        if (esh_upper_diff < 6.0) {
+          update_Buffer_feedback(name, name + " oben gut");
+          neg_feedback = false;
+          if (was_it_down){
+            update_joint_Buffer_was_it_down(name, false);
+            update_Buffer_counter(name, counter+1);
+          }
+        } else
+        if (esh_upper_diff < 15.0) {
+          update_Buffer_feedback(name, name + " oben noch etwas höher");
+          neg_feedback = false;
+        } else
+        if (esh_upper_diff < 17.0) {
+          update_Buffer_feedback(name, name + " oben zu niedrig");
+          neg_feedback = true;
+        }
+
+      }
+
+      //tolleranz 10, 15,20,25
+      if(dirchange == directionchange.downup){
+
+        score.add(scorewithTolerances(min_angle, average_angle, 25.0), 10);
+        double esh_downer_diff = average_angle - min_angle;
+
+        //todo:werte tweaken
+        //auswertung hier etwas langsamer
+
+        if (esh_downer_diff < 10.0) {
+          update_Buffer_feedback(name, name + " unten super");
+          if(!was_it_down){
+            update_joint_Buffer_was_it_down(name, true);
+          }
+        } else
+        if (esh_downer_diff < 15.0) {
+          update_Buffer_feedback(name, name + " unten gut");
+          if(!was_it_down){
+            update_joint_Buffer_was_it_down(name, true);
+          }
+        } else
+        if (esh_downer_diff < 20.0) {
+          update_Buffer_feedback(name, name + " unten weiter runter");
+        } else
+        if (esh_downer_diff < 25.0) {
+          update_Buffer_feedback(name, name + " unten viel weiter runter");
+          neg_feedback = false;
+        }
+        print("downup");
+      }
+
+      direction_changed = false;
+      //zu schnelle wechsel nicht anerkennen
+      final now = DateTime.now();
+      if (_lastActionTime == null ||
+          now.difference(_lastActionTime!) > _cooldown) {
+        if (movement_dir == direction.up){
+          update_joint_Buffer_movement_dir(name, direction.down);
+        }
+        else{
+          update_joint_Buffer_movement_dir(name, direction.up);
+        }
+        _lastActionTime = now;
+      }
+    }
+  }
+  // eine funktion die checkt ob es negatives feedback gibt und dann sagt
+  //funktion die input image speichert zusätzlich zu negativem feedback wenn dieser eintritt
+  //bei negativem feedback wird diese funktion aufgerufen und macht ein foto davon
+
+  /*
+  got_you_in_4k(InputImage inputImage){
+    //TODO:adden im speicher und probleme lösen
+    //problem verzögerung durch buffer average kann zu einem bild an falscher stelle führen
+    //Problem es sollen nicht durchgängig werte aufgenommen werden sonderneinmal pro problem
+
+    //neg_feedback wieder auf false machen wenn das hier abgeklappert wurde
+
+    //feedback liste erstellen mit jeweils fotos und werten
+    feedbacks.add([
+      esh_buffer_average_l,
+      esh_buffer_average_r,
+      esh_dir_change_upper_feedback,
+      esh_dir_change_downer_feedback,
+      wes_buffer_average_l,
+      wes_buffer_average_r,
+      wes_angle_feedback,
+      inputImage
+    ]);
+    //timespamp ? auch abspeichern ?
+
+    //print(results[0][0]); // Lateral Raises
+    //results[0] ereignis
     return;
   }*/
 
-  bool intolerance_t_pose_starter(bool init, {
-    double target_wes = 180.0,
-    double target_esh = 95.0,
-    double tolerance_wes = 25.0,
-    double tolerance_esh = 20.0,
-    double intolerance = 0.7,
-
-    double r_wes_angl = 0.0,
-    double r_esh_angl = 0.0,
-    double l_wes_angl = 0.0,
-    double l_esh_angl = 0.0,
-  }){
-    if(!init){
-      return false;
-    }
-    double high_intolerance_wesh_r = scorewithTolerances(target_wes, r_wes_angl, tolerance_wes) * scorewithTolerances(target_esh, r_esh_angl, tolerance_esh);
-    double high_intolerance_wesh_l = scorewithTolerances(target_wes, l_wes_angl, tolerance_wes) * scorewithTolerances(target_esh, l_esh_angl, tolerance_esh);
-    print("intolerance " + (high_intolerance_wesh_l+high_intolerance_wesh_r/2).toString());
-    if((high_intolerance_wesh_l+high_intolerance_wesh_r/2) > intolerance){
-      triggered = true;
-      return true;
-    }
-    return false;
-
-  }
 }
-
-
 
 
 //wichtig für Lat
@@ -266,7 +658,7 @@ class Pose_init {
 //handgelenke neutral
 //kein schultern hochziehen
 //kopf bliebt grade
-
+/*
 class MovementReference {
 
   //veralgemeinern das wird nicht genutzt
@@ -275,7 +667,6 @@ class MovementReference {
   double lowerAngle;
   double tolerance;
   double minTime;
-
 
   bool session_started = false;
   List<List<dynamic>> feedbacks = [];
@@ -421,7 +812,6 @@ class MovementReference {
           esh_dir_change_upper_feedback = side + " zu hoch!";
           neg_feedback = true;
           score.add(0.8,2); //strafpunkt für die gesundheit
-           //TODO: problem das wenn man oben hält das es nur countet !!!!!
           if (was_it_down){
             reps++;
           }
@@ -476,7 +866,7 @@ class MovementReference {
           esh_dir_change_downer_feedback = side + " weiter runter";
         } else
         if (esh_downer_diff < 25.0) {
-          esh_dir_change_downer_feedback = side + " zu hoch";
+          esh_dir_change_downer_feedback = side + " weiter runter (zu hoch)";
           neg_feedback = false;
         }
       }
@@ -523,6 +913,7 @@ class MovementReference {
     return;
   }
 }
+ */
 
 class Joint_Angle {
   final String first;
