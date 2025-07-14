@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+import '../frosted_glasst_button.dart';
 import '../services/auto_save_service.dart';
 
 
@@ -37,6 +38,7 @@ class CameraView extends StatefulWidget {
 }
 
 class _CameraViewState extends State<CameraView> {
+  bool _isProcessingEnabled = false;
   static List<CameraDescription> _cameras = [];
   CameraController? _controller;
   int _cameraIndex = -1;
@@ -122,6 +124,7 @@ class _CameraViewState extends State<CameraView> {
           _fpsDisplay(),
           _stopwatchDisplay(),
           _stopwatchControls(),
+          _captureButton(),
         ],
       ),
     );
@@ -358,6 +361,7 @@ class _CameraViewState extends State<CameraView> {
   }
 
   void _processCameraImage(CameraImage image) {
+    if (!_isProcessingEnabled) return;
     final inputImage = _inputImageFromCameraImage(image);
     if (inputImage == null) return;
     
@@ -595,4 +599,67 @@ class _CameraViewState extends State<CameraView> {
           ],
         ),
       );
+
+  Widget _captureButton() => Positioned(
+    bottom: 0,
+    left: 0,
+    right: 0,
+    child: SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FrostedGlassButton(
+          onTap: () {
+            setState(() {
+              _isProcessingEnabled = !_isProcessingEnabled;
+            });
+          },
+          child: Center(
+            child: Text(
+              _isProcessingEnabled ? 'Start' : 'Stopp',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+
+        ),
+      ),
+    ),
+  );
+
+
+
+
+
+/*
+      Positioned(
+    bottom: 80,
+    left: 0,
+    right: 0,
+    child: Center(
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() {
+            _isProcessingEnabled = !_isProcessingEnabled;
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _isProcessingEnabled ? Colors.red : Colors.green,
+          shape: CircleBorder(),
+          padding: EdgeInsets.all(20),
+        ),
+        child: Icon(
+          _isProcessingEnabled ? Icons.stop : Icons.play_arrow,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
+    ),
+  );*/
+
 }
+
+
+

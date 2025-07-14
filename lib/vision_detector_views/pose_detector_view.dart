@@ -18,8 +18,9 @@ import 'camera_view.dart' as camera_view;
 import 'direction.dart';
 
 class PoseDetectorView extends StatefulWidget {
-  final ExerciseType exerciseName;
-  PoseDetectorView({required this.exerciseName});
+  bool _isDetecting = false;
+  final ExerciseType exerciseType;
+  PoseDetectorView({required this.exerciseType});
 
   @override
   State<StatefulWidget> createState() => _PoseDetectorViewState();
@@ -33,7 +34,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
-  //var _cameraLensDirection = CameraLensDirection.back;
   var _cameraLensDirection = CameraLensDirection.back;
 
   Pose_analytics analytics = Pose_analytics();
@@ -46,9 +46,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   void initState() {
     super.initState();
 
-    if (widget.exerciseName == ExerciseType.lateralRaises) {
+    if (widget.exerciseType == ExerciseType.lateralRaises) {
       movement = LateralRaiseReference(180, 10, 10, 1.0);
-    } else if(widget.exerciseName == ExerciseType.bicepCurls){
+    } else if(widget.exerciseType == ExerciseType.bicepCurls){
       movement = BicepCurlReference(180, 10, 10, 1.0);
     }
   }
@@ -104,14 +104,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                 ),
               ),
             ),
+
           ],
         ),
-        floatingActionButton: FloatingActionButton(
+        /*floatingActionButton: FloatingActionButton(
           onPressed: _viewSavedScores,
           child: Icon(Icons.history),
           tooltip: 'View Performance History',
           backgroundColor: Colors.blue,
-        ),
+        ),*/
       );
     }
 
@@ -179,6 +180,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       ));
   }
 
+
+
   Future<void> _processImage(InputImage inputImage) async {
     if (!_canProcess) return;
     if (_isBusy) return;
@@ -187,7 +190,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       _text = '';
     });
 
-    //List<TimedPose> recordedPoses = []; // for timestamps
 
     final poses = await _poseDetector.processImage(inputImage); //hier kommen daten rein
     //final Duration timestamp = camera_view.CameraView.stopwatch.elapsed;

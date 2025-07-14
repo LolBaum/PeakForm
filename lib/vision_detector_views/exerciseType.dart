@@ -2,6 +2,9 @@ enum ExerciseType {
   lateralRaises,
   bicepCurls,
   pushUps,
+  running,
+  planks,
+  lunges
 }
 
 String exerciseTypeToString(ExerciseType type) {
@@ -12,5 +15,6 @@ String exerciseTypeToString(ExerciseType type) {
       return 'Bicep Curls';
     case ExerciseType.pushUps:
       return 'Push Ups';
+    default: return 'Placehodler';
   }
 }
