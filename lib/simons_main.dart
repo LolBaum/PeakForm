@@ -20,6 +20,7 @@ import 'vision_detector_views/exerciseType.dart';
 
 late final Logger logger;
 
+
 Future<void> main() async {
   // Ensure that Flutter bindings are initialized before loading assets
   WidgetsFlutterBinding.ensureInitialized();

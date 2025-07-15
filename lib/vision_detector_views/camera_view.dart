@@ -6,9 +6,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import '../frosted_glasst_button.dart';
+import '../result_screen.dart';
 import '../services/auto_save_service.dart';
 
+import '/util/logging_service.dart';
+import 'package:flutter/foundation.dart';
 
+final List<FeedbackItem> exampleGoodFeedback = [
+  FeedbackItem(label: "Gute Haltung während der Übung", timestamp: "00:10"),
+  FeedbackItem(label: "Atmung stimmt"),
+  FeedbackItem(label: "Saubere Ausführung"),
+];
+
+final List<FeedbackItem> exampleBadFeedback = [
+  FeedbackItem(label: "Arme zu weit unten", timestamp: "00:20"),
+  FeedbackItem(label: "Ferse hebt sich", timestamp: "00:32"),
+  FeedbackItem(label: "Wade nicht angespannt", timestamp: "00:45"),
+];
+
+final List<FeedbackItem> exampleTips = [
+  FeedbackItem(label: "Versuche den Mittelfuß stärker aufzusetzen"),
+  FeedbackItem(label: "Arme während der Übung etwas höher halten"),
+];
+
+
+CameraController? _cameraController;
+//----------
+XFile? _recordedVideoFile;
+bool _isRecording = false;
+bool _hasDetectionBeenStarted = false;
+
+CameraController? get cameraController => _cameraController;
+
+// Video recording getters
+XFile? get recordedVideoFile => _recordedVideoFile;
+bool get isRecording => _isRecording;
+//----------
 class CameraView extends StatefulWidget {
   CameraView(
       {Key? key,
@@ -566,20 +599,22 @@ class _CameraViewState extends State<CameraView> {
               child: SizedBox(
                 height: 50.0,
                 width: 50.0,
-                child: FloatingActionButton(
+                /*child: FloatingActionButton(
                   heroTag: "stopwatch_start_pause",
                   onPressed: CameraView.isStopwatchRunning ? _pauseStopwatch : _startStopwatch, //das hier triggern über eine globale variableüber tdetector view
                   backgroundColor: CameraView.isStopwatchRunning ? Colors.orange : Colors.green,
-                  child: Icon(
+                  *//*child: Icon(
                     CameraView.isStopwatchRunning ? Icons.pause : Icons.play_arrow,
                     size: 25,
                     color: Colors.white,
-                  ),
-                ),
+                  ),*//*
+                ),*/
               ),
             ),
             // Reset button
-            Container(
+
+            //Reset Button
+            /*Container(
               margin: EdgeInsets.symmetric(horizontal: 4),
               child: SizedBox(
                 height: 50.0,
@@ -595,13 +630,13 @@ class _CameraViewState extends State<CameraView> {
                   ),
                 ),
               ),
-            ),
+            ),*/
           ],
         ),
       );
 
   Widget _captureButton() => Positioned(
-    bottom: 0,
+    bottom: 10,
     left: 0,
     right: 0,
     child: SafeArea(
@@ -612,10 +647,31 @@ class _CameraViewState extends State<CameraView> {
             setState(() {
               _isProcessingEnabled = !_isProcessingEnabled;
             });
+            if(!_isProcessingEnabled){
+              /*Navigator.pushNamed(
+                  context,
+                  '/result',*/
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResultScreen(
+                    goodFeedback: exampleGoodFeedback,
+                    badFeedback: exampleBadFeedback,
+                    tips: exampleTips,
+                    videoPath: "video", // oder null
+                    score: 2,
+                  ),
+                ),
+              );
+
+            } else{
+              _startStopwatch();
+            }
           },
           child: Center(
             child: Text(
-              _isProcessingEnabled ? 'Start' : 'Stopp',
+              _isProcessingEnabled ? 'Stopp' : 'Start',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -629,35 +685,44 @@ class _CameraViewState extends State<CameraView> {
     ),
   );
 
+  void _log(String message) {
+    try {
+      LoggingService.instance.i(message);
+    } catch (e) {
+      debugPrint('PoseDetectionProvider: $message');
+    }
+  }
 
+  // Start video recording
+  Future<void> startVideoRecording() async {
+    if (_cameraController != null && !_isRecording) {
+      try {
+        await _cameraController!.startVideoRecording();
+        _isRecording = true;
+        //notifyListeners();
+      } catch (e, stack) {
+        _log('Failed to start video recording: $e');
+        debugPrint('Failed to start video recording: $e\n$stack');
+      }
+    }
+  }
 
-
-
-/*
-      Positioned(
-    bottom: 80,
-    left: 0,
-    right: 0,
-    child: Center(
-      child: ElevatedButton(
-        onPressed: () {
-          setState(() {
-            _isProcessingEnabled = !_isProcessingEnabled;
-          });
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _isProcessingEnabled ? Colors.red : Colors.green,
-          shape: CircleBorder(),
-          padding: EdgeInsets.all(20),
-        ),
-        child: Icon(
-          _isProcessingEnabled ? Icons.stop : Icons.play_arrow,
-          color: Colors.white,
-          size: 30,
-        ),
-      ),
-    ),
-  );*/
+  // Stop video recording
+  Future<XFile?> stopVideoRecording() async {
+    if (_cameraController != null && _isRecording) {
+      try {
+        final file = await _cameraController!.stopVideoRecording();
+        _isRecording = false;
+        _recordedVideoFile = file;
+        //notifyListeners();
+        return file;
+      } catch (e, stack) {
+        _log('Failed to stop video recording: $e');
+        debugPrint('Failed to stop video recording: $e\n$stack');
+      }
+    }
+    return null;
+  }
 
 }
 

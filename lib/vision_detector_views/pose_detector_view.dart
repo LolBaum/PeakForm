@@ -16,9 +16,10 @@ import '../services/performance_service.dart';
 import 'exerciseType.dart';
 import 'camera_view.dart' as camera_view;
 import 'direction.dart';
+import '/util/logging_service.dart';
+import 'package:flutter/foundation.dart';
 
 class PoseDetectorView extends StatefulWidget {
-  bool _isDetecting = false;
   final ExerciseType exerciseType;
   PoseDetectorView({required this.exerciseType});
 
@@ -204,6 +205,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       );
       _customPaint = CustomPaint(painter: painter);
 
+
+      //Score-Berechnungen
       for (Pose pose in poses) {
 
         //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
@@ -226,24 +229,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           camera_view.CameraView.pose_Stopwatch_activation_bool =
               eval.triggered;
         }
-        //gucken ob an und aus geht und danach score
-
-        /*
-        //gucken wie man diesen ausdruck bekommt und dann testen
-        if(camera_view.CameraView.pose_Stopwatch_activation_bool){
-          if(eval.evaluation(score)){
-            //exercise.state_change();
-          }
-        } else {
-          eval.started = false;
-        }
-        */
-
-
-
-        //score wird erst berechnet wenn initial pose gefunden wird
-        //scores einfluss kann hier mit der certenty gewichtet werden
-        //scoreForLAt rise zu score with tolerances ersätzen
 
         movement.checkExerciseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
 
@@ -262,30 +247,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         movement.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
         movement.update_direction();
 
-            /*if (angle_status >= lar_angels.length-1){
-              angle_up = true;
-              wdhs++;
-            } else if (angle_status <= 0) {
-              angle_up = false;
-            }*/
-
-
-        //todo store min / max average angle.
-        //if difference ~5 away from value -> change direction
-
-        //TODO: Testen wie sich der Average verhällt
-
-        //prozent an korrektheit averagen
-
-        //wrist unter ellenbogeen für winkelunterscheideung
-        // bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
-        // likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
-
       }
-      //for(TimedPose p in recordedPoses){
-        //print("${p.pose} detected at ${p.timestamp.inMilliseconds} ms\n");
-      //}
-
 
     } else {
       _text = 'Poses found: ${poses.length}\n\n';
@@ -297,4 +259,5 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       setState(() {});
     }
   }
+
 }
