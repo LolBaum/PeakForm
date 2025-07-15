@@ -11,6 +11,7 @@ import '../services/auto_save_service.dart';
 
 import '/util/logging_service.dart';
 import 'package:flutter/foundation.dart';
+import 'pose_detector_view.dart';
 
 final List<FeedbackItem> exampleGoodFeedback = [
   FeedbackItem(label: "Gute Haltung während der Übung", timestamp: "00:10"),
@@ -394,7 +395,7 @@ class _CameraViewState extends State<CameraView> {
   }
 
   void _processCameraImage(CameraImage image) {
-    if (!_isProcessingEnabled) return;
+    //if (!_isProcessingEnabled) return;
     final inputImage = _inputImageFromCameraImage(image);
     if (inputImage == null) return;
     
@@ -509,7 +510,7 @@ class _CameraViewState extends State<CameraView> {
   void _pose_Stopwatch_activation() {
     if (CameraView.pose_Stopwatch_activation_bool) {
       _startStopwatch();
-      CameraView.pose_Stopwatch_activation_bool = false;
+      //CameraView.pose_Stopwatch_activation_bool = false;
     }
   }
 
@@ -660,7 +661,7 @@ class _CameraViewState extends State<CameraView> {
                     badFeedback: exampleBadFeedback,
                     tips: exampleTips,
                     videoPath: "video", // oder null
-                    score: 2,
+                    score: (score * 100).round(),
                   ),
                 ),
               );

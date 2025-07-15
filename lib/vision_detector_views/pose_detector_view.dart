@@ -19,6 +19,8 @@ import 'direction.dart';
 import '/util/logging_service.dart';
 import 'package:flutter/foundation.dart';
 
+double score = 0.0;
+
 class PoseDetectorView extends StatefulWidget {
   final ExerciseType exerciseType;
   PoseDetectorView({required this.exerciseType});
@@ -35,22 +37,68 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
-  var _cameraLensDirection = CameraLensDirection.back;
+  var _cameraLensDirection = CameraLensDirection.front; //richtung geändert
 
-  Pose_analytics analytics = Pose_analytics();
-  LAR_Evaluation eval = LAR_Evaluation();
+  /*
+  leftShoulder,
+  rightShoulder,
+  leftElbow,
+  rightElbow,
+  leftWrist,
+  rightWrist,
 
-  var bufferShoulder_r = CircularBuffer<double>(10);
-  late MovementReference movement;
+  leftPinky,
+  rightPinky,
+  leftIndex,
+  rightIndex,
+  leftThumb,
+  rightThumb,
+
+  leftHip,
+  rightHip,
+  leftKnee,
+  rightKnee,
+  leftAnkle,
+  rightAnkle,
+  leftHeel,
+  rightHeel,
+  leftFootIndex,
+  rightFootIndex
+ */
+  /*Pose_analytics analytics = Pose_analytics();
+  LAR_Evaluation eval = LAR_Evaluation();*/
+
+
+  General_MovementReference lar;
+
+  General_pose_analytics general_analytics = General_pose_analytics();
+  General_Pose_init t_pose = General_Pose_init(0.7);
+
+  Joint_Angle r_wes = Joint_Angle(first: "rightShoulder", second: "rightElbow", third: "rightWrist");
+  Joint_Angle r_esh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightElbow");
+  Joint_Angle r_wsh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightWrist");
+
+  Joint_Angle l_wes = Joint_Angle(first: "leftShoulder", second: "leftElbow", third: "leftWrist");
+  Joint_Angle l_esh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftElbow");
+  Joint_Angle l_wsh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftWrist");
+
+
+
+
+
+  bool all_angls = false;
 
   @override
   void initState() {
     super.initState();
 
     if (widget.exerciseType == ExerciseType.lateralRaises) {
-      movement = LateralRaiseReference(180, 10, 10, 1.0);
+      General_Pose_init t_pose = General_Pose_init(0.7);
+      lar = General_MovementReference(1.0,
+          ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh'], [false, true, true, false, true, true]); // false ist static
     } else if(widget.exerciseType == ExerciseType.bicepCurls){
-      movement = BicepCurlReference(180, 10, 10, 1.0);
+      lar = General_MovementReference(1.0,
+          ['r_wes', 'r_esh', 'l_wes', 'l_esh'], [true, false, true, true]); // false ist static
     }
   }
 
@@ -62,60 +110,65 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   }
 
   @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        body: Stack(
-          children: [
-            DetectorView(
-              title: 'Pose Detector',
-              customPaint: _customPaint,
-              text: _text,
-              onImage: _processImage,
-              initialCameraLensDirection: _cameraLensDirection,
-              onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
-            ),
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(8),
-                color: Colors.black.withOpacity(0.5),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Wiederholungen: ${movement.reps}",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    Text(
-                      "Straight Arm Angle: ${movement.secondary_angle}",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    Text(
-                      "Right Lateral Angle: ${movement.angle}",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    Text(
-                      "Moving Direction: ${movement.dir}",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    Text(
-                      "Arms bent: ${movement.armsBent}",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          ],
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        DetectorView(
+          title: 'Pose Detector',
+          customPaint: _customPaint,
+          text: _text,
+          onImage: _processImage,
+          initialCameraLensDirection: _cameraLensDirection,
+          onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
-        /*floatingActionButton: FloatingActionButton(
-          onPressed: _viewSavedScores,
-          child: Icon(Icons.history),
-          tooltip: 'View Performance History',
-          backgroundColor: Colors.blue,
-        ),*/
-      );
-    }
+        Center(
+          child: Container(
+            padding: EdgeInsets.all(8),
+            //color: Colors.black.withOpacity(0.5),
+            color: Color.fromARGB(128, 0, 0, 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /*
+                Text(
+                  lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),*/
+                Text(
+                  "name: ${lar.debug_name}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "angle: ${lar.debug_angle}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "count: ${lar.debug_counter}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "down?: ${lar.debug_was_it_down}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "Feedback: ${lar.debug_feedback}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                Text(
+                  "dir: ${lar.debug_dir}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),Text(
+                  "score: ${lar.debug_score.toString()}",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   Future<void> _viewSavedScores() async {
     double? latestScore = await PerformanceService.getLatestScore();
@@ -204,49 +257,82 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         _cameraLensDirection,
       );
       _customPaint = CustomPaint(painter: painter);
-
-
-      //Score-Berechnungen
       for (Pose pose in poses) {
 
-        //recordedPoses.add(TimedPose(getPoseName(pose.landmarks.entries.toList(), "rightShoulder"), timestamp));
+        //wenn kein fehler denn kein posenet und kein score
+        r_wes.angle = general_analytics.get_angles(pose, r_wes); //wert actuallisieren
+        r_esh.angle = general_analytics.get_angles(pose, r_esh);
+        r_wsh.angle = general_analytics.get_angles(pose, r_wsh);
 
-        analytics.set_new_pose(pose);
-        analytics.get_lr_wesh_points();
-        analytics.compute_wesh_joints();
+        l_wes.angle = general_analytics.get_angles(pose, l_wes);
+        l_esh.angle = general_analytics.get_angles(pose, l_esh);
+        l_wsh.angle = general_analytics.get_angles(pose, l_wsh);
 
-        //eval.intolerance_t_pose_starter(); //set triggered
-        //camera_view.CameraView.pose_Stopwatch_activation_bool = eval.triggered;
+        all_angls = r_wes.detected & r_esh.detected & r_wsh.detected & l_wes.detected & l_esh.detected & l_wsh.detected;
+        score = lar.debug_score;
 
-        //bei pausieren wieder in den init zustand bringen
+
+
+        //bei pausieren wieder t_posen zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
-          eval.triggered = false;
+          t_pose.triggered = false;
         }
-        if(analytics.is_wesh()) {
-          eval.session(!camera_view.CameraView.pose_Stopwatch_activation_bool,
-              analytics.r_wes_angl, analytics.r_esh_angl, analytics.l_wes_angl,
-              analytics.l_esh_angl);
-          camera_view.CameraView.pose_Stopwatch_activation_bool =
-              eval.triggered;
+        //initialisierung am anfang oder wenn noch nicht
+        if(all_angls && !t_pose.triggered) {
+
+          t_pose.pose_detected = true; //fals es mal false war soll es testen
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_wes.angle, 180, 25);
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_esh.angle, 95, 20);
+
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_wes.angle, 180, 25);
+          t_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_esh.angle, 95, 20);
+          t_pose.apply();
+
+          camera_view.CameraView.pose_Stopwatch_activation_bool = t_pose.triggered;
+
+          if(t_pose.triggered){
+            lar = General_MovementReference(1.0, ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh'], [false, true, true, false, true, true]);
+          }
         }
+        if(camera_view.CameraView.pose_Stopwatch_activation_bool){
+          //hier beginnt eine neue session
+          //neue werte abspeichern und feedbach abspeichern
 
-        movement.checkExerciseCycle(analytics.l_wsh_angl, analytics.r_wsh_angl);
+          lar.session_started = true;
+          lar.update_joint_Buffer('r_wes', r_wes.angle);
+          lar.update_joint_Buffer('r_esh', r_esh.angle);
+          //lar.update_joint_Buffer('r_wsh', r_wes.angle);
+          lar.update_joint_Buffer('l_wes', l_wes.angle);
+          lar.update_joint_Buffer('l_esh', l_esh.angle);
+          //lar.update_joint_Buffer('l_wsh', l_wes.angle);
 
+          lar.checkStatic_execution('r_wes', 180, 30, 5, 85, 1);
+          lar.checkStatic_execution('l_wes', 180, 30, 5, 85, 1);
 
-        movement.checkElbowAngle(analytics.l_wes_angl, analytics.r_wes_angl);
+          //mischregister für repeating machen
+          //lar.checkRepeating_execution('r_esh', 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25]);
+          lar.checkRepeating_execution('l_esh', 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25]);
 
-        bufferShoulder_r.add(analytics.r_esh_angl);
-        print(bufferShoulder_r);
-        print(analytics.r_esh_angl);
+          /*
+          if(lateral_rises.neg_feedback){
+            lateral_rises.got_you_in_4k(inputImage);
+          }
+          */
 
-            //print("P_Score: " + (Score.average).toString());
-            AutoSaveService.updateCurrentScore(10); // Todo: Track current score
-            //print("r_ARM (wes): " + r_wes_angl.toString());
-            //print("r_HIP (esh): " + r_esh_angl.toString());
+          AutoSaveService.updateCurrentScore(10); // Todo: Track current score
 
-        movement.update_angles(analytics.r_esh_angl, analytics.r_wes_angl);
-        movement.update_direction();
-
+        } else {
+          //camera detection ist aus und eine session war noch an => abgeschlossen
+          //if(lateral_rises.session_started == true){ // oder oben bei t_pose.triggered = false;
+          if(lar.session_started == true){
+            //sesion wurde beendet
+            //für den Score die letzten x sekunden entfernen die man zum abbrechen braucht;
+            // und die letzten feedbacks dazu auch
+            //feedbackliste abspeichern und score und so
+            //lateral_rises.session_started == false;
+            lar.session_started == false;
+          }
+        }
       }
 
     } else {
