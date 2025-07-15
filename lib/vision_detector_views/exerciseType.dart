@@ -15,6 +15,8 @@ String exerciseTypeToString(ExerciseType type) {
       return 'Bicep Curls';
     case ExerciseType.pushUps:
       return 'Push Ups';
+    case ExerciseType.lunges:
+      return 'Lunges';
     default: return 'Placehodler';
   }
 }

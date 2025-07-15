@@ -213,6 +213,7 @@ class General_Pose_init {
     if (!init) {
       return false;
     }
+    print(scorewithTolerances(target, angle, tolerance).toString());
     if (scorewithTolerances(target, angle, tolerance) > treshold) {
       pose_detected = pose_detected & true;
       return true;

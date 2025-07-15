@@ -55,7 +55,7 @@ class GymScreen extends StatelessWidget {
       ],
     ),
     GymExercise(
-      exerciseType: ExerciseType.lateralRaises,
+      exerciseType: ExerciseType.bicepCurls,
 
       label: 'Planks',
       videoPath: 'assets/videos/planks/planks.mov',
@@ -68,7 +68,7 @@ class GymScreen extends StatelessWidget {
       ],
     ),
     GymExercise(
-      exerciseType: ExerciseType.lateralRaises,
+      exerciseType: ExerciseType.lunges,
 
       label: 'Lunges',
       videoPath: 'assets/videos/lunges/lunges.mov',
@@ -205,7 +205,7 @@ class GymScreen extends StatelessWidget {
                                   thumbnailBytes: bytes.buffer.asUint8List(),
                                   executionSteps: exercise.executionSteps,
                                   exerciseTags: exercise.exerciseTags,
-                                  exerciseType: ExerciseType.lateralRaises,
+                                  exerciseType: exercise.exerciseType,
                                   onPlayVideo: () async {
                                     final scaffoldContext = context;
                                     try {
