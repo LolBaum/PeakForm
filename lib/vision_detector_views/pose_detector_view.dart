@@ -24,7 +24,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   String? _text;
   var _cameraLensDirection = CameraLensDirection.front; //richtung geändert
 
-
   /*
   leftShoulder,
   rightShoulder,
@@ -52,11 +51,9 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   rightFootIndex
  */
 
-
   General_pose_analytics general_analytics = General_pose_analytics();
   General_Pose_init t_pose = General_Pose_init(0.7);
-  //MovementReference lateral_rises = MovementReference(180, 10, 10, 1.0);
-  General_MovementReference lar = General_MovementReference(1.0, ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh']);
+  General_MovementReference lar = General_MovementReference(1.0, ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh'], [false, true, true, false, true, true]);
   //liste zum adden hier einfügen... vlt beim init nur feedback ändern...
 
   Joint_Angle r_wes = Joint_Angle(first: "rightShoulder", second: "rightElbow", third: "rightWrist");
@@ -66,11 +63,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   Joint_Angle l_wes = Joint_Angle(first: "leftShoulder", second: "leftElbow", third: "leftWrist");
   Joint_Angle l_esh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftElbow");
   Joint_Angle l_wsh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftWrist");
-
-
-
-
-
 
   bool all_angls = false;
 
@@ -107,50 +99,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),*/
-
-                /*
-                SizedBox(height: 8),
-                Text(
-                  "Wiederholungen: ${lateral_rises.reps}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                /*
-                Text(
-                  "Elbow Angle: ${lateral_rises.wes_buffer_average_l}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "Moving Direction: ${lateral_rises.dir}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "esh_average: ${lateral_rises.esh_buffer_average_l}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                */
-                Text(
-                  "Performance: ${(lateral_rises.score.average*100).toInt()} %",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "uFB: ${lateral_rises.esh_dir_change_upper_feedback}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "dFB: ${lateral_rises.esh_dir_change_downer_feedback}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "arms: ${lateral_rises.wes_angle_feedback}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                /*
-                lateral_rises.dir == direction.up ? Text(
-                  "Arm ist not straight!",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ) : SizedBox.shrink(),
-                 */
-                 */
                 Text(
                   "name: ${lar.debug_name}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
@@ -206,8 +154,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
       for (Pose pose in poses) {
 
-
-
         //wenn kein fehler denn kein posenet und kein score
         r_wes.angle = general_analytics.get_angles(pose, r_wes); //wert actuallisieren
         r_esh.angle = general_analytics.get_angles(pose, r_esh);
@@ -238,8 +184,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           camera_view.CameraView.pose_Stopwatch_activation_bool = t_pose.triggered;
 
           if(t_pose.triggered){
-            //lateral_rises = MovementReference(180, 10, 10, 1.0);
-            lar = General_MovementReference(1.0, ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh']);
+            lar = General_MovementReference(1.0, ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh'], [false, true, true, false, true, true]);
           }
         }
         if(camera_view.CameraView.pose_Stopwatch_activation_bool){
@@ -258,19 +203,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           lar.checkStatic_execution('l_wes', 180, 30, 5, 85, 1);
 
           //mischregister für repeating machen
-          //lar.checkRepeating_execution('r_esh', 85, 20, 20, 25, 10);
-          lar.checkRepeating_execution('l_esh', 85, 20, 20, 25, 10);
-
-          //updown geht noch nicht
+          //lar.checkRepeating_execution('r_esh', 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25]);
+          lar.checkRepeating_execution('l_esh', 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25]);
 
           /*
-          lateral_rises.session_started = true;
-          lateral_rises.update_esh_angles(l_esh.angle, r_esh.angle);
-          lateral_rises.update_wes_angles(l_wes.angle, r_wes.angle);
-
-          lateral_rises.checkElbowAngle();
-          lateral_rises.update_direction_lr('beide'); //richtigen namen für feedback
-
           if(lateral_rises.neg_feedback){
             lateral_rises.got_you_in_4k(inputImage);
           }
@@ -289,54 +225,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             lar.session_started == false;
           }
         }
-
-
-
-        /*
-        Todo:
-        //sachen vereinfachen
-        //lauras klasse generalisieren ? oder als lar einheit aufstellen
-
-        //farben bei neg feedback
-        //klassen veralgemeinern
-        //dann klassen veralgemeinern getrennt von den exisierenden mit allem moglichen
-        und namen nennen so werden die variablen dann heißen oder ein struckt für diese wie bei der winkel zu string idee
-        //klassen so verallgemeinern das man mehrere übungen damit machen kann
-
-
-
-        bei der stunde: neu erzeugen der klasse wenn camera_view.CameraView.pose_Stopwatch_activation_bool
-        und dann auch die werte abspeichern in got you in 4k
-
-        //und stream erzeugen mit abgleich (von ideal und nachgemacht)
-        //Curls auch machen als einheit erstmal durch stream und mit den veralgemeinerten klassen probieren
-
-        jetzt:
-        //notes vom handy
-
-        // dann bewertung pro frame wenn man eine abfolge erreicht aber denn auch nicht von der abfolge zurück geht
-        // also eine sequenz vin winkeln die gemacht werden muss
-
-        //pro übung eine liste an toleranzen und winkel erstellen
-
-
-
-        //full into KI mit bewegungsablauf oder noch kontrolle haben ?
-        */
-
-
-        //scores einfluss kann hier mit der certenty gewichtet werden
-        //bei geringerer likelyhood mehr tolleranter beim winkel bestimmen
-        //likelyhood gilt auch für z werte die wir im 2dimensionalen ignorieren
-
-
-        //todo store min / max average angle.
-        //if difference ~5 away from value -> change direction
-
       }
-      //for(TimedPose p in recordedPoses){
-        //print("${p.pose} detected at ${p.timestamp.inMilliseconds} ms\n");
-      //}
 
 
     } else {
