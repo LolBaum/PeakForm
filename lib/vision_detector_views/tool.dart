@@ -252,26 +252,8 @@ class General_MovementReference {
 
   //am anfang nutzen
   //man könnte dafür sorgen das man sagt wecher Body_joint welche features bekommt (also ob min movement oder lieber nur dir und so)
-  void add_Body_joint_Buffer({
-    String name = "idle",
-    int size = 1,
-    bool movement_joint = false,
-  }) {
 
-    if (body_joint_buffers.containsKey(name) && body_joint_feedbacks.containsKey(name) && body_joint_counter.containsKey(name)) {
-      print("Buffer '$name' existiert bereits!");
-      return;
-    }
-    body_joint_buffers[name] = CircularBuffer<double>(size);
-    body_joint_feedbacks[name] = " ";
-    body_joint_counter[name] = 0;
-    if (movement_joint) {
-      body_joint_max_movement[name] = 0;
-      body_joint_min_movement[name] = 180;
-      body_joint_movement_dir[name] = direction.down;
-      body_joint_was_it_down[name] = false;
-    }
-  }
+
 
   //zwischenschrittlich
   void update_joint_Buffer(String name, double value) {
@@ -479,7 +461,7 @@ class General_MovementReference {
     bool direction_changed = false;
     directionchange dirchange = directionchange.updown;
 
-
+    /*
     //ab hier debug!
     final debug_feedback_probably = getValue_from_body_joint_feedback(name);
     if (debug_feedback_probably == null) {
@@ -494,6 +476,7 @@ class General_MovementReference {
     debug_angle = min_movement_angle.toString();
     debug_dir = movement_dir.toString();
     //bis hier debug!
+     */
 
 
     if(movement_dir == direction.down){ // Down -> Up
