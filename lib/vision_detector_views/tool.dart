@@ -522,7 +522,6 @@ class General_MovementReference {
         //haltung ausgleichen mit guter wdh
         score.add(scorewithTolerances(max_angle, average_angle, score_updown_tolerance), score_weight);
         double esh_upper_diff = max_angle - average_angle;
-        print("FUCK: " + esh_upper_diff.toString());
         print("updown");
         //todo:werte tweaken
 
