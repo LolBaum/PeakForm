@@ -343,7 +343,7 @@ class _CameraViewState extends State<CameraView> {
       camera,
       // Set to ResolutionPreset.high. Do NOT set it to ResolutionPreset.max because for some phones does NOT work.
       ResolutionPreset.high,
-      enableAudio: false,
+      enableAudio: true,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.nv21
           : ImageFormatGroup.bgra8888,
@@ -352,6 +352,8 @@ class _CameraViewState extends State<CameraView> {
       if (!mounted) {
         return;
       }
+      // Expose the controller globally so recording helpers can use it
+      _cameraController = _controller;
       _controller?.getMinZoomLevel().then((value) {
         _currentZoomLevel = value;
         _minAvailableZoom = value;
@@ -643,15 +645,27 @@ class _CameraViewState extends State<CameraView> {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FrostedGlassButton(
-          onTap: () {
+          onTap: () async {
+            // Toggle processing (start/stop workout)
             setState(() {
               _isProcessingEnabled = !_isProcessingEnabled;
             });
-            if(!_isProcessingEnabled){
-              /*Navigator.pushNamed(
-                  context,
-                  '/result',*/
 
+            if (_isProcessingEnabled) {
+              // -------------- START --------------
+              _startStopwatch();
+              await startVideoRecording();
+            } else {
+              // -------------- STOP --------------
+              _pauseStopwatch();
+
+              // Finish recording and obtain the file
+              final recordedFile = await stopVideoRecording();
+              final String? videoPath = recordedFile?.path;
+
+              if (!mounted) return;
+
+              // Navigate to results screen with the recorded video
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -659,14 +673,11 @@ class _CameraViewState extends State<CameraView> {
                     goodFeedback: exampleGoodFeedback,
                     badFeedback: exampleBadFeedback,
                     tips: exampleTips,
-                    videoPath: "video", // oder null
-                    score: 2,
+                    videoPath: videoPath, // Could be null if recording failed
+                    score: 2, // TODO: replace with actual calculated score
                   ),
                 ),
               );
-
-            } else{
-              _startStopwatch();
             }
           },
           child: Center(
@@ -695,15 +706,27 @@ class _CameraViewState extends State<CameraView> {
 
   // Start video recording
   Future<void> startVideoRecording() async {
-    if (_cameraController != null && !_isRecording) {
-      try {
-        await _cameraController!.startVideoRecording();
-        _isRecording = true;
-        //notifyListeners();
-      } catch (e, stack) {
-        _log('Failed to start video recording: $e');
-        debugPrint('Failed to start video recording: $e\n$stack');
+    if (_cameraController == null || _isRecording) return;
+
+    try {
+      // 1. Stop any existing image stream (required by the camera plugin).
+      if (_cameraController!.value.isStreamingImages) {
+        await _cameraController!.stopImageStream();
       }
+
+      // 2. Start recording **and** request frames via the callback so pose
+      //    detection can continue while the video is being captured.
+      await _cameraController!.startVideoRecording(
+        onAvailable: (cameraImage) {
+          // Re-use the same processing pipeline that live mode uses.
+          _processCameraImage(cameraImage);
+        },
+      );
+
+      _isRecording = true;
+    } catch (e, stack) {
+      _log('Failed to start video recording: $e');
+      debugPrint('Failed to start video recording: $e\n$stack');
     }
   }
 
