@@ -1,10 +1,14 @@
 //import 'dart:ffi';
 import 'dart:math';
+import 'package:google_ml_kit_example/result_screen.dart';
+import 'package:google_ml_kit_example/vision_detector_views/pose_detector_view.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 //import 'pose_detector_view.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'package:circular_buffer/circular_buffer.dart';
+import 'camera_view.dart';
+import 'feedback_generator.dart';
 
 //3D bereich
 class Vector3 {
@@ -234,6 +238,16 @@ class General_Pose_init {
   double min_esh_angle = 180;
   double max_esh_angle = 0;
    */
+String getFormattedStopwatchTimestamp() {
+  final elapsed = CameraView.stopwatch.elapsed;
+
+  final minutes = elapsed.inMinutes.remainder(60).toString().padLeft(2, '0');
+  final seconds = elapsed.inSeconds.remainder(60).toString().padLeft(2, '0');
+  final milliseconds = (elapsed.inMilliseconds.remainder(1000) ~/ 10).toString().padLeft(2, '0');
+
+  return "$minutes:$seconds:$milliseconds";
+}
+
 
 //generalisiert halt
 class General_MovementReference {
@@ -257,6 +271,7 @@ class General_MovementReference {
   String debug_angle = " ";
   String debug_dir = " ";
   double debug_score = 0;
+
   //bis hier debug!
 
   final Map<String, CircularBuffer<double>> body_joint_buffers = {};
@@ -427,6 +442,7 @@ class General_MovementReference {
 
     if(bent_count > 5){
       update_Buffer_feedback(name, name + " not straight");
+      badFeedback.add(FeedbackItem(label: "$name nicht gerade", timestamp: getFormattedStopwatchTimestamp()));
       neg_feedback = true;
       print("not straight");
     }
@@ -502,8 +518,6 @@ class General_MovementReference {
     //bis hier debug!
 
 
-
-
     if(movement_dir == direction.down){ // Down -> Up
       if (min_movement_angle < average_angle){ //größer werdende entfernung zum minimum
         direction_changed = true;
@@ -533,6 +547,8 @@ class General_MovementReference {
 
         if (esh_upper_diff < upper_tolerances[0]) {
           update_Buffer_feedback(name, name + " zu hoch");
+          badFeedback.add(FeedbackItem(label: "$name zu hoch", timestamp: getFormattedStopwatchTimestamp()));
+          errorCounters["oben_zu_hoch"] = (errorCounters["oben_zu_hoch"] ?? 0) + 1;
           neg_feedback = true;
           score.add(0.8,2); //strafpunkt für die gesundheit
           if (was_it_down){
@@ -542,6 +558,8 @@ class General_MovementReference {
         } else
         if (esh_upper_diff < upper_tolerances[1]) {
           update_Buffer_feedback(name, name + " oben super");
+          goodFeedback.add(FeedbackItem(label: "$name oben super",timestamp: getFormattedStopwatchTimestamp()));
+          errorCounters["oben_sehr_gut"] = (errorCounters["oben_sehr_gut"] ?? 0) + 1;
           neg_feedback = false;
           if (was_it_down){
             update_joint_Buffer_was_it_down(name, false);
@@ -550,6 +568,8 @@ class General_MovementReference {
         } else
         if (esh_upper_diff < upper_tolerances[2]) {
           update_Buffer_feedback(name, name + " oben gut");
+          goodFeedback.add(FeedbackItem(label: "$name oben gut",timestamp: getFormattedStopwatchTimestamp()));
+          errorCounters["oben_sehr_gut"] = (errorCounters["oben_sehr_gut"] ?? 0) + 1;
           neg_feedback = false;
           if (was_it_down){
             update_joint_Buffer_was_it_down(name, false);
@@ -558,15 +578,19 @@ class General_MovementReference {
         } else
         if (esh_upper_diff < upper_tolerances[3]) {
           update_Buffer_feedback(name, name + " oben noch etwas höher");
+          //tips.add(FeedbackItem(label: "$name oben noch etwas höher"));
+          errorCounters["oben_zu_niedrig"] = (errorCounters["oben_zu_niedrig"] ?? 0) + 1;
+
           neg_feedback = false;
         } else
         if (esh_upper_diff < upper_tolerances[4]) {
           update_Buffer_feedback(name, name + " oben zu niedrig");
+          badFeedback.add(FeedbackItem(label: "$name zu niedrig",timestamp: getFormattedStopwatchTimestamp()));
+          errorCounters["oben_zu_niedrig"] = (errorCounters["oben_zu_niedrig"] ?? 0) + 1;
+
           neg_feedback = true;
         }
-
       }
-
       //tolleranz 10, 15,20,25
       if(dirchange == directionchange.downup){
 
@@ -577,21 +601,35 @@ class General_MovementReference {
 
         if (esh_downer_diff < downer_tolerances[0]) {
           update_Buffer_feedback(name, name + " unten super");
+          goodFeedback.add(FeedbackItem(label: "$name unten super",timestamp: getFormattedStopwatchTimestamp()));
+          errorCounters["unten_sehr_gut"] = (errorCounters["unten_sehr_gut"] ?? 0) + 1;
+
+
           if(!was_it_down){
             update_joint_Buffer_was_it_down(name, true);
           }
         } else
         if (esh_downer_diff < downer_tolerances[1]) {
           update_Buffer_feedback(name, name + " unten gut");
+          goodFeedback.add(FeedbackItem(label: "$name unten gut",timestamp: getFormattedStopwatchTimestamp()));
+          errorCounters["unten_gut"] = (errorCounters["unten_gut"] ?? 0) + 1;
+
+
           if(!was_it_down){
             update_joint_Buffer_was_it_down(name, true);
           }
         } else
         if (esh_downer_diff < downer_tolerances[2]) {
           update_Buffer_feedback(name, name + " unten weiter runter");
+          tips.add(FeedbackItem(label: "$name unten weiter runter"));
+          errorCounters["unten_zu_hoch"] = (errorCounters["unten_zu_hoch"] ?? 0) + 1;
+
         } else
         if (esh_downer_diff < downer_tolerances[3]) {
           update_Buffer_feedback(name, name + " unten viel weiter runter");
+          tips.add(FeedbackItem(label: "$name unten viel weiter runter"));
+          errorCounters["unten_viel_zu_hoch"] = (errorCounters["unten_viel_zu_hoch"] ?? 0) + 1;
+
           neg_feedback = false;
         }
       }

@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit_example/vision_detector_views/exercises/bicep_curls.dart';
+import 'package:google_ml_kit_example/vision_detector_views/globals.dart';
 import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:circular_buffer/circular_buffer.dart';
@@ -18,8 +19,16 @@ import 'camera_view.dart' as camera_view;
 import 'direction.dart';
 import '/util/logging_service.dart';
 import 'package:flutter/foundation.dart';
+import '../result_screen.dart';
+import 'feedback_generator.dart';
+
 
 double score = 0.0;
+final List<FeedbackItem> goodFeedback = [];
+
+final List<FeedbackItem> badFeedback = [];
+
+final List<FeedbackItem> tips = [];
 
 class PoseDetectorView extends StatefulWidget {
   final ExerciseType exerciseType;
@@ -37,7 +46,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
-  var _cameraLensDirection = CameraLensDirection.front; //richtung geändert
+  var _cameraLensDirection = CameraLensDirection.back; //richtung geändert
 
   /*
   leftShoulder,
@@ -64,9 +73,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   rightHeel,
   leftFootIndex,
   rightFootIndex
-
    */
-
 
 
   General_pose_analytics general_analytics = General_pose_analytics();
@@ -85,14 +92,13 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   Joint_Angle r_hak = Joint_Angle(first: "rightHip", second: "rightKnee", third: "rightAnkle");
 
 
-
-
   bool all_angls = false;
 
 
   @override
   void initState() {
     super.initState();
+    mostRecentExercise = widget.exerciseType;
     if (widget.exerciseType == ExerciseType.lateralRaises) {
       lar = General_MovementReference(1.0,
           ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh'],
@@ -127,6 +133,36 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           initialCameraLensDirection: _cameraLensDirection,
           onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
+        Positioned(
+          top: 40,
+          right: 20,
+          child: Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Exercise: ${exerciseTypeToString(widget.exerciseType)}",
+                  style: TextStyle(color: Colors.white, fontSize: 10,decoration: TextDecoration.none,
+                  ),
+                ),
+                // Uncomment if needed
+                // Text(
+                //   "angle: ${lar.debug_angle}",
+                //   style: TextStyle(color: Colors.white, fontSize: 20),
+                // ),
+                Text(
+                  "Reps: ${lar.debug_counter}",
+                  style: TextStyle(color: Colors.white, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ),
         Center(
           child: Container(
             padding: EdgeInsets.all(8),
@@ -140,33 +176,24 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                   lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),*/
-                Text(
-                  "name: ${lar.debug_name}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "angle: ${lar.debug_angle}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
-                  "count: ${lar.debug_counter}",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                Text(
+
+               /* Text(
                   "down?: ${lar.debug_was_it_down}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+                ),*/
                 Text(
                   "Feedback: ${lar.debug_feedback}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                Text(
+
+                /*Text(
                   "dir: ${lar.debug_dir}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),Text(
+                ),*/
+                /*Text(
                   "score: ${lar.debug_score.toString()}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+                ),*/
 
               ],
             ),
@@ -175,72 +202,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       ],
     );
   }
-
-  Future<void> _viewSavedScores() async {
-    double? latestScore = await PerformanceService.getLatestScore();
-    List<Map<String, dynamic>> allScoresWithTimestamps = await PerformanceService.getAllScoresWithTimestamps();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Performance History'),
-        content: Container(
-          width: double.maxFinite,
-          height: 300,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Latest Score: ${latestScore?.toStringAsFixed(2) ?? 'None'}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Text('Total Sessions: ${allScoresWithTimestamps.length}'),
-              SizedBox(height: 10),
-              Expanded(
-                child: allScoresWithTimestamps.isEmpty
-                  ? Center(child: Text('No performance data yet.\n\nStart exercising to see your scores!'))
-                  : ListView.builder(
-                      itemCount: allScoresWithTimestamps.length,
-                      itemBuilder: (context, index) {
-                        final scoreData = allScoresWithTimestamps[index];
-                        final score = scoreData['score'] as double;
-                        final formattedTime = scoreData['formattedTime'] as String;
-
-                        final duration = scoreData['duration'] as String;
-
-                        return ListTile(
-                          leading: CircleAvatar(
-                            child: Text('${index + 1}'),
-                            backgroundColor: Colors.blue,
-                          ),
-                          title: Text('Score: ${score.toStringAsFixed(2)}'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('$formattedTime ${index == 0 ? '(Most Recent)' : ''}'),
-                              Text('Duration: $duration',
-                                   style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500)),
-                            ],
-                          ),
-                          isThreeLine: true,
-                        );
-                      },
-                    ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Close'),
-          ),
-        ],
-      ));
-  }
-
-
 
   Future<void> _processImage(InputImage inputImage) async {
     if (!_canProcess) return;
@@ -264,7 +225,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
       );
       _customPaint = CustomPaint(painter: painter);
       for (Pose pose in poses) {
-
 
         //wenn kein fehler denn kein posenet und kein score
         r_wes.angle = general_analytics.get_angles(pose, r_wes); //wert actuallisieren
@@ -290,11 +250,12 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //initialisierung am anfang oder wenn noch nicht
         if(all_angls && !init_pose.triggered) {
 
-          init_pose.pose_detected = true; //fals es mal false war soll es testen
+          init_pose.pose_detected = true; //falls es mal false war soll es testen
 
           //hier fall unterscheidung!!!
 
           if (widget.exerciseType == ExerciseType.lateralRaises) {
+
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_wes.angle, 180, 25);
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_esh.angle, 95, 20);
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_wes.angle, 180, 25);
@@ -306,8 +267,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_hak.angle, 90, 30);
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_hak.angle, 180, 30);
           }
-
-          //sonst einfach true
 
           init_pose.apply();
 
@@ -363,9 +322,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           lar.session_started = true;
 
           //fallunterscheidung
-
-
-
           //hier auch fallunterscheidung
 
 
@@ -391,15 +347,18 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         }
       }
 
+
     } else {
       _text = 'Poses found: ${poses.length}\n\n';
       // TODO: set _customPaint to draw landmarks on top of image
       _customPaint = null;
     }
+
     _isBusy = false;
     if (mounted) {
       setState(() {});
     }
   }
+
 
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit_example/services/performance_service.dart';
+import 'package:google_ml_kit_example/vision_detector_views/feedback_generator.dart';
 import 'constants/constants.dart';
 import 'l10n/app_localizations.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'dart:typed_data';
 import 'package:open_file/open_file.dart';
-//import 'package:fitness_app/providers/auth_provider.dart';
+import 'vision_detector_views/feedback_generator.dart';
 
 class FeedbackItem {
   final String label;
@@ -29,6 +31,8 @@ class ResultScreen extends StatefulWidget {
     required this.score,
   });
 
+
+
   @override
   State<ResultScreen> createState() => _ResultScreenState();
 }
@@ -42,6 +46,7 @@ class _ResultScreenState extends State<ResultScreen> {
   void initState() {
     super.initState();
     _generateThumbnail();
+    errorCounters.updateAll((key, value) => 0);
   }
 
   Future<void> _generateThumbnail() async {
@@ -205,7 +210,7 @@ class _ResultScreenState extends State<ResultScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: Text(
-                      '${widget.score}/10',
+                      '${widget.score}%', //score
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -214,6 +219,31 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                //performance history
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: 400,
+                    child: ElevatedButton(
+                      onPressed: _viewSavedScores,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[800],
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 8,
+                      ),
+                      child: Text('View Performance History',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SizedBox(
@@ -363,5 +393,68 @@ class _ResultScreenState extends State<ResultScreen> {
         ],
       ),
     );
+  }
+  Future<void> _viewSavedScores() async {
+    double? latestScore = await PerformanceService.getLatestScore();
+    List<Map<String, dynamic>> allScoresWithTimestamps = await PerformanceService.getAllScoresWithTimestamps();
+
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Performance History'),
+          content: Container(
+            width: double.maxFinite,
+            height: 300,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Latest Score: ${latestScore?.toStringAsFixed(2) ?? 'None'}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Text('Total Sessions: ${allScoresWithTimestamps.length}'),
+                SizedBox(height: 10),
+                Expanded(
+                  child: allScoresWithTimestamps.isEmpty
+                      ? Center(child: Text('No performance data yet.\n\nStart exercising to see your scores!'))
+                      : ListView.builder(
+                    itemCount: allScoresWithTimestamps.length,
+                    itemBuilder: (context, index) {
+                      final scoreData = allScoresWithTimestamps[index];
+                      final score = scoreData['score'] as double;
+                      final formattedTime = scoreData['formattedTime'] as String;
+
+                      final duration = scoreData['duration'] as String;
+
+                      return ListTile(
+                        leading: CircleAvatar(
+                          child: Text('${index + 1}'),
+                          backgroundColor: Colors.blue,
+                        ),
+                        title: Text('Score: ${score.toStringAsFixed(2)}'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('$formattedTime ${index == 0 ? '(Most Recent)' : ''}'),
+                            Text('Duration: $duration',
+                                style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500)),
+                          ],
+                        ),
+                        isThreeLine: true,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
+            ),
+          ],
+        ));
   }
 }

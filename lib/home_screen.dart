@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit_example/vision_detector_views/exerciseType.dart';
+import 'package:google_ml_kit_example/vision_detector_views/globals.dart';
+import 'package:google_ml_kit_example/vision_detector_views/pose_detector_view.dart';
 import 'package:provider/provider.dart';
 import '../util/logging_service.dart';
 import 'constants/constants.dart';
@@ -22,6 +25,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final translation = AppLocalizations.of(context)!;
+    tips.clear();
     _log('HomeScreen built for user: $userName');
 
     return Scaffold(
@@ -160,10 +164,8 @@ class HomeScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ChangeNotifierProvider(
-                                    create: (_) => PoseDetectionProvider(),
-                                    child: const CameraScreen(),
-                                  ),
+                                  //TODO: select most rescent exercise
+                                    builder: (context) => PoseDetectorView(exerciseType: mostRecentExercise ?? ExerciseType.lateralRaises)
                                 ),
                               );
                             },

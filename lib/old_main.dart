@@ -45,8 +45,8 @@ class Home extends StatelessWidget {
         child: Center(
               child: Column(
                 children: [
-                      CustomCard(exerciseTypeToString(ExerciseType.lateralRaises), PoseDetectorView(exerciseName: ExerciseType.lateralRaises,)),
-                      CustomCard( exerciseTypeToString(ExerciseType.bicepCurls), PoseDetectorView(exerciseName: ExerciseType.bicepCurls,)),
+                     /* CustomCard(exerciseTypeToString(ExerciseType.lateralRaises), PoseDetectorView(exerciseName: ExerciseType.lateralRaises,)),
+                      CustomCard( exerciseTypeToString(ExerciseType.bicepCurls), PoseDetectorView(exerciseName: ExerciseType.bicepCurls,)),*/
                 ],
               ),
 

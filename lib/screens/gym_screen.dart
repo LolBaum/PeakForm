@@ -7,6 +7,8 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import '../vision_detector_views/exerciseType.dart';
+import '../vision_detector_views/globals.dart';
+import '../vision_detector_views/pose_detector_view.dart';
 
 class GymExercise {
   final ExerciseType exerciseType;
@@ -57,15 +59,17 @@ class GymScreen extends StatelessWidget {
     GymExercise(
       exerciseType: ExerciseType.bicepCurls,
 
-      label: 'Planks',
+      label: 'Bicep Curls',
       videoPath: 'assets/videos/planks/planks.mov',
       thumbnailPath: 'assets/images/thumbnail/thumbnail-planks.jpeg',
       exerciseTags: ['Core', 'Stabilität'],
-      executionSteps: [
-        'Lege dich mit den Unterarmen auf den Boden.',
-        'Stütze dich auf die Zehenspitzen und halte den Körper gerade.',
-        'Halte die Position für die gewünschte Zeit.',
-      ],
+        executionSteps: [
+          'Stelle dich schulterbreit hin, die Knie leicht gebeugt.',
+          'Halte in jeder Hand eine Kurzhantel mit den Handflächen nach vorne.',
+          'Bewege die Unterarme und führe die Hanteln langsam Richtung Schultern.',
+          'Halte die Position kurz oben für maximale Muskelspannung.',
+          'Senke die Hanteln kontrolliert zurück in die Ausgangsposition.',
+        ]
     ),
     GymExercise(
       exerciseType: ExerciseType.lunges,
@@ -106,7 +110,7 @@ class GymScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final translation = AppLocalizations.of(context)!;
     LoggingService.instance.i('GymScreen displayed');
-
+    tips.clear();
     return Scaffold(
       // TODO: Use constants
       backgroundColor: const Color(0xFFF2F2F2),

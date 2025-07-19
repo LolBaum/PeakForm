@@ -12,6 +12,8 @@ import '../services/auto_save_service.dart';
 import '/util/logging_service.dart';
 import 'package:flutter/foundation.dart';
 import 'pose_detector_view.dart';
+import '../constants/constants.dart';
+import 'feedback_generator.dart';
 
 final List<FeedbackItem> exampleGoodFeedback = [
   FeedbackItem(label: "Gute Haltung während der Übung", timestamp: "00:10"),
@@ -152,12 +154,13 @@ class _CameraViewState extends State<CameraView> {
           ),
           _backButton(),
           _switchLiveCameraToggle(),
+/*
           _detectionViewModeToggle(),
+*/
           _zoomControl(),
           _exposureControl(),
           _fpsDisplay(),
           _stopwatchDisplay(),
-          _stopwatchControls(),
           _captureButton(),
         ],
       ),
@@ -177,12 +180,13 @@ class _CameraViewState extends State<CameraView> {
             child: Icon(
               Icons.arrow_back_ios_outlined,
               size: 20,
+              color: lime,
             ),
           ),
         ),
       );
 
-  Widget _detectionViewModeToggle() => Positioned(
+  /*Widget _detectionViewModeToggle() => Positioned(
         bottom: 8,
         left: 8,
         child: SizedBox(
@@ -195,10 +199,11 @@ class _CameraViewState extends State<CameraView> {
             child: Icon(
               Icons.photo_library_outlined,
               size: 25,
+              color: lime,
             ),
           ),
         ),
-      );
+      );*/
 
   Widget _switchLiveCameraToggle() => Positioned(
         bottom: 8,
@@ -215,6 +220,7 @@ class _CameraViewState extends State<CameraView> {
                   ? Icons.flip_camera_ios_outlined
                   : Icons.flip_camera_android_outlined,
               size: 25,
+              color: lime
             ),
           ),
         ),
@@ -270,7 +276,7 @@ class _CameraViewState extends State<CameraView> {
       );
 
   Widget _exposureControl() => Positioned(
-        top: 40,
+        top: 45,
         right: 8,
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -395,7 +401,7 @@ class _CameraViewState extends State<CameraView> {
   }
 
   void _processCameraImage(CameraImage image) {
-    //if (!_isProcessingEnabled) return;
+    if (!_isProcessingEnabled) return;
     final inputImage = _inputImageFromCameraImage(image);
     if (inputImage == null) return;
     
@@ -507,6 +513,17 @@ class _CameraViewState extends State<CameraView> {
     }
   }
 
+  String getFormattedStopwatchTimestamp() {
+    final elapsed = CameraView.stopwatch.elapsed;
+
+    final minutes = elapsed.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = elapsed.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final milliseconds = (elapsed.inMilliseconds.remainder(1000) ~/ 10).toString().padLeft(2, '0');
+
+    return "$minutes:$seconds:$milliseconds"; // Beispiel: 00:45:23
+  }
+
+
   void _pose_Stopwatch_activation() {
     if (CameraView.pose_Stopwatch_activation_bool) {
       _startStopwatch();
@@ -587,7 +604,7 @@ class _CameraViewState extends State<CameraView> {
         ),
       );
 
-  Widget _stopwatchControls() => Positioned(
+  /*Widget _stopwatchControls() => Positioned(
         top: 150,
         left: 0,
         right: 0,
@@ -600,22 +617,22 @@ class _CameraViewState extends State<CameraView> {
               child: SizedBox(
                 height: 50.0,
                 width: 50.0,
-                /*child: FloatingActionButton(
+                *//*child: FloatingActionButton(
                   heroTag: "stopwatch_start_pause",
                   onPressed: CameraView.isStopwatchRunning ? _pauseStopwatch : _startStopwatch, //das hier triggern über eine globale variableüber tdetector view
                   backgroundColor: CameraView.isStopwatchRunning ? Colors.orange : Colors.green,
-                  *//*child: Icon(
+                  *//**//*child: Icon(
                     CameraView.isStopwatchRunning ? Icons.pause : Icons.play_arrow,
                     size: 25,
                     color: Colors.white,
-                  ),*//*
-                ),*/
+                  ),*//**//*
+                ),*//*
               ),
             ),
             // Reset button
 
             //Reset Button
-            /*Container(
+            *//*Container(
               margin: EdgeInsets.symmetric(horizontal: 4),
               child: SizedBox(
                 height: 50.0,
@@ -631,13 +648,13 @@ class _CameraViewState extends State<CameraView> {
                   ),
                 ),
               ),
-            ),*/
+            ),*//*
           ],
         ),
-      );
+      );*/
 
   Widget _captureButton() => Positioned(
-    bottom: 10,
+    bottom: 40,
     left: 0,
     right: 0,
     child: SafeArea(
@@ -652,20 +669,24 @@ class _CameraViewState extends State<CameraView> {
               /*Navigator.pushNamed(
                   context,
                   '/result',*/
+              final List<String> summarySentences = getSummaryFeedback();
+              for (final sentence in summarySentences) {
+                tips.add(FeedbackItem(label: sentence));
+              }
 
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ResultScreen(
-                    goodFeedback: exampleGoodFeedback,
-                    badFeedback: exampleBadFeedback,
-                    tips: exampleTips,
+                    goodFeedback: goodFeedback,
+                    badFeedback: badFeedback,
+                    tips: tips,
                     videoPath: "video", // oder null
                     score: (score * 100).round(),
                   ),
                 ),
               );
-
+              _resetStopwatch();
             } else{
               _startStopwatch();
             }
