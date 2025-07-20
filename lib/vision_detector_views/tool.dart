@@ -291,7 +291,7 @@ class General_MovementReference {
       }
       body_joint_buffers[name] = CircularBuffer<double>(7);
       body_joint_feedbacks[name] = " ";
-      body_joint_counter[name] = 0; // wenn init gleich t_pose ist
+      body_joint_counter[name] = 1; // wenn init gleich t_pose ist
       if (movement[i]) {
         body_joint_max_movement[name] = 0;
         body_joint_min_movement[name] = 180;
