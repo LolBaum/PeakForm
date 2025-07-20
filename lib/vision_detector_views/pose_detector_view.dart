@@ -316,7 +316,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             lar.update_joint_Buffer('r_hak', r_hak.angle);
             lar.update_joint_Buffer('l_hak', l_hak.angle);
             lar.checkRepeating_execution('r_hak', 180, 90, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30]);
-            lar.checkRepeating_execution('l_hak', 180, 90, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30]);
+            lar.checkRepeating_execution('l_hak', 90, 180, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30]);
           }
 
           lar.session_started = true;
