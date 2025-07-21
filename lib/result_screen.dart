@@ -107,6 +107,28 @@ class _ResultScreenState extends State<ResultScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12), // Optional padding for spacing
+            child: GestureDetector(
+              onTap: () {
+                _viewSavedScores(); // Your function
+              },
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.history,
+                  color: AppColors.onPrimary,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         top: true,
@@ -221,7 +243,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 const SizedBox(height: 24),
 
                 //performance history
-                Padding(
+               /* Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SizedBox(
                     width: 400,
@@ -241,7 +263,7 @@ class _ResultScreenState extends State<ResultScreen> {
                               fontSize: 16)),
                     ),
                   ),
-                ),
+                ),*/
                 const SizedBox(height: 16),
 
                 Padding(
@@ -430,7 +452,7 @@ class _ResultScreenState extends State<ResultScreen> {
                     return ListTile(
                       leading: CircleAvatar(
                         child: Text('${index + 1}'),
-                        backgroundColor: Colors.blue,
+                        backgroundColor: AppColors.primary,
                       ),
                       title: Text('Score: ${score.toStringAsFixed(2)}'),
                       subtitle: Column(
@@ -452,7 +474,9 @@ class _ResultScreenState extends State<ResultScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Close'),
+            child: Text('Close',
+              style: TextStyle(color: AppColors.primary),
+            ),
           ),
         ],
       ),
