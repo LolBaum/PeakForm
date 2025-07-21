@@ -676,9 +676,7 @@ class _CameraViewState extends State<CameraView> {
               _isProcessingEnabled = !_isProcessingEnabled;
             });
             if(!_isProcessingEnabled){
-              /*Navigator.pushNamed(
-                  context,
-                  '/result',*/
+              _pauseStopwatch();
               final List<String> summarySentences = getSummaryFeedback();
               for (final sentence in summarySentences) {
                 tips.add(FeedbackItem(label: sentence));
