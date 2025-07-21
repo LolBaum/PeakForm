@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../frosted_glasst_button.dart';
 import '../result_screen.dart';
 import '../services/auto_save_service.dart';
@@ -85,6 +86,8 @@ class _CameraViewState extends State<CameraView> {
   double _maxAvailableExposureOffset = 0.0;
   double _currentExposureOffset = 0.0;
   bool _changingCameraLens = false;
+  bool _isInitializing = false;
+  String? _initError;
 
   // FPS tracking variables
   int _frameCount = 0;
@@ -102,27 +105,70 @@ class _CameraViewState extends State<CameraView> {
     super.initState();
 
     _initialize();
+    
   }
 
-  void _initialize() async {
-    if (_cameras.isEmpty) {
-      _cameras = await availableCameras();
+  Future<void> _initialize() async {
+    if (_isInitializing) {
+      print('🔄 Initialisierung läuft bereits, Abbruch');
+      return;
     }
-    
-    for (var i = 0; i < _cameras.length; i++) {
-      if (_cameras[i].lensDirection == widget.initialCameraLensDirection) {
-        _cameraIndex = i;
-        break;
+    _isInitializing = true;
+    print('🔄 Initialisierung gestartet');
+    try {
+      // Permissions abfragen
+      final cameraStatus = await Permission.camera.request();
+      final micStatus = await Permission.microphone.request();
+      if (!cameraStatus.isGranted || !micStatus.isGranted) {
+        if (mounted) {
+          setState(() {
+            _initError = 'Kamera- und Mikrofonrechte werden benötigt. Bitte in den Einstellungen aktivieren.';
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(_initError!)),
+          );
+        }
+        _isInitializing = false;
+        return;
       }
-    }
+      if (_cameras.isEmpty) {
+        _cameras = await availableCameras();
+      }
+      for (var i = 0; i < _cameras.length; i++) {
+        if (_cameras[i].lensDirection == widget.initialCameraLensDirection) {
+          _cameraIndex = i;
+          break;
+        }
+      }
+      if (_cameraIndex != -1) {
+        print('🔄 Starting live feed...');
+        try {
+                  await _startLiveFeed();
 
-    if (_cameraIndex != -1) {
-      _startLiveFeed();
+        } catch (e, stack) {
+          LoggingService.instance.e("Kamera Fehler: _startLiveFeed $e\n$stack");
+        }
+      }
+      if (mounted) setState(() { _initError = null; });
+    } catch (e, stack) {
+      LoggingService.instance.e('Kamera Fehler: $e\n$stack');
+      if (mounted) {
+        setState(() {
+          _initError = 'Kamera konnte nicht initialisiert werden: '+e.toString();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_initError!)),
+        );
+      }
+    } finally {
+      _isInitializing = false;
+      print('🔄 Initialisierung beendet');
     }
   }
 
   @override
   void dispose() {
+    print('🔄 Disposing camera view...');
     _stopLiveFeed();
     CameraView.stopwatchTimer?.cancel();
     super.dispose();
@@ -130,13 +176,50 @@ class _CameraViewState extends State<CameraView> {
 
   @override
   Widget build(BuildContext context) {
+    print('🔄 Building camera view...');
     return Scaffold(body: _liveFeedBody());
   }
 
   Widget _liveFeedBody() {
-    if (_cameras.isEmpty) return Container();
-    if (_controller == null) return Container();
-    if (_controller?.value.isInitialized == false) return Container();
+    print('🔄 Building live feed body...');
+    if (_initError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.red, size: 48),
+              const SizedBox(height: 16),
+              Text(_initError!, style: const TextStyle(color: Colors.red, fontSize: 18), textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  setState(() { _initError = null; });
+                  await _initialize();
+                },
+                child: const Text('Erneut versuchen'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (_isInitializing) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_cameras.isEmpty) {
+      print('🔄 Cameras empty');
+      return Container();
+    }
+    if (_controller == null) {
+      print('🔄 Controller null');
+      return Container();
+    }
+    if (_controller?.value.isInitialized == false) {
+      print('🔄 Controller not initialized');
+      return Container();
+    }
     return ColoredBox(
       color: Colors.black,
       child: Stack(
@@ -351,17 +434,18 @@ class _CameraViewState extends State<CameraView> {
       );
 
   Future _startLiveFeed() async {
-    final camera = _cameras[_cameraIndex];
-    _controller = CameraController(
-      camera,
-      // Set to ResolutionPreset.high. Do NOT set it to ResolutionPreset.max because for some phones does NOT work.
-      ResolutionPreset.high,
-      enableAudio: true,
-      imageFormatGroup: Platform.isAndroid
-          ? ImageFormatGroup.nv21
-          : ImageFormatGroup.bgra8888,
-    );
-    _controller?.initialize().then((_) {
+    try {
+      final camera = _cameras[_cameraIndex];
+      _controller = CameraController(
+        camera,
+        // Set to ResolutionPreset.high. Do NOT set it to ResolutionPreset.max because for some phones does NOT work.
+        ResolutionPreset.medium,
+        enableAudio: true,
+        imageFormatGroup: Platform.isIOS
+            ? ImageFormatGroup.nv21
+            : ImageFormatGroup.bgra8888,
+      );
+      await _controller?.initialize();
       if (!mounted) {
         return;
       }
@@ -381,31 +465,52 @@ class _CameraViewState extends State<CameraView> {
       _controller?.getMaxExposureOffset().then((value) {
         _maxAvailableExposureOffset = value;
       });
-      _controller?.startImageStream(_processCameraImage).then((value) {
-        if (widget.onCameraFeedReady != null) {
-          widget.onCameraFeedReady!();
-        }
-        if (widget.onCameraLensDirectionChanged != null) {
-          widget.onCameraLensDirectionChanged!(camera.lensDirection);
-        }
-      });
+      await _controller?.startImageStream(_processCameraImage);
+      if (widget.onCameraFeedReady != null) {
+        widget.onCameraFeedReady!();
+      }
+      if (widget.onCameraLensDirectionChanged != null) {
+        widget.onCameraLensDirectionChanged!(camera.lensDirection);
+      }
       setState(() {});
-    });
+    } catch (e, stack) {
+      print('🔄 Kamera-Feed-Fehler: $e\n$stack');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Kamera-Feed konnte nicht gestartet werden: \n'+e.toString())),
+        );
+      }
+      try { LoggingService.instance.e('Kamera-Feed-Fehler: $e\n$stack'); } catch (_) {}
+    }
   }
 
   Future _stopLiveFeed() async {
-    await _controller?.stopImageStream();
-    await _controller?.dispose();
-    _controller = null;
+    try {
+      await _controller?.stopImageStream();
+      await _controller?.dispose();
+      _controller = null;
+    } catch (e, stack) {
+      print('🔄 Kamera-Stop-Fehler: $e\n$stack');
+      try { LoggingService.instance.e('Kamera-Stop-Fehler: $e\n$stack'); } catch (_) {}
+      // Kein UI-Feedback nötig, da dies meist beim Wechsel passiert
+    }
   }
 
   Future _switchLiveCamera() async {
     setState(() => _changingCameraLens = true);
     _cameraIndex = (_cameraIndex + 1) % _cameras.length;
-
-    await _stopLiveFeed();
-    await _startLiveFeed();
-    setState(() => _changingCameraLens = false);
+    try {
+      await _stopLiveFeed();
+      await _startLiveFeed();
+    } catch (e, stack) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Kamerawechsel fehlgeschlagen: \n'+e.toString())),
+        );
+      }
+      try { LoggingService.instance.e('Kamerawechsel-Fehler: $e\n$stack'); } catch (_) {}
+    }
+    if (mounted) setState(() => _changingCameraLens = false);
   }
 
   void _processCameraImage(CameraImage image) {
@@ -671,40 +776,60 @@ class _CameraViewState extends State<CameraView> {
         padding: const EdgeInsets.all(16.0),
         child: FrostedGlassButton(
           onTap: () async {
-            // Toggle processing (start/stop workout)
-            setState(() {
-              _isProcessingEnabled = !_isProcessingEnabled;
-            });
-            if(!_isProcessingEnabled){
-              _pauseStopwatch();
-              final List<String> summarySentences = getSummaryFeedback();
-              for (final sentence in summarySentences) {
-                tips.add(FeedbackItem(label: sentence));
-              }
-
-              // Finish recording and obtain the file
-              final recordedFile = await stopVideoRecording();
-              final String? videoPath = recordedFile?.path;
-
-              if (!mounted) return;
-
-              // Navigate to results screen with the recorded video
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ResultScreen(
-                    goodFeedback: goodFeedback,
-                    badFeedback: badFeedback,
-                    tips: tips,
-                    videoPath: videoPath, // Could be null if recording failed
-                    score: (score * 100).round(),
+            print('🔄 Capture button tapped');
+            if (_isProcessingEnabled) {
+              // Stop-Logik
+              setState(() {
+                _isProcessingEnabled = false;
+              });
+              try {
+                _pauseStopwatch();
+                final List<String> summarySentences = getSummaryFeedback();
+                for (final sentence in summarySentences) {
+                  tips.add(FeedbackItem(label: sentence));
+                }
+                final recordedFile = await stopVideoRecording();
+                final String? videoPath = recordedFile?.path;
+                if (!mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResultScreen(
+                      goodFeedback: goodFeedback,
+                      badFeedback: badFeedback,
+                      tips: tips,
+                      videoPath: videoPath, // Could be null if recording failed
+                      score: (score * 100).round(),
+                    ),
                   ),
-                ),
-              );
-              _resetStopwatch();
-            } else{
-              _startStopwatch();
-              await startVideoRecording();
+                );
+                _resetStopwatch();
+              } catch (e, stack) {
+                print('Fehler beim Stoppen: $e\n$stack');
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Fehler beim Stoppen: $e')),
+                  );
+                }
+              }
+            } else {
+              setState(() {
+                _isProcessingEnabled = true;
+              });
+              try {
+                _startStopwatch();
+                await startVideoRecording();
+              } catch (e, stack) {
+                print('Fehler beim Starten: $e\n$stack');
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Fehler beim Starten: $e')),
+                  );
+                }
+                setState(() {
+                  _isProcessingEnabled = false;
+                });
+              }
             }
           },
           child: Center(
@@ -752,7 +877,7 @@ class _CameraViewState extends State<CameraView> {
 
       _isRecording = true;
     } catch (e, stack) {
-      _log('Failed to start video recording: $e');
+      LoggingService.instance.e('Failed to start video recording: $e');
       debugPrint('Failed to start video recording: $e\n$stack');
     }
   }
@@ -767,7 +892,7 @@ class _CameraViewState extends State<CameraView> {
         //notifyListeners();
         return file;
       } catch (e, stack) {
-        _log('Failed to stop video recording: $e');
+        LoggingService.instance.e('Failed to stop video recording: $e');
         debugPrint('Failed to stop video recording: $e\n$stack');
       }
     }

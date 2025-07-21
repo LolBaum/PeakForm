@@ -250,11 +250,24 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
+      final Map<String, String> boneFeedback = {
+        'leftUpperArm': 'default',
+        'leftLowerArm': 'default',
+        'rightUpperArm': 'default',
+        'rightLowerArm': 'default',
+        'leftTorso': 'default',
+        'rightTorso': 'default',
+        'leftUpperLeg': 'default',
+        'leftLowerLeg': 'default',
+        'rightUpperLeg': 'default',
+        'rightLowerLeg': 'default',
+      };
       final painter = PosePainter(
         poses,
         inputImage.metadata!.size,
         inputImage.metadata!.rotation,
         _cameraLensDirection,
+        boneFeedback,
       );
       _customPaint = CustomPaint(painter: painter);
       for (Pose pose in poses) {
