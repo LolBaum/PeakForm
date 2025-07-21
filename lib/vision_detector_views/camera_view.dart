@@ -180,7 +180,7 @@ class _CameraViewState extends State<CameraView> {
           child: FloatingActionButton(
             heroTag: Object(),
             onPressed: () => Navigator.of(context).pop(),
-            backgroundColor: Colors.black54,
+            //backgroundColor: Colors.black54,
             child: Icon(
               Icons.arrow_back_ios_outlined,
               size: 20,

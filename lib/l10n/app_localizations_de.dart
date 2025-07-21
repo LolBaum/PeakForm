@@ -1,5 +1,7 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+import '../vision_detector_views/exerciseType.dart';
+import '../vision_detector_views/globals.dart';
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -23,7 +25,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get home_level => 'LVL. 10';
 
   @override
-  String get home_last_recording => 'LETZTE AUFNAHME: TENNIS';
+  String get home_last_recording => 'Letzte Aufnahme: ${exerciseTypeToString(mostRecentExercise)}';
 
   @override
   String get home_record => 'Aufnehmen';

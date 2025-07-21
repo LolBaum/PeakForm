@@ -125,7 +125,7 @@ class GymScreen extends StatelessWidget {
             //  ),
             //),
             Padding(
-              // TODO: Use constants
+              // TODO: Route back to Homescreen
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +137,7 @@ class GymScreen extends StatelessWidget {
                           onPressed: () {
                             LoggingService.instance
                                 .i('User navigated back from gym screen');
-                            Navigator.pop(context);
+                            Navigator.pop(context); //TODO: fehler
                           },
                           icon: const Icon(Icons.arrow_back)),
                       const Icon(Icons.star, color: darkGreen, size: 28),

@@ -135,7 +135,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
         Positioned(
-          bottom: 350,
+          bottom: 150,
           left: 16,
           child: Container(
             padding: EdgeInsets.all(10),
@@ -146,19 +146,18 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                /*Text(
                   "Exercise: ${exerciseTypeToString(widget.exerciseType)}",
-                  style: TextStyle(color: Colors.black, fontSize: 10,decoration: TextDecoration.none, fontFamily: "League Spartan",
+                  style: TextStyle(color: Colors.white, fontSize: 20,decoration: TextDecoration.none, fontFamily: "League Spartan",
                   ),
-                ),
-                // Uncomment if needed
+                ),*/
                 // Text(
                 //   "angle: ${lar.debug_angle}",
                 //   style: TextStyle(color: Colors.white, fontSize: 20),
                 // ),
                 Text(
                   "Reps: ${lar.debug_counter}",
-                  style: TextStyle(color: Colors.black, fontSize: 10,decoration: TextDecoration.none, fontFamily: "League Spartan"),
+                  style: TextStyle(color: Colors.white, fontSize: 20,decoration: TextDecoration.none, fontFamily: "League Spartan"),
                 ),
               ],
             ),

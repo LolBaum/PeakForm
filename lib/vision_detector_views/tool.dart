@@ -445,6 +445,7 @@ class General_MovementReference {
     if(bent_count > 5){
       update_Buffer_feedback(name, name + " not straight");
       badFeedback.add(FeedbackItem(label: "$name nicht gerade", timestamp: getFormattedStopwatchTimestamp()));
+      errorCounters["nicht_gerade"] = (errorCounters["nicht_gerade"] ?? 0) + 1;
       neg_feedback = true;
       print("not straight");
     }

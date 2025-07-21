@@ -12,6 +12,7 @@ Map<String, int> errorCounters = {
   "unten_viel_zu_hoch": 0,
   "unten_sehr_gut": 0,
   "unten_gut": 0,
+  "nicht_gerade": 0,
 };
 
 List<String> getSummaryFeedback() {
@@ -44,6 +45,10 @@ List<String> getSummaryFeedback() {
         summary.add("Deine Lunges sind nicht schlecht!");
         break;
     }
+  }
+
+  if ((errorCounters["nicht_gerade"] ?? 0) >= 5) {
+    summary.add("Deine Arme sind öfters nicht ausgestreckt genug");
   }
 
   if ((errorCounters["oben_zu_niedrig"] ?? 0) >= 3) {

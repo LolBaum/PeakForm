@@ -151,6 +151,7 @@ class HomeScreen extends StatelessWidget {
                     Center(
                       child: Column(
                         children: [
+                          const SizedBox(height: AppGaps.gap6),
                           Text(translation.home_last_recording,
                               style: const TextStyle(
                                   fontSize: AppFontSizes.small,
