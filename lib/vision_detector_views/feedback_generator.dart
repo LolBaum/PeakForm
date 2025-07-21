@@ -32,6 +32,20 @@ List<String> getSummaryFeedback() {
         break;
     }
   }
+  /*
+  if ((errorCounters["oben_sehr_gut"] ?? 0) >= 5) {
+    switch (mostRecentExercise){
+      case ExerciseType.lateralRaises:
+        summary.add("Super Lateral Raises!");
+        break;
+      case ExerciseType.bicepCurls:
+        summary.add("Geile Bicep Curls insgesamt!");
+        break;
+      case ExerciseType.lunges:
+        summary.add("Deine Lunges sind an sich klasse!");
+        break;
+    }
+  }*/
 
   /*if ((errorCounters["oben_gut"] ?? 0) >= 5) {
     switch (mostRecentExercise){
@@ -51,7 +65,7 @@ List<String> getSummaryFeedback() {
     summary.add("Deine Arme sind öfters nicht ausgestreckt genug");
   }
 
-  if ((errorCounters["oben_zu_niedrig"] ?? 0) >= 3) {
+  if ((errorCounters["oben_zu_niedrig"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
         summary.add("Arme nicht weit genug hochgestreckt");
@@ -64,7 +78,7 @@ List<String> getSummaryFeedback() {
         break;
     }
   }
-  if ((errorCounters["oben_zu_hoch"] ?? 0) >= 3) {
+  if ((errorCounters["oben_zu_hoch"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
         summary.add("Du musst deine Arme nicht höher als 90° zu deinem Körper hochziehen");
@@ -106,7 +120,7 @@ List<String> getSummaryFeedback() {
     }
   }
 
-  if ((errorCounters["unten zu hoch"] ?? 0) >= 3) {
+  if ((errorCounters["unten zu hoch"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
         summary.add("Arme beim Runtergehen näher zum Körper ziehen");
@@ -119,7 +133,7 @@ List<String> getSummaryFeedback() {
         break;
     }
   }
-  if ((errorCounters["unten_viel_zu_hoch"] ?? 0) >= 3) {
+  if ((errorCounters["unten_viel_zu_hoch"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
         summary.add("Arme beim Runtergehen deutlich näher an den Körper ziehen");

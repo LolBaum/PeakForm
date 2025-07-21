@@ -442,7 +442,7 @@ class General_MovementReference {
       print("good");
     }
 
-    if(bent_count > 5){
+    if(bent_count > counter_tolerance){
       update_Buffer_feedback(name, name + " nicht gerade");
       badFeedback.add(FeedbackItem(label: "$name nicht gerade", timestamp: getFormattedStopwatchTimestamp()));
       errorCounters["nicht_gerade"] = (errorCounters["nicht_gerade"] ?? 0) + 1;
@@ -461,7 +461,7 @@ class General_MovementReference {
   */
   //tolleranzen einstellbar machen ab wann etwas gut ist oder schlecht oder unzureichend
   //wenn average zwischen links und rechts dann combined Buffer eintrag (also buffer für l und r machen und da denn den durchschnitt der werte rein machen) machen und dann auch feedback auf das eine bekommen
-  void checkRepeating_execution(String name, double max_angle, double min_angle, double score_updown_tolerance, double score_downup_tolerance, int score_weight, List<double> upper_tolerances, List<double> downer_tolerances){
+  void checkRepeating_execution(String name, double max_angle, double min_angle, double score_updown_tolerance, double score_downup_tolerance, int score_weight, List<double> upper_tolerances, List<double> downer_tolerances, bool hyper_movement){
 
     final average_angle_probably = getAverage_from_body_joint_buffer(name);
     if (average_angle_probably == null) {
@@ -548,8 +548,9 @@ class General_MovementReference {
         double esh_upper_diff = max_angle - average_angle;
         //todo: toleranz werte tweaken ?
 
-        if (esh_upper_diff < upper_tolerances[0]) {
+        if (esh_upper_diff < upper_tolerances[0] && hyper_movement) {
           update_Buffer_feedback(name, name + " zu hoch");
+          //bad feedbackadd wenn ne anhal davon kam
           badFeedback.add(FeedbackItem(label: "$name zu hoch", timestamp: getFormattedStopwatchTimestamp()));
           errorCounters["oben_zu_hoch"] = (errorCounters["oben_zu_hoch"] ?? 0) + 1;
           neg_feedback = true;
@@ -582,6 +583,7 @@ class General_MovementReference {
         if (esh_upper_diff < upper_tolerances[3]) {
           update_Buffer_feedback(name, name + " oben noch etwas höher");
           //tips.add(FeedbackItem(label: "$name oben noch etwas höher"));
+          badFeedback.add(FeedbackItem(label: "$name oben noch etwas höher",timestamp: getFormattedStopwatchTimestamp()));
           errorCounters["oben_zu_niedrig"] = (errorCounters["oben_zu_niedrig"] ?? 0) + 1;
 
           neg_feedback = false;
@@ -624,13 +626,13 @@ class General_MovementReference {
         } else
         if (esh_downer_diff < downer_tolerances[2]) {
           update_Buffer_feedback(name, name + " unten weiter runter");
-          tips.add(FeedbackItem(label: "$name unten weiter runter"));
+          badFeedback.add(FeedbackItem(label: "$name unten weiter runter"));
           errorCounters["unten_zu_hoch"] = (errorCounters["unten_zu_hoch"] ?? 0) + 1;
 
         } else
         if (esh_downer_diff < downer_tolerances[3]) {
           update_Buffer_feedback(name, name + " unten viel weiter runter");
-          tips.add(FeedbackItem(label: "$name unten viel weiter runter"));
+          badFeedback.add(FeedbackItem(label: "$name unten viel weiter runter"));
           errorCounters["unten_viel_zu_hoch"] = (errorCounters["unten_viel_zu_hoch"] ?? 0) + 1;
 
           neg_feedback = false;

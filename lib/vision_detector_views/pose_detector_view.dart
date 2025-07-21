@@ -76,6 +76,16 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
   rightFootIndex
    */
 
+  String r_wes_name = '∠ R Ober- und Unterarm ist';
+  String r_esh_name = '∠ R Oberarm und Torso ist';
+  //String r_wsh_name = 'r_wsh';
+  String r_hak_name = '∠ R Ober- und Unterschenkel ist';
+
+  String l_wes_name = '∠ L Ober- und Unterarm ist';
+  String l_esh_name = '∠ L Oberarm und Torso ist';
+  //String l_wsh_name = 'l_wsh';
+  String l_hak_name = '∠ L Ober- und Unterschenkel ist';
+
 
   General_pose_analytics general_analytics = General_pose_analytics();
   late General_MovementReference lar;
@@ -83,11 +93,11 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
 
   Joint_Angle r_wes = Joint_Angle(first: "rightShoulder", second: "rightElbow", third: "rightWrist");
   Joint_Angle r_esh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightElbow");
-  Joint_Angle r_wsh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightWrist");
+  //Joint_Angle r_wsh = Joint_Angle(first: "rightHip", second: "rightShoulder", third: "rightWrist");
 
   Joint_Angle l_wes = Joint_Angle(first: "leftShoulder", second: "leftElbow", third: "leftWrist");
   Joint_Angle l_esh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftElbow");
-  Joint_Angle l_wsh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftWrist");
+  //Joint_Angle l_wsh = Joint_Angle(first: "leftHip", second: "leftShoulder", third: "leftWrist");
 
   Joint_Angle l_hak = Joint_Angle(first: "leftHip", second: "leftKnee", third: "leftAnkle");
   Joint_Angle r_hak = Joint_Angle(first: "rightHip", second: "rightKnee", third: "rightAnkle");
@@ -102,15 +112,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     mostRecentExercise = widget.exerciseType;
     if (widget.exerciseType == ExerciseType.lateralRaises) {
       lar = General_MovementReference(1.0,
-          ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh'],
+          [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
           [false, true, true, false, true, true]); // false ist static
     } else if(widget.exerciseType == ExerciseType.bicepCurls){
       lar = General_MovementReference(1.0,
-          ['r_wes', 'r_esh', 'l_wes', 'l_esh'],
+          [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
           [true, false, true, false]); // false ist static
     } else if(widget.exerciseType == ExerciseType.lunges){
       lar = General_MovementReference(1.0,
-          ['r_hak', 'l_hak'],
+          [r_hak_name, l_hak_name],
           [true, true]); // false ist static
     }
   }
@@ -252,19 +262,20 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         //wenn kein fehler denn kein posenet und kein score
         r_wes.angle = general_analytics.get_angles(pose, r_wes); //wert actuallisieren
         r_esh.angle = general_analytics.get_angles(pose, r_esh);
-        r_wsh.angle = general_analytics.get_angles(pose, r_wsh);
+        //r_wsh.angle = general_analytics.get_angles(pose, r_wsh);
 
         l_wes.angle = general_analytics.get_angles(pose, l_wes);
         l_esh.angle = general_analytics.get_angles(pose, l_esh);
-        l_wsh.angle = general_analytics.get_angles(pose, l_wsh);
+        //l_wsh.angle = general_analytics.get_angles(pose, l_wsh);
 
         r_hak.angle = general_analytics.get_angles(pose, r_hak);
         l_hak.angle = general_analytics.get_angles(pose, l_hak);
 
-        all_angls = r_wes.detected & r_esh.detected & r_wsh.detected & l_wes.detected & l_esh.detected & l_wsh.detected;
+        //all_angls = r_wes.detected & r_esh.detected & r_wsh.detected & l_wes.detected & l_esh.detected & l_wsh.detected;
+        all_angls = r_wes.detected & r_esh.detected & l_wes.detected & l_esh.detected;
         score = lar.debug_score;
 
-        print(camera_view.CameraView.pose_Stopwatch_activation_bool.toString());
+        //print(camera_view.CameraView.pose_Stopwatch_activation_bool.toString());
 
         //bei pausieren wieder t_posen zustand bringen
         if(!camera_view.CameraView.pose_Stopwatch_activation_bool){
@@ -278,7 +289,6 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           //hier fall unterscheidung!!!
 
           if (widget.exerciseType == ExerciseType.lateralRaises) {
-
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_wes.angle, 180, 25);
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, r_esh.angle, 95, 20);
             init_pose.add_values_4_init_pose_starter(!camera_view.CameraView.pose_Stopwatch_activation_bool, l_wes.angle, 180, 25);
@@ -299,15 +309,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             //neu starten der übung wenn man kurz raus war sollte es neu starten
             if (widget.exerciseType == ExerciseType.lateralRaises) {
               lar = General_MovementReference(1.0,
-                  ['r_wes', 'r_esh', 'r_wsh', 'l_wes', 'l_esh', 'l_wsh'],
+                  [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
                   [false, true, true, false, true, true]); // false ist static
             } else if(widget.exerciseType == ExerciseType.bicepCurls){
               lar = General_MovementReference(1.0,
-                  ['r_wes', 'r_esh', 'l_wes', 'l_esh'],
+                  [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
                   [true, false, true, false]); // false ist static
             } else if(widget.exerciseType == ExerciseType.lunges){
               lar = General_MovementReference(1.0,
-                  ['r_hak', 'l_hak'],
+                  [r_hak_name, l_hak_name],
                   [true, true]); // false ist static
             }
           }
@@ -317,29 +327,29 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           //neue werte abspeichern und feedbach abspeichern
 
           if (widget.exerciseType == ExerciseType.lateralRaises) {
-            lar.update_joint_Buffer('r_wes', r_wes.angle);
-            lar.update_joint_Buffer('r_esh', r_esh.angle);
-            lar.update_joint_Buffer('l_wes', l_wes.angle);
-            lar.update_joint_Buffer('l_esh', l_esh.angle);
+            lar.update_joint_Buffer(r_wes_name, r_wes.angle);
+            lar.update_joint_Buffer(r_esh_name, r_esh.angle);
+            lar.update_joint_Buffer(l_wes_name, l_wes.angle);
+            lar.update_joint_Buffer(l_esh_name, l_esh.angle);
 
-            lar.checkStatic_execution('r_wes', 180, 30, 5, 85, 1);
-            lar.checkStatic_execution('l_wes', 180, 30, 5, 85, 1);
+            lar.checkStatic_execution(r_wes_name, 180, 30, 5, 85, 1);
+            lar.checkStatic_execution(l_wes_name, 180, 30, 5, 85, 1);
 
             //mischregister für repeating machen
-            lar.checkRepeating_execution('r_esh', 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25]);
-            lar.checkRepeating_execution('l_esh', 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25]);
+            lar.checkRepeating_execution(r_esh_name, 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25], true);
+            lar.checkRepeating_execution(l_esh_name, 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25], true);
           } else if(widget.exerciseType == ExerciseType.bicepCurls){
             //misst momentan an 2 armen
-            lar.update_joint_Buffer('r_wes', r_wes.angle);
-            lar.update_joint_Buffer('l_wes', l_wes.angle);
-            lar.checkRepeating_execution('r_wes', 170, 50, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30]);
-            lar.checkRepeating_execution('l_wes', 170, 50, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30]);
+            lar.update_joint_Buffer(r_wes_name, r_wes.angle);
+            lar.update_joint_Buffer(l_wes_name, l_wes.angle);
+            lar.checkRepeating_execution(r_wes_name, 170, 50, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30], false);
+            lar.checkRepeating_execution(l_wes_name, 170, 50, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30], false);
           } else if(widget.exerciseType == ExerciseType.lunges){
             //misst momentan an 2 armen
-            lar.update_joint_Buffer('r_hak', r_hak.angle);
-            lar.update_joint_Buffer('l_hak', l_hak.angle);
-            lar.checkRepeating_execution('r_hak', 180, 90, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30]);
-            lar.checkRepeating_execution('l_hak', 90, 180, 20, 20, 10, [-6, 2, 6, 20, 25], [15, 20, 25, 30]);
+            lar.update_joint_Buffer(r_hak_name, r_hak.angle);
+            lar.update_joint_Buffer(l_hak_name, l_hak.angle);
+            lar.checkRepeating_execution(r_hak_name, 180, 105, 20, 20, 10, [-6, 2, 6, 20, 25], [5, 8, 12, 30], false);
+            lar.checkRepeating_execution(l_hak_name, 180, 105, 20, 20, 10, [-6, 2, 6, 20, 25], [5, 8, 12, 30], false);
           }
 
           lar.session_started = true;
