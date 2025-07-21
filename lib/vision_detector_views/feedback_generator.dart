@@ -12,6 +12,7 @@ Map<String, int> errorCounters = {
   "unten_viel_zu_hoch": 0,
   "unten_sehr_gut": 0,
   "unten_gut": 0,
+  "nicht_gerade": 0,
 };
 
 List<String> getSummaryFeedback() {
@@ -21,18 +22,18 @@ List<String> getSummaryFeedback() {
   if ((errorCounters["oben_sehr_gut"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
-        summary.add("Super Lateral Raises!");
+        summary.add("Die Höhe beim Ausstrecken stimmt!");
         break;
       case ExerciseType.bicepCurls:
-        summary.add("Geile Bicep Curls insgesamt!");
+        summary.add("Gut ausgestreckt!");
         break;
       case ExerciseType.lunges:
-        summary.add("Deine Lunges sind an sich klasse!");
+        //summary.add("Deine Lunges sind an sich klasse!");
         break;
     }
   }
 
-  if ((errorCounters["oben_gut"] ?? 0) >= 5) {
+  /*if ((errorCounters["oben_gut"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
         summary.add("Das wird gut mit den Lateral Raises!");
@@ -44,6 +45,10 @@ List<String> getSummaryFeedback() {
         summary.add("Deine Lunges sind nicht schlecht!");
         break;
     }
+  }*/
+
+  if ((errorCounters["nicht_gerade"] ?? 0) >= 5) {
+    summary.add("Deine Arme sind öfters nicht ausgestreckt genug");
   }
 
   if ((errorCounters["oben_zu_niedrig"] ?? 0) >= 3) {
@@ -73,7 +78,7 @@ List<String> getSummaryFeedback() {
     }
   }
 
-  if ((errorCounters["unten_sehr_gut"] ?? 0) >= 5) {
+  if ((errorCounters["unten_sehr_gut"] ?? 0) >= 5 && (errorCounters["oben_sehr_gut"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
         summary.add("Super Lateral Raises!");
@@ -87,7 +92,7 @@ List<String> getSummaryFeedback() {
     }
   }
 
-  if ((errorCounters["unten_gut"] ?? 0) >= 5) {
+  if ((errorCounters["unten_gut"] ?? 0) >= 5 && (errorCounters["oben_gut"] ?? 0) >= 5) {
     switch (mostRecentExercise){
       case ExerciseType.lateralRaises:
         summary.add("Das wird gut mit den Lateral Raises!");
@@ -110,7 +115,7 @@ List<String> getSummaryFeedback() {
         summary.add("Unterarm näher anziehen");
         break;
       case ExerciseType.lunges:
-        summary.add("Weiter Runtergehen");
+        summary.add("Weiter Runtergehen - Knie sollte Richtung Boden gehen");
         break;
     }
   }
