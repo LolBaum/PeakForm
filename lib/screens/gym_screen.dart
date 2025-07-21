@@ -45,7 +45,7 @@ class GymScreen extends StatelessWidget {
   final List<GymExercise> exercises = const [
     GymExercise(
       exerciseType: ExerciseType.lateralRaises,
-      label: 'Dumbbell Lateral Raises',
+      label: 'Lateral Raises',
       videoPath: 'assets/videos/gym/Dumbbell-Lateral-Raises.mov',
       thumbnailPath:
           'assets/images/thumbnail/thumbnail-dumbbell-lateral-raises.jpeg',
@@ -60,9 +60,9 @@ class GymScreen extends StatelessWidget {
       exerciseType: ExerciseType.bicepCurls,
 
       label: 'Bicep Curls',
-      videoPath: 'assets/videos/planks/planks.mov',
-      thumbnailPath: 'assets/images/thumbnail/thumbnail-planks.jpeg',
-      exerciseTags: ['Core', 'Stabilität'],
+      videoPath: 'assets/videos/biceps/biceps-curls.mov',
+      thumbnailPath: 'assets/images/thumbnail/thumbnail-biceps-curls.jpeg',
+      exerciseTags: ['Arme', 'Freihanteln'],
         executionSteps: [
           'Stelle dich schulterbreit hin, die Knie leicht gebeugt.',
           'Halte in jeder Hand eine Kurzhantel mit den Handflächen nach vorne.',
@@ -74,7 +74,7 @@ class GymScreen extends StatelessWidget {
     GymExercise(
       exerciseType: ExerciseType.lunges,
 
-      label: 'Lunges',
+      label: 'Side Lunges',
       videoPath: 'assets/videos/lunges/lunges.mov',
       thumbnailPath: 'assets/images/thumbnail/thumbnail-lunges.jpeg',
       exerciseTags: ['Beine', 'Quadrizeps', 'Hamstrings'],

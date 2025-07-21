@@ -1,7 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-import '../vision_detector_views/exerciseType.dart';
-import '../vision_detector_views/globals.dart';
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -25,7 +23,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get home_level => 'LVL. 10';
 
   @override
-  String get home_last_recording => 'Letzte Aufnahme: ${exerciseTypeToString(mostRecentExercise)}';
+  String get home_last_recording => 'LETZTE AUFNAHME: LATERAL RAISES';
 
   @override
   String get home_record => 'Aufnehmen';
@@ -70,15 +68,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gym_pose_in_gym => 'POSE IM GYM';
 
   @override
-  String get gym_improve_flexibility =>
-      'VERBESSERN SIE FLEXIBILITÄT, STEIGERN\nSIE MOBILITÄT UND FÖRDERN SIE DAS\nWOHLBEFINDEN.';
+  String get gym_improve_flexibility => 'VERBESSERN SIE FLEXIBILITÄT, STEIGERN\nSIE MOBILITÄT UND FÖRDERN SIE DAS\nWOHLBEFINDEN.';
 
   @override
-  String get gym_course_feedback =>
-      'EIN KURS, DER EFFEKTIVES FEEDBACK FÜR\nIHRE KNIEBEUGEN BIETET';
+  String get gym_course_feedback => 'EIN KURS, DER EFFEKTIVES FEEDBACK FÜR\nIHRE KNIEBEUGEN BIETET';
 
   @override
-  String get excercise_lunges_title => 'Lunges';
+  String get excercise_lunges_title => 'Seitliche Lunges';
 
   @override
   String get excercise_lunges_tagOne => 'Core';
@@ -90,28 +86,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get excercise_lunges_tagThree => 'Hamstrings';
 
   @override
-  String get excercise_lunges_executionSteps_One =>
-      'Beginne im Stand, deine Füße sind weiter als schulterbreit auseinander';
+  String get excercise_lunges_executionSteps_One => 'Beginne im Stand, deine Füße sind weiter als schulterbreit auseinander';
 
   @override
-  String get excercise_lunges_executionSteps_Two =>
-      'Deine Beine sind durchgestreckt, dein Oberkörper aufrecht';
+  String get excercise_lunges_executionSteps_Two => 'Deine Beine sind durchgestreckt, dein Oberkörper aufrecht';
 
   @override
-  String get excercise_lunges_executionSteps_Three =>
-      'Deine Hände berühren den Körper nicht';
+  String get excercise_lunges_executionSteps_Three => 'Deine Hände berühren den Körper nicht';
 
   @override
-  String get excercise_lunges_executionSteps_Four =>
-      'Beuge die Knie und komme in einen breiten Ausfallschritt zur Seite, das andere Bein bleibt durchgestreckt';
+  String get excercise_lunges_executionSteps_Four => 'Beuge die Knie und komme in einen breiten Ausfallschritt zur Seite, das andere Bein bleibt durchgestreckt';
 
   @override
-  String get excercise_lunges_executionSteps_Five =>
-      'Senke die Hüfte bis auf Kniehöhe ab';
+  String get excercise_lunges_executionSteps_Five => 'Senke die Hüfte bis auf Kniehöhe ab';
 
   @override
-  String get excercise_lunges_executionSteps_Six =>
-      'Wechsle bei jeder Wiederholung das Bein';
+  String get excercise_lunges_executionSteps_Six => 'Wechsle bei jeder Wiederholung das Bein';
 
   @override
   String get excercise_plank_title => 'Planke halten';
@@ -123,12 +113,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get excercise_plank_tagTwo => 'Becken';
 
   @override
-  String get excercise_plank_executionSteps_One =>
-      'Die Ellbogen sind unter den Schultern';
+  String get excercise_plank_executionSteps_One => 'Die Ellbogen sind unter den Schultern';
 
   @override
-  String get excercise_plank_executionSteps_Two =>
-      'Kopf, Schultern, Hüfte, und Knie bilden eine Linie';
+  String get excercise_plank_executionSteps_Two => 'Kopf, Schultern, Hüfte, und Knie bilden eine Linie';
 
   @override
   String get exercise_screen_execution_subtitle => 'Ausführung';
@@ -146,15 +134,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get excercise_running_tagTwo => 'Oberschenkel';
 
   @override
-  String get excercise_running_executionSteps_One =>
-      'Fließende Bewegungen, regelmäßige Schritte.';
+  String get excercise_running_executionSteps_One => 'Fließende Bewegungen, regelmäßige Schritte.';
 
   @override
-  String get excercise_running_executionSteps_Two =>
-      'Griffe zur Gleichgewichtshilfe nutzen, nicht abstützen.';
+  String get excercise_running_executionSteps_Two => 'Griffe zur Gleichgewichtshilfe nutzen, nicht abstützen.';
 
   @override
-  String get excercise_gym_title => 'Dumbell Lateral Raises-Ausführung';
+  String get excercise_gym_title => 'Lateral Raises-Ausführung';
 
   @override
   String get excercise_gym_tagOne => 'Arme';
@@ -163,20 +149,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get excercise_gym_tagTwo => 'Trizeps';
 
   @override
-  String get excercise_gym_executionSteps_One =>
-      '⁠Beginne im aufrechten Stand mit einer Kurzhantel in jeder Hand, deine Arme hängen seitlich neben dem Körper';
+  String get excercise_gym_executionSteps_One => '⁠Beginne im aufrechten Stand mit einer Kurzhantel in jeder Hand, deine Arme hängen seitlich neben dem Körper';
 
   @override
-  String get excercise_gym_executionSteps_Two =>
-      'Spanne dem Rumpf die ganze Zeit über an';
+  String get excercise_gym_executionSteps_Two => 'Spanne dem Rumpf die ganze Zeit über an';
 
   @override
-  String get excercise_gym_executionSteps_Three =>
-      'Deine Arme bleiben ausgestreckt.';
+  String get excercise_gym_executionSteps_Three => 'Deine Arme bleiben ausgestreckt.';
 
   @override
-  String get excercise_gym_executionSteps_Four =>
-      'Hebe die Arme seitlich auf Schulterhöhe';
+  String get excercise_gym_executionSteps_Four => 'Hebe die Arme seitlich auf Schulterhöhe';
 
   @override
   String get result_title => 'Ergebnis';
@@ -197,15 +179,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get primary_button_close => 'Beenden';
 
   @override
-  String get tooltip_good_posture =>
-      'Aufrechte, nach vorn gerichtete Körperhaltung';
+  String get tooltip_good_posture => 'Aufrechte, nach vorn gerichtete Körperhaltung';
 
   @override
   String get tooltip_good_breathing => 'Regelmäßige stabile Atmung';
 
   @override
-  String get result_bad_arms =>
-      'Arme zu steif oder überschlagen vor dem Körper';
+  String get result_bad_arms => 'Arme zu steif oder überschlagen vor dem Körper';
 
   @override
   String get result_bad_heel => 'Erstes Aufkommen mit der Ferse [00:20min]';
@@ -250,8 +230,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get video_start => 'START';
 
   @override
-  String get video_course_description =>
-      'TRAUST DU DAVON, MÜHELOSER, SCHNELLER UND VERLETZUNGSFREIER ZU LAUFEN? UNSER INNOVATIVER LAUFKURS MACHT ES MÖGLICH! WIR KOMBINIEREN PROFESSIONELLES COACHING MIT DER MODERNSTEN TECHNOLOGIE, UM DEIN LAUFTRAINING AUF EIN VÖLLIG NEUES NIVEAU ZU HEBEN.';
+  String get video_course_description => 'TRAUST DU DAVON, MÜHELOSER, SCHNELLER UND VERLETZUNGSFREIER ZU LAUFEN? UNSER INNOVATIVER LAUFKURS MACHT ES MÖGLICH! WIR KOMBINIEREN PROFESSIONELLES COACHING MIT DER MODERNSTEN TECHNOLOGIE, UM DEIN LAUFTRAINING AUF EIN VÖLLIG NEUES NIVEAU ZU HEBEN.';
 
   @override
   String get pose_permission_required => 'Kameraberechtigung erforderlich';
@@ -260,8 +239,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pose_permission_dialog_title => 'Kameraberechtigung erforderlich';
 
   @override
-  String get pose_permission_dialog_content =>
-      'Diese App benötigt Zugriff auf die Kamera, um Posen mit MoveNet zu erkennen. Bitte erteilen Sie die Kameraberechtigung in den Einstellungen.';
+  String get pose_permission_dialog_content => 'Diese App benötigt Zugriff auf die Kamera, um Posen mit MoveNet zu erkennen. Bitte erteilen Sie die Kameraberechtigung in den Einstellungen.';
 
   @override
   String get pose_permission_dialog_cancel => 'Abbrechen';
@@ -289,6 +267,5 @@ class AppLocalizationsDe extends AppLocalizations {
   String get camera_permission_required => 'Kameraberechtigung erforderlich';
 
   @override
-  String get camera_permission_required_description =>
-      'Diese App benötigt Zugriff auf die Kamera. Bitte erteile die Berechtigung in den Einstellungen.';
+  String get camera_permission_required_description => 'Diese App benötigt Zugriff auf die Kamera. Bitte erteile die Berechtigung in den Einstellungen.';
 }

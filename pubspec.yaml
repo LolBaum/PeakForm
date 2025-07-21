@@ -50,6 +50,15 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.14.4"
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icons/AppIconPeakForm.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#256F5D"
+  adaptive_icon_foreground: "assets/icons/AppIconPeakForm.png"
 
 l10n:
   arb-dir: lib/l10n
@@ -74,7 +83,11 @@ flutter:
     - .env
     - assets/fonts/
     - assets/images/
+    - assets/icons/AppIconPeakForm.png
     - assets/icons/close.svg
+    - assets/icons/IconConfirm.svg
+    - assets/icons/IconBell.svg
+    - assets/icons/IconRocket.svg
     - assets/models/3.tflite
     - assets/golf.jpg
     - assets/gym.jpg

@@ -1,8 +1,7 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
-import '../vision_detector_views/globals.dart';
-import '../vision_detector_views/exerciseType.dart';
+
 // ignore_for_file: type=lint
 
 /// The translations for English (`en`).
@@ -24,7 +23,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_level => 'LVL. 10';
 
   @override
-  String get home_last_recording => 'Last Recording: ${exerciseTypeToString(mostRecentExercise)}';
+  String get home_last_recording => 'LAST RECORDING: LATERAL RAISES';
 
   @override
   String get home_record => 'Record';
@@ -69,15 +68,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gym_pose_in_gym => 'POSE IN THE GYM';
 
   @override
-  String get gym_improve_flexibility =>
-      'IMPROVE FLEXIBILITY, INCREASE MOBILITY, AND PROMOTE WELL-BEING.';
+  String get gym_improve_flexibility => 'IMPROVE FLEXIBILITY, INCREASE MOBILITY, AND PROMOTE WELL-BEING.';
 
   @override
-  String get gym_course_feedback =>
-      'A COURSE THAT PROVIDES EFFECTIVE FEEDBACK FOR YOUR SQUATS';
+  String get gym_course_feedback => 'A COURSE THAT PROVIDES EFFECTIVE FEEDBACK FOR YOUR SQUATS';
 
   @override
-  String get excercise_lunges_title => 'Lunges';
+  String get excercise_lunges_title => 'Side Lunges';
 
   @override
   String get excercise_lunges_tagOne => 'Core';
@@ -89,28 +86,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get excercise_lunges_tagThree => 'Hamstrings';
 
   @override
-  String get excercise_lunges_executionSteps_One =>
-      'Start in a standing position, with your feet wider than shoulder-width apart.';
+  String get excercise_lunges_executionSteps_One => 'Start in a standing position, with your feet wider than shoulder-width apart.';
 
   @override
-  String get excercise_lunges_executionSteps_Two =>
-      'Keep your legs straight and your upper body upright.';
+  String get excercise_lunges_executionSteps_Two => 'Keep your legs straight and your upper body upright.';
 
   @override
-  String get excercise_lunges_executionSteps_Three =>
-      'Ensure your hands are not touching your body.';
+  String get excercise_lunges_executionSteps_Three => 'Ensure your hands are not touching your body.';
 
   @override
-  String get excercise_lunges_executionSteps_Four =>
-      'Bend your knees and move into a wide side lunge, keeping the other leg straight.';
+  String get excercise_lunges_executionSteps_Four => 'Bend your knees and move into a wide side lunge, keeping the other leg straight.';
 
   @override
-  String get excercise_lunges_executionSteps_Five =>
-      'Lower your hips to knee height.';
+  String get excercise_lunges_executionSteps_Five => 'Lower your hips to knee height.';
 
   @override
-  String get excercise_lunges_executionSteps_Six =>
-      'Change the leg after each repetition';
+  String get excercise_lunges_executionSteps_Six => 'Change the leg after each repetition';
 
   @override
   String get excercise_plank_title => 'Plank Hold';
@@ -122,12 +113,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get excercise_plank_tagTwo => 'Basin';
 
   @override
-  String get excercise_plank_executionSteps_One =>
-      'The elbows are under the shoulders';
+  String get excercise_plank_executionSteps_One => 'The elbows are under the shoulders';
 
   @override
-  String get excercise_plank_executionSteps_Two =>
-      'Head, shoulders, hips and knees form a line';
+  String get excercise_plank_executionSteps_Two => 'Head, shoulders, hips and knees form a line';
 
   @override
   String get exercise_screen_execution_subtitle => 'Execution';
@@ -145,12 +134,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get excercise_running_tagTwo => 'Thighs';
 
   @override
-  String get excercise_running_executionSteps_One =>
-      'Fluid movements, regular strides.';
+  String get excercise_running_executionSteps_One => 'Fluid movements, regular strides.';
 
   @override
-  String get excercise_running_executionSteps_Two =>
-      'Use handles for balance, do not lean heavily.';
+  String get excercise_running_executionSteps_Two => 'Use handles for balance, do not lean heavily.';
 
   @override
   String get excercise_gym_title => 'Dumbbell';
@@ -162,19 +149,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get excercise_gym_tagTwo => 'Triceps';
 
   @override
-  String get excercise_gym_executionSteps_One =>
-      'Start in an upright position with a dumbbell in each hand, your arms hanging at your sides';
+  String get excercise_gym_executionSteps_One => 'Start in an upright position with a dumbbell in each hand, your arms hanging at your sides';
 
   @override
-  String get excercise_gym_executionSteps_Two =>
-      'Keep your core engaged at all times';
+  String get excercise_gym_executionSteps_Two => 'Keep your core engaged at all times';
 
   @override
   String get excercise_gym_executionSteps_Three => 'Your arms remain extended.';
 
   @override
-  String get excercise_gym_executionSteps_Four =>
-      'Raise your arms sideways to shoulder height';
+  String get excercise_gym_executionSteps_Four => 'Raise your arms sideways to shoulder height';
 
   @override
   String get result_title => 'Result';
@@ -201,8 +185,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltip_good_breathing => 'Regular, stable breathing';
 
   @override
-  String get result_bad_arms =>
-      'Arms too stiff or crossed in front of the body';
+  String get result_bad_arms => 'Arms too stiff or crossed in front of the body';
 
   @override
   String get result_bad_heel => 'First contact with the heel [00:20min]';
@@ -247,8 +230,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get video_start => 'START';
 
   @override
-  String get video_course_description =>
-      'DO YOU WANT TO RUN MORE EASILY, FASTER, AND WITH FEWER INJURIES? OUR INNOVATIVE RUNNING COURSE MAKES IT POSSIBLE! WE COMBINE PROFESSIONAL COACHING WITH THE LATEST TECHNOLOGY TO TAKE YOUR RUNNING TRAINING TO A WHOLE NEW LEVEL.';
+  String get video_course_description => 'DO YOU WANT TO RUN MORE EASILY, FASTER, AND WITH FEWER INJURIES? OUR INNOVATIVE RUNNING COURSE MAKES IT POSSIBLE! WE COMBINE PROFESSIONAL COACHING WITH THE LATEST TECHNOLOGY TO TAKE YOUR RUNNING TRAINING TO A WHOLE NEW LEVEL.';
 
   @override
   String get pose_permission_required => 'Camera permission required';
@@ -257,8 +239,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pose_permission_dialog_title => 'Camera Permission Required';
 
   @override
-  String get pose_permission_dialog_content =>
-      'This app needs camera access to detect poses using MoveNet. Please grant camera permission in settings.';
+  String get pose_permission_dialog_content => 'This app needs camera access to detect poses using MoveNet. Please grant camera permission in settings.';
 
   @override
   String get pose_permission_dialog_cancel => 'Cancel';
@@ -286,6 +267,5 @@ class AppLocalizationsEn extends AppLocalizations {
   String get camera_permission_required => 'Camera permission required';
 
   @override
-  String get camera_permission_required_description =>
-      'This app needs camera access to function. Please grant permission in settings.';
+  String get camera_permission_required_description => 'This app needs camera access to function. Please grant permission in settings.';
 }
