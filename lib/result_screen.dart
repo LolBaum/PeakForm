@@ -451,10 +451,12 @@ class _ResultScreenState extends State<ResultScreen> {
 
                     return ListTile(
                       leading: CircleAvatar(
-                        child: Text('${index + 1}'),
-                        backgroundColor: AppColors.primary,
+                        child: Text('${index + 1}',
+                          style: TextStyle(color: Colors.white),),
+                        backgroundColor: AppColors.secondary,
                       ),
-                      title: Text('Score: ${score.toStringAsFixed(2)}'),
+                      title: Text(
+                          'Score: ${score.toStringAsFixed(2)}'),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
