@@ -399,62 +399,62 @@ class _ResultScreenState extends State<ResultScreen> {
     List<Map<String, dynamic>> allScoresWithTimestamps = await PerformanceService.getAllScoresWithTimestamps();
 
     showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Performance History'),
-          content: Container(
-            width: double.maxFinite,
-            height: 300,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Latest Score: ${latestScore?.toStringAsFixed(2) ?? 'None'}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Text('Total Sessions: ${allScoresWithTimestamps.length}'),
-                SizedBox(height: 10),
-                Expanded(
-                  child: allScoresWithTimestamps.isEmpty
-                      ? Center(child: Text('No performance data yet.\n\nStart exercising to see your scores!'))
-                      : ListView.builder(
-                    itemCount: allScoresWithTimestamps.length,
-                    itemBuilder: (context, index) {
-                      final scoreData = allScoresWithTimestamps[index];
-                      final score = scoreData['score'] as double;
-                      final formattedTime = scoreData['formattedTime'] as String;
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Performance History'),
+        content: Container(
+          width: double.maxFinite,
+          height: 300,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Latest Score: ${latestScore?.toStringAsFixed(2) ?? 'None'}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text('Total Sessions: ${allScoresWithTimestamps.length}'),
+              SizedBox(height: 10),
+              Expanded(
+                child: allScoresWithTimestamps.isEmpty
+                    ? Center(child: Text('No performance data yet.\n\nStart exercising to see your scores!'))
+                    : ListView.builder(
+                  itemCount: allScoresWithTimestamps.length,
+                  itemBuilder: (context, index) {
+                    final scoreData = allScoresWithTimestamps[index];
+                    final score = scoreData['score'] as double;
+                    final formattedTime = scoreData['formattedTime'] as String;
 
-                      final duration = scoreData['duration'] as String;
+                    final duration = scoreData['duration'] as String;
 
-                      return ListTile(
-                        leading: CircleAvatar(
-                          child: Text('${index + 1}'),
-                          backgroundColor: Colors.blue,
-                        ),
-                        title: Text('Score: ${score.toStringAsFixed(2)}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('$formattedTime ${index == 0 ? '(Most Recent)' : ''}'),
-                            Text('Duration: $duration',
-                                style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                        isThreeLine: true,
-                      );
-                    },
-                  ),
+                    return ListTile(
+                      leading: CircleAvatar(
+                        child: Text('${index + 1}'),
+                        backgroundColor: Colors.blue,
+                      ),
+                      title: Text('Score: ${score.toStringAsFixed(2)}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('$formattedTime ${index == 0 ? '(Most Recent)' : ''}'),
+                          Text('Duration: $duration',
+                              style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                      isThreeLine: true,
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close'),
-            ),
-          ],
-        ));
-  }
-}
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }}

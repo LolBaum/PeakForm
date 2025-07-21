@@ -157,9 +157,13 @@ class _CameraViewState extends State<CameraView> {
 /*
           _detectionViewModeToggle(),
 */
+/*
           _zoomControl(),
+*/
+/*
           _exposureControl(),
-          _fpsDisplay(),
+*/
+          //_fpsDisplay(),
           _stopwatchDisplay(),
           _captureButton(),
         ],
@@ -180,7 +184,7 @@ class _CameraViewState extends State<CameraView> {
             child: Icon(
               Icons.arrow_back_ios_outlined,
               size: 20,
-              color: lime,
+              color: Colors.green,
             ),
           ),
         ),
@@ -220,7 +224,7 @@ class _CameraViewState extends State<CameraView> {
                   ? Icons.flip_camera_ios_outlined
                   : Icons.flip_camera_android_outlined,
               size: 25,
-              color: lime
+              color: Colors.green
             ),
           ),
         ),
@@ -275,6 +279,7 @@ class _CameraViewState extends State<CameraView> {
         ),
       );
 
+/*
   Widget _exposureControl() => Positioned(
         top: 45,
         right: 8,
@@ -323,6 +328,7 @@ class _CameraViewState extends State<CameraView> {
           ]),
         ),
       );
+*/
 
   Widget _fpsDisplay() => Positioned(
         top: 40,
@@ -350,7 +356,7 @@ class _CameraViewState extends State<CameraView> {
       camera,
       // Set to ResolutionPreset.high. Do NOT set it to ResolutionPreset.max because for some phones does NOT work.
       ResolutionPreset.high,
-      enableAudio: false,
+      enableAudio: true,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.nv21
           : ImageFormatGroup.bgra8888,
@@ -359,6 +365,8 @@ class _CameraViewState extends State<CameraView> {
       if (!mounted) {
         return;
       }
+      // Expose the controller globally so recording helpers can use it
+      _cameraController = _controller;
       _controller?.getMinZoomLevel().then((value) {
         _currentZoomLevel = value;
         _minAvailableZoom = value;
@@ -501,6 +509,7 @@ class _CameraViewState extends State<CameraView> {
   // Stopwatch methods
   void _startStopwatch() {
     if (!CameraView.isStopwatchRunning) {
+      CameraView.stopwatch.reset();
       CameraView.stopwatch.start();
       CameraView.isStopwatchRunning = true;
       CameraView.stopwatchTimer = Timer.periodic(Duration(milliseconds: 10), (timer) {
@@ -597,7 +606,7 @@ class _CameraViewState extends State<CameraView> {
                 color: Colors.white,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'monospace',
+                fontFamily: 'League Spartan',
               ),
             ),
           ),
@@ -661,7 +670,8 @@ class _CameraViewState extends State<CameraView> {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FrostedGlassButton(
-          onTap: () {
+          onTap: () async {
+            // Toggle processing (start/stop workout)
             setState(() {
               _isProcessingEnabled = !_isProcessingEnabled;
             });
@@ -674,6 +684,13 @@ class _CameraViewState extends State<CameraView> {
                 tips.add(FeedbackItem(label: sentence));
               }
 
+              // Finish recording and obtain the file
+              final recordedFile = await stopVideoRecording();
+              final String? videoPath = recordedFile?.path;
+
+              if (!mounted) return;
+
+              // Navigate to results screen with the recorded video
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -681,7 +698,7 @@ class _CameraViewState extends State<CameraView> {
                     goodFeedback: goodFeedback,
                     badFeedback: badFeedback,
                     tips: tips,
-                    videoPath: "video", // oder null
+                    videoPath: videoPath, // Could be null if recording failed
                     score: (score * 100).round(),
                   ),
                 ),
@@ -689,6 +706,7 @@ class _CameraViewState extends State<CameraView> {
               _resetStopwatch();
             } else{
               _startStopwatch();
+              await startVideoRecording();
             }
           },
           child: Center(
@@ -717,15 +735,27 @@ class _CameraViewState extends State<CameraView> {
 
   // Start video recording
   Future<void> startVideoRecording() async {
-    if (_cameraController != null && !_isRecording) {
-      try {
-        await _cameraController!.startVideoRecording();
-        _isRecording = true;
-        //notifyListeners();
-      } catch (e, stack) {
-        _log('Failed to start video recording: $e');
-        debugPrint('Failed to start video recording: $e\n$stack');
+    if (_cameraController == null || _isRecording) return;
+
+    try {
+      // 1. Stop any existing image stream (required by the camera plugin).
+      if (_cameraController!.value.isStreamingImages) {
+        await _cameraController!.stopImageStream();
       }
+
+      // 2. Start recording **and** request frames via the callback so pose
+      //    detection can continue while the video is being captured.
+      await _cameraController!.startVideoRecording(
+        onAvailable: (cameraImage) {
+          // Re-use the same processing pipeline that live mode uses.
+          _processCameraImage(cameraImage);
+        },
+      );
+
+      _isRecording = true;
+    } catch (e, stack) {
+      _log('Failed to start video recording: $e');
+      debugPrint('Failed to start video recording: $e\n$stack');
     }
   }
 

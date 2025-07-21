@@ -40,26 +40,29 @@ class PoseFeedbackTooltip extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 159,
-          height: 44,
+          /*width: 159,
+          height: 44,*/
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: ShapeDecoration(
             color: AppColors.backgroundSecondary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
           ),
-        ),
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: color,
-            fontSize: AppFontSizes.title,
-            fontFamily: 'League Spartan',
-            fontWeight: AppFontWeights.semiBold,
-            height: 0.78,
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: color,
+              fontSize: AppFontSizes.title,
+              fontFamily: 'League Spartan',
+              fontWeight: AppFontWeights.semiBold,
+              decoration: TextDecoration.none,
+              height: 0,
+            ),
           ),
         ),
+
       ],
     );
   }

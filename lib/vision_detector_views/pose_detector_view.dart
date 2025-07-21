@@ -7,6 +7,7 @@ import 'package:google_ml_kit_example/vision_detector_views/tool.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:circular_buffer/circular_buffer.dart';
 
+import '../widgets/pose_feedback_tooltip.dart';
 import 'detector_view.dart';
 import 'exercises/lateral_raise.dart';
 import 'movement_reference.dart';
@@ -134,20 +135,20 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
         Positioned(
-          top: 40,
-          right: 20,
+          bottom: 350,
+          left: 16,
           child: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
-              borderRadius: BorderRadius.circular(10),
+              //color: Colors.black.withOpacity(0.6),
+              //borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Exercise: ${exerciseTypeToString(widget.exerciseType)}",
-                  style: TextStyle(color: Colors.white, fontSize: 10,decoration: TextDecoration.none,
+                  style: TextStyle(color: Colors.black, fontSize: 10,decoration: TextDecoration.none, fontFamily: "League Spartan",
                   ),
                 ),
                 // Uncomment if needed
@@ -157,48 +158,71 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                 // ),
                 Text(
                   "Reps: ${lar.debug_counter}",
-                  style: TextStyle(color: Colors.white, fontSize: 10),
+                  style: TextStyle(color: Colors.black, fontSize: 10,decoration: TextDecoration.none, fontFamily: "League Spartan"),
                 ),
               ],
             ),
           ),
         ),
+        lar.debug_feedback.trim().isNotEmpty == true
+            ? Positioned(
+          right: 16,
+          bottom: 150,
+          child: PoseFeedbackTooltip(
+            title: lar.debug_feedback,
+            color: Colors.green,
+          ),
+        )
+            : SizedBox.shrink(),
+/*
         Center(
           child: Container(
             padding: EdgeInsets.all(8),
             //color: Colors.black.withOpacity(0.5),
-            color: Color.fromARGB(128, 0, 0, 0),
+            //color: Color.fromARGB(128, 0, 0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                /*
+                */
+/*
                 Text(
                   lateral_rises.dir==direction.up ? "Beide Arme oben!" : "Arme unten",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),*/
+                ),*//*
 
-               /* Text(
+
+               */
+/* Text(
                   "down?: ${lar.debug_was_it_down}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),*/
-                Text(
+                ),*//*
+
+                */
+/*Text(
                   "Feedback: ${lar.debug_feedback}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+                ),*//*
 
-                /*Text(
+
+
+                */
+/*Text(
                   "dir: ${lar.debug_dir}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),*/
-                /*Text(
+                ),*//*
+
+                */
+/*Text(
                   "score: ${lar.debug_score.toString()}",
                   style: TextStyle(color: Colors.white, fontSize: 20),
-                ),*/
+                ),*//*
+
 
               ],
             ),
           ),
         ),
+*/
       ],
     );
   }
@@ -331,7 +355,7 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           }
           */
 
-          AutoSaveService.updateCurrentScore(10); // Todo: Track current score
+          AutoSaveService.updateCurrentScore(score * 100); // Todo: Track current score
 
         } else {
           //camera detection ist aus und eine session war noch an => abgeschlossen

@@ -10,6 +10,8 @@ import 'package:circular_buffer/circular_buffer.dart';
 import 'camera_view.dart';
 import 'feedback_generator.dart';
 
+import '../widgets/pose_feedback_tooltip.dart';
+
 //3D bereich
 class Vector3 {
   final double x, y, z;
