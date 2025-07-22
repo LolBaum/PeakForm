@@ -85,4 +85,6 @@ flutter:
     - assets/images/thumbnail/thumbnail-dumbbell-lateral-raises.jpeg
     - assets/images/thumbnail/thumbnail-planks.jpeg
     - assets/images/thumbnail/thumbnail-lunges.jpeg
-  generate: true
+    - assets/models/3.tflite
+    - assets/models/
+    generate: true
