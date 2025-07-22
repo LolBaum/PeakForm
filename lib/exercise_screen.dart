@@ -192,7 +192,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                   ),
                   child: Text((widget.exerciseType.name.toLowerCase() == 'laufen' || widget.exerciseType.name.toLowerCase() == 'running') ? 'JETZT FREISCHALTEN' : translation.video_start,
                       style: TextStyle(
-                          color: Colors.black,
+                          color: (widget.exerciseType.name.toLowerCase() == 'laufen' || widget.exerciseType.name.toLowerCase() == 'running') ? Colors.black : Colors.white,
                           fontSize: 15,
                           fontFamily: 'League Spartan',
                           fontWeight: FontWeight.w600,
