@@ -4,6 +4,7 @@ import 'l10n/app_localizations.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'dart:typed_data';
 import 'package:open_file/open_file.dart';
+//import 'package:fitness_app/providers/auth_provider.dart';
 
 class FeedbackItem {
   final String label;
@@ -17,6 +18,7 @@ class ResultScreen extends StatefulWidget {
   final List<FeedbackItem> badFeedback;
   final List<FeedbackItem> tips;
   final String? videoPath;
+  final int score;
 
   const ResultScreen({
     super.key,
@@ -24,6 +26,7 @@ class ResultScreen extends StatefulWidget {
     required this.badFeedback,
     required this.tips,
     this.videoPath,
+    required this.score,
   });
 
   @override
@@ -33,6 +36,7 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   Uint8List? _thumbnailBytes;
   bool _loadingThumbnail = false;
+  bool _loadingVideo = false;
 
   @override
   void initState() {
@@ -79,6 +83,7 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
     final translation = AppLocalizations.of(context)!;
+    //final userName = Provider.of<AuthProvider>(context).userName ?? 'User';
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppBar(
@@ -107,56 +112,74 @@ class _ResultScreenState extends State<ResultScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Material(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(25),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(25),
-                    onTap: widget.videoPath != null
-                        ? _openVideoWithSystemPlayer
-                        : null,
-                    splashColor:
-                        AppColors.primary.withAlpha((255 * 0.2).toInt()),
-                    highlightColor:
-                        AppColors.primary.withAlpha((255 * 0.1).toInt()),
-                    child: Container(
-                      width: double.infinity,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withAlpha((255 * 0.1).toInt()),
-                        borderRadius: BorderRadius.circular(25),
+                const SizedBox(height: 12),
+                Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: widget.videoPath != null && !_loadingVideo
+                          ? () async {
+                              setState(() => _loadingVideo = true);
+                              await _openVideoWithSystemPlayer();
+                              if (mounted) {
+                                setState(() => _loadingVideo = false);
+                              }
+                            }
+                          : null,
+                      child: Container(
+                        width: double.infinity,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color:
+                              AppColors.primary.withAlpha((255 * 0.1).toInt()),
+                        ),
+                        child: widget.videoPath != null
+                            ? (_loadingThumbnail
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : _thumbnailBytes != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            Image.memory(_thumbnailBytes!,
+                                                fit: BoxFit.cover),
+                                            Container(
+                                                color: Colors.black.withAlpha(
+                                                    (255 * 0.2).toInt())),
+                                            const Center(
+                                              child: Icon(
+                                                  Icons.play_circle_fill,
+                                                  color: Colors.white,
+                                                  size: 64),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Icon(Icons.play_circle_fill,
+                                            color: Colors.white, size: 64),
+                                      ))
+                            : const Center(
+                                child: Icon(Icons.directions_run,
+                                    size: 100, color: AppColors.primary),
+                              ),
                       ),
-                      child: widget.videoPath != null
-                          ? (_loadingThumbnail
-                              ? const Center(child: CircularProgressIndicator())
-                              : _thumbnailBytes != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(25),
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          Image.memory(_thumbnailBytes!,
-                                              fit: BoxFit.cover),
-                                          Container(
-                                              color: Colors.black.withAlpha(
-                                                  (255 * 0.2).toInt())),
-                                          const Center(
-                                            child: Icon(Icons.play_circle_fill,
-                                                color: Colors.white, size: 64),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : const Center(
-                                      child: Icon(Icons.play_circle_fill,
-                                          color: Colors.white, size: 64),
-                                    ))
-                          : const Center(
-                              child: Icon(Icons.directions_run,
-                                  size: 100, color: AppColors.primary),
-                            ),
                     ),
-                  ),
+                    if (_loadingVideo)
+                      Positioned.fill(
+                        child: Container(
+                          color:
+                              AppColors.primary.withAlpha((255 * 0.3).toInt()),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(translation.feedback_title,
@@ -174,13 +197,30 @@ class _ResultScreenState extends State<ResultScreen> {
                 const SizedBox(height: 12),
                 _tipsCard(context, widget.tips),
                 const SizedBox(height: 32),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '${widget.score}/10',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SizedBox(
                     width: 400,
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context)
-                          .pushNamedAndRemoveUntil('/', (route) => false),
+                          .pushNamedAndRemoveUntil('/gym', (route) => false),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(

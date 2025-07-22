@@ -76,6 +76,59 @@ class AppLocalizationsEn extends AppLocalizations {
       'A COURSE THAT PROVIDES EFFECTIVE FEEDBACK FOR YOUR SQUATS';
 
   @override
+  String get excercise_lunges_title => 'Lunges';
+
+  @override
+  String get excercise_lunges_tagOne => 'Core';
+
+  @override
+  String get excercise_lunges_tagTwo => 'Quadtriceps';
+
+  @override
+  String get excercise_lunges_tagThree => 'Hamstrings';
+
+  @override
+  String get excercise_lunges_executionSteps_One =>
+      'Start in a standing position, with your feet wider than shoulder-width apart.';
+
+  @override
+  String get excercise_lunges_executionSteps_Two =>
+      'Keep your legs straight and your upper body upright.';
+
+  @override
+  String get excercise_lunges_executionSteps_Three =>
+      'Ensure your hands are not touching your body.';
+
+  @override
+  String get excercise_lunges_executionSteps_Four =>
+      'Bend your knees and move into a wide side lunge, keeping the other leg straight.';
+
+  @override
+  String get excercise_lunges_executionSteps_Five =>
+      'Lower your hips to knee height.';
+
+  @override
+  String get excercise_lunges_executionSteps_Six =>
+      'Change the leg after each repetition';
+
+  @override
+  String get excercise_plank_title => 'Plank Hold';
+
+  @override
+  String get excercise_plank_tagOne => 'Core';
+
+  @override
+  String get excercise_plank_tagTwo => 'Basin';
+
+  @override
+  String get excercise_plank_executionSteps_One =>
+      'The elbows are under the shoulders';
+
+  @override
+  String get excercise_plank_executionSteps_Two =>
+      'Head, shoulders, hips and knees form a line';
+
+  @override
   String get exercise_screen_execution_subtitle => 'Execution';
 
   @override

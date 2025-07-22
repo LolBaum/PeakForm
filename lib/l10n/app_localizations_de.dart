@@ -76,6 +76,59 @@ class AppLocalizationsDe extends AppLocalizations {
       'EIN KURS, DER EFFEKTIVES FEEDBACK FÜR\nIHRE KNIEBEUGEN BIETET';
 
   @override
+  String get excercise_lunges_title => 'Lunges';
+
+  @override
+  String get excercise_lunges_tagOne => 'Core';
+
+  @override
+  String get excercise_lunges_tagTwo => 'Quadrizeps';
+
+  @override
+  String get excercise_lunges_tagThree => 'Hamstrings';
+
+  @override
+  String get excercise_lunges_executionSteps_One =>
+      'Beginne im Stand, deine Füße sind weiter als schulterbreit auseinander';
+
+  @override
+  String get excercise_lunges_executionSteps_Two =>
+      'Deine Beine sind durchgestreckt, dein Oberkörper aufrecht';
+
+  @override
+  String get excercise_lunges_executionSteps_Three =>
+      'Deine Hände berühren den Körper nicht';
+
+  @override
+  String get excercise_lunges_executionSteps_Four =>
+      'Beuge die Knie und komme in einen breiten Ausfallschritt zur Seite, das andere Bein bleibt durchgestreckt';
+
+  @override
+  String get excercise_lunges_executionSteps_Five =>
+      'Senke die Hüfte bis auf Kniehöhe ab';
+
+  @override
+  String get excercise_lunges_executionSteps_Six =>
+      'Wechsle bei jeder Wiederholung das Bein';
+
+  @override
+  String get excercise_plank_title => 'Planke halten';
+
+  @override
+  String get excercise_plank_tagOne => 'Core';
+
+  @override
+  String get excercise_plank_tagTwo => 'Becken';
+
+  @override
+  String get excercise_plank_executionSteps_One =>
+      'Die Ellbogen sind unter den Schultern';
+
+  @override
+  String get excercise_plank_executionSteps_Two =>
+      'Kopf, Schultern, Hüfte, und Knie bilden eine Linie';
+
+  @override
   String get exercise_screen_execution_subtitle => 'Ausführung';
 
   @override
