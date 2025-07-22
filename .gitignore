@@ -11,6 +11,7 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+.env
 
 # IntelliJ related
 *.iml
@@ -26,7 +27,10 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
-.dart_tool/
+**/ios/Runner/Info.plist
+ios/Runner.xcodeproj
+ios/Runner.xcodeproj/project.pbxproj
+.dart_tool
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
@@ -62,3 +66,4 @@ assets/models/4.tflite
 *.iml
 .vscode/settings.json
 .vscode/launch.json
+.cursor

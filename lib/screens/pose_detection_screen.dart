@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../providers/pose_detection_provider.dart';
-import '../widgets/pose_painter.dart';
+import 'package:fitness_app/providers/pose_detection_provider.dart';
+import 'package:fitness_app/frosted_glasst_button.dart';
+import 'dart:async';
+import 'package:fitness_app/widgets/pose_painter.dart';
+import 'package:fitness_app/constants/constants.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
+import 'package:fitness_app/util/logging_service.dart';
 
 class PoseDetectionScreen extends StatefulWidget {
   const PoseDetectionScreen({super.key});
@@ -13,31 +18,49 @@ class PoseDetectionScreen extends StatefulWidget {
   State<PoseDetectionScreen> createState() => _PoseDetectionScreenState();
 }
 
+/// Pose Detection Screen State
+///
+/// This state is responsible for managing the state of the Pose Detection Screen.
+/// It also uses the PoseDetectionProvider to manage the camera and pose detection.
+/// It also uses the PosePainter to draw the poses on the camera preview.
+/// It also uses the FrostedGlassButton to create a frosted glass button.
 class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
   bool _permissionGranted = false;
 
   @override
   void initState() {
     super.initState();
+    LoggingService.instance.i('PoseDetectionScreen initialized');
     if (defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS) {
       _requestPermissions();
     }
   }
 
+  /// Request Permissions
+  ///
+  /// This method is responsible for requesting permissions to use the camera.
   Future<void> _requestPermissions() async {
+    LoggingService.instance.i('Requesting camera permissions');
     final status = await Permission.camera.request();
     if (status.isGranted) {
+      LoggingService.instance.i('Camera permission granted');
       setState(() {
         _permissionGranted = true;
       });
       _initializeCamera();
     } else {
+      LoggingService.instance.i('Camera permission denied: $status');
       _showPermissionDialog();
     }
   }
 
+  /// Show Permission Dialog
+  ///
+  /// This method is responsible for showing a dialog to the user to request permissions.
+  /// It uses the PermissionHandler to request permissions.
   void _showPermissionDialog() {
+    LoggingService.instance.i('Showing permission dialog to user');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -47,11 +70,16 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              LoggingService.instance.i('User cancelled permission request');
+              Navigator.pop(context);
+            },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
+              LoggingService.instance
+                  .i('User opened app settings for permission');
               Navigator.pop(context);
               openAppSettings();
             },
@@ -62,206 +90,64 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
     );
   }
 
+  /// Initialize Camera
+  ///
+  /// This method is responsible for initializing the camera.
+  /// It uses the PoseDetectionProvider to initialize the camera.
   Future<void> _initializeCamera() async {
+    LoggingService.instance.i('Initializing camera through provider');
     final provider = Provider.of<PoseDetectionProvider>(context, listen: false);
     await provider.initializeCamera();
+    LoggingService.instance.i('Camera initialization completed');
   }
 
+  Future<void> _onStartStopDetection(PoseDetectionProvider provider) async {
+    if (!provider.isCameraInitialized) return;
+    if (provider.isDetecting) {
+      provider.stopDetection();
+      final file = await provider.stopVideoRecording();
+      if (!mounted) return;
+      String? videoPath = file?.path;
+      Navigator.pushNamed(
+        context,
+        '/result',
+        arguments: videoPath,
+      );
+    } else {
+      provider.startDetection();
+      await provider.startVideoRecording();
+      if (!mounted) return;
+    }
+  }
+
+  /// Build
+  ///
+  /// This method is responsible for building the Pose Detection Screen.
+  /// It uses the PoseDetectionProvider to manage the camera and pose detection.
   @override
   Widget build(BuildContext context) {
     // Check if platform supports camera
     if (defaultTargetPlatform != TargetPlatform.android &&
         defaultTargetPlatform != TargetPlatform.iOS) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('MoveNet Pose Detection'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        ),
-        body: const Center(
-          child: Padding(
-            padding: EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.phone_android,
-                  size: 80,
-                  color: Colors.grey,
-                ),
-                SizedBox(height: 24),
-                Text(
-                  'Mobile Device Required',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'MoveNet pose detection requires a mobile device with camera access. Please run this app on:',
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  '📱 Android device\n🍎 iOS device',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 24),
-                Text(
-                  'Web browsers do not support camera-based pose detection with TensorFlow Lite.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      return const _PermissionDeniedView();
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MoveNet Pose Detection'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
       body: !_permissionGranted
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.camera_alt, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('Camera permission required'),
-                ],
-              ),
-            )
+          ? const _PermissionDeniedView()
           : Consumer<PoseDetectionProvider>(
               builder: (context, provider, child) {
                 if (!provider.isCameraInitialized) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Initializing MoveNet model...'),
-                      ],
-                    ),
-                  );
+                  return const _LoadingView();
                 }
-
-                return Column(
+                return Stack(
                   children: [
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          // Camera preview - full screen natural view
-                          Positioned.fill(
-                            child: CameraPreview(provider.cameraController!),
-                          ),
-                          // Pose overlay
-                          if (provider.poses.isNotEmpty)
-                            Positioned.fill(
-                              child: CustomPaint(
-                                painter: PosePainter(
-                                  poses: provider.poses,
-                                  imageSize: Size(
-                                    provider.cameraController!.value.previewSize!.height,
-                                    provider.cameraController!.value.previewSize!.width,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          // Status overlay
-                          Positioned(
-                            top: 16,
-                            left: 16,
-                            right: 16,
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.7),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                provider.detectionStatus,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          // Pose count and confidence
-                          if (provider.poses.isNotEmpty)
-                            Positioned(
-                              bottom: 100,
-                              left: 16,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withValues(alpha: 0.8),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Poses: ${provider.poses.length}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    if (provider.poses.isNotEmpty)
-                                      Text(
-                                        'Confidence: ${(provider.poses.first.confidence * 100).toStringAsFixed(1)}%',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    // Control buttons
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(
-                        child: ElevatedButton.icon(
-                          onPressed: provider.isCameraInitialized
-                              ? (provider.isDetecting
-                                  ? provider.stopDetection
-                                  : provider.startDetection)
-                              : null,
-                          icon: Icon(provider.isDetecting ? Icons.stop : Icons.play_arrow),
-                          label: Text(provider.isDetecting ? 'Stop Detection' : 'Start Detection'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: provider.isDetecting ? Colors.red : Colors.green,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            minimumSize: const Size(200, 50),
-                          ),
-                        ),
-                      ),
+                    _CameraPreviewWithOverlays(provider: provider),
+                    if (!provider.isDetecting) _StatusBar(provider: provider),
+                    const _CloseButton(),
+                    _StartStopButton(
+                      provider: provider,
+                      onStartStop: () => _onStartStopDetection(provider),
                     ),
                   ],
                 );
@@ -269,9 +155,321 @@ class _PoseDetectionScreenState extends State<PoseDetectionScreen> {
             ),
     );
   }
+}
+
+//*****COMPONENTS***** //
+/// Camera Preview with Overlays
+///
+/// This widget is responsible for displaying the camera preview with overlays.
+/// It uses the PoseDetectionProvider to manage the camera and pose detection.
+/// It also uses the PosePainter to draw the poses on the camera preview.
+class _CameraPreviewWithOverlays extends StatefulWidget {
+  final PoseDetectionProvider provider;
+  const _CameraPreviewWithOverlays({required this.provider});
+
+  @override
+  State<_CameraPreviewWithOverlays> createState() =>
+      _CameraPreviewWithOverlaysState();
+}
+
+class _CameraPreviewWithOverlaysState
+    extends State<_CameraPreviewWithOverlays> {
+  double _currentZoom = 1.0;
+  double _baseZoom = 1.0;
+  Offset? _focusPoint;
+  Timer? _focusTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    final controller = widget.provider.cameraController!;
+    controller.getMaxZoomLevel().then((maxZoom) {
+      controller.getMinZoomLevel().then((minZoom) {
+        setState(() {
+          _currentZoom = minZoom;
+          _baseZoom = minZoom;
+        });
+      });
+    });
+  }
 
   @override
   void dispose() {
+    _focusTimer?.cancel();
     super.dispose();
   }
-} 
+
+  void _showFocusIndicator(Offset localPosition) {
+    setState(() {
+      _focusPoint = localPosition;
+    });
+    _focusTimer?.cancel();
+    _focusTimer = Timer(const Duration(seconds: 1), () {
+      setState(() {
+        _focusPoint = null;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = widget.provider.cameraController!;
+    return Positioned.fill(
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTapDown: (details) async {
+                final box = context.findRenderObject() as RenderBox;
+                final localPosition = box.globalToLocal(details.globalPosition);
+                final x = localPosition.dx / box.size.width;
+                final y = localPosition.dy / box.size.height;
+                _showFocusIndicator(localPosition);
+                try {
+                  await controller.setFocusPoint(Offset(x, y));
+                  await controller.setFocusMode(FocusMode.auto);
+                } catch (e) {
+                  debugPrint('Focus not supported: $e');
+                }
+              },
+              child: Listener(
+                onPointerSignal: (event) {},
+                onPointerDown: (_) {
+                  _baseZoom = _currentZoom;
+                },
+                child: GestureDetector(
+                  onScaleStart: (details) {
+                    _baseZoom = _currentZoom;
+                  },
+                  onScaleUpdate: (details) async {
+                    if (details.pointerCount == 2) {
+                      final minZoom = await controller.getMinZoomLevel();
+                      final maxZoom = await controller.getMaxZoomLevel();
+                      double newZoom = (_baseZoom * details.scale).clamp(
+                        minZoom,
+                        maxZoom,
+                      );
+                      await controller.setZoomLevel(newZoom);
+                      setState(() => _currentZoom = newZoom);
+                    }
+                  },
+                  child: CameraPreview(controller),
+                ),
+              ),
+            ),
+          ),
+          if (_focusPoint != null)
+            Positioned(
+              left: _focusPoint!.dx - 20,
+              top: _focusPoint!.dy - 20,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.yellow, width: 2),
+                ),
+              ),
+            ),
+          if (widget.provider.poses.isNotEmpty)
+            Positioned.fill(
+              child: CustomPaint(
+                painter: PosePainter(
+                  poses: widget.provider.poses,
+                  imageSize: Size(
+                    controller.value.previewSize!.height,
+                    controller.value.previewSize!.width,
+                  ),
+                ),
+              ),
+            ),
+          if (widget.provider.poses.isNotEmpty)
+            _PoseCountOverlay(provider: widget.provider),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusBar extends StatelessWidget {
+  final PoseDetectionProvider provider;
+  const _StatusBar({required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: FrostedGlassButton(
+            onTap: () {},
+            child: Text(
+              provider.detectionStatus,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: FrostedGlassButton(
+            onTap: () => Navigator.of(context).pop(),
+            child: const Icon(Icons.close, color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StartStopButton extends StatelessWidget {
+  final PoseDetectionProvider provider;
+  final VoidCallback onStartStop;
+  const _StartStopButton({required this.provider, required this.onStartStop});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 32,
+      child: SafeArea(
+        top: false,
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FrostedGlassButton(
+                onTap: onStartStop,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 12.0,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        provider.isDetecting ? Icons.stop : Icons.play_arrow,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        provider.isDetecting
+                            ? 'Stop Detection'
+                            : 'Start Detection',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (kDebugMode) ...[
+                const SizedBox(width: 16),
+                FrostedGlassButton(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/result');
+                  },
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.bug_report, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text('Debug',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 16)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PoseCountOverlay extends StatelessWidget {
+  final PoseDetectionProvider provider;
+  const _PoseCountOverlay({required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    final translation = AppLocalizations.of(context)!;
+    return Positioned(
+      bottom: 100,
+      left: 16,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.secondary.withAlpha((255 * 0.8).toInt()),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              translation.pose_count(provider.poses.length),
+              style: const TextStyle(
+                color: AppColors.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (provider.poses.isNotEmpty)
+              Text(
+                translation.pose_confidence(
+                    (provider.poses.first.confidence * 100).toStringAsFixed(1)),
+                style:
+                    const TextStyle(color: AppColors.onPrimary, fontSize: 12),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PermissionDeniedView extends StatelessWidget {
+  const _PermissionDeniedView();
+
+  @override
+  Widget build(BuildContext context) {
+    final translation = AppLocalizations.of(context)!;
+    return Center(child: Text(translation.pose_permission_required));
+  }
+}
+
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: CircularProgressIndicator());
+  }
+}

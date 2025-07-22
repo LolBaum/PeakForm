@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
+import 'package:fitness_app/util/logging_service.dart';
 
 // MoveNet keypoint indices according to TensorFlow documentation
 // https://www.tensorflow.org/hub/tutorials/movenet
@@ -52,6 +53,9 @@ class PoseDetectionProvider extends ChangeNotifier {
   bool _isModelLoaded = false;
   String _detectionStatus = 'Initializing...';
   bool _isProcessing = false;
+  XFile? _recordedVideoFile;
+  bool _isRecording = false;
+  bool _hasDetectionBeenStarted = false;
 
   // TensorFlow Lite
   Interpreter? _interpreter;
@@ -67,6 +71,15 @@ class PoseDetectionProvider extends ChangeNotifier {
   static const double confidenceThreshold =
       0.01; // Very low threshold to see all detections
 
+  // Safe logger access that won't crash if global logger isn't initialized
+  void _log(String message) {
+    try {
+      LoggingService.instance.i(message);
+    } catch (e) {
+      debugPrint('PoseDetectionProvider: $message');
+    }
+  }
+
   // Getters
   CameraController? get cameraController => _cameraController;
   List<Pose> get poses => _poses;
@@ -75,21 +88,39 @@ class PoseDetectionProvider extends ChangeNotifier {
   bool get isModelLoaded => _isModelLoaded;
   String get detectionStatus => _detectionStatus;
   bool get isPlatformSupported => !kIsWeb;
+  bool get hasDetectionBeenStarted => _hasDetectionBeenStarted;
+
+  // Video recording getters
+  XFile? get recordedVideoFile => _recordedVideoFile;
+  bool get isRecording => _isRecording;
 
   // Initialize camera and load MoveNet model
   Future<void> initializeCamera() async {
+    _log('Initializing camera and pose detection system');
+    _hasDetectionBeenStarted = false;
     try {
       if (!isPlatformSupported) {
+        _log('Camera not supported on web platform');
         _detectionStatus = 'Camera not supported on web platform';
         notifyListeners();
         return;
       }
 
-      // Load MoveNet model first
-      await _loadModel();
+      // Try to load MoveNet model, but continue if it fails
+      bool modelLoaded = false;
+      try {
+        await _loadModel();
+        modelLoaded = true;
+        _log('MoveNet model loaded successfully');
+      } catch (e) {
+        _log('Model loading failed: $e - continuing with camera only');
+        _detectionStatus = '⚠️ Model loading failed: $e\nCamera preview only.';
+        debugPrint('❌ Model loading error (camera will still open): $e');
+      }
 
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
+        _log('No cameras available on device');
         _detectionStatus = 'No cameras available';
         notifyListeners();
         return;
@@ -101,6 +132,7 @@ class PoseDetectionProvider extends ChangeNotifier {
         orElse: () => cameras.first,
       );
 
+      _log('Using camera: ${frontCamera.name} (${frontCamera.lensDirection})');
       debugPrint('📷 Using camera: ${frontCamera.name}');
 
       _cameraController = CameraController(
@@ -112,11 +144,19 @@ class PoseDetectionProvider extends ChangeNotifier {
       await _cameraController!.initialize();
       _isCameraInitialized = true;
 
-      _detectionStatus = 'MoveNet SinglePose Lightning model loaded and ready!';
+      if (modelLoaded && kDebugMode) {
+        _detectionStatus =
+            'MoveNet SinglePose Lightning model loaded and ready!';
+        _log('Camera and model initialization completed successfully');
+      } else {
+        _detectionStatus = 'Camera ready. Pose detection unavailable.';
+        _log('Camera initialization completed (model unavailable)');
+      }
 
-      debugPrint('✅ Camera and MoveNet SinglePose Lightning model initialized');
+      debugPrint('✅ Camera initialized (model loaded: $modelLoaded)');
       notifyListeners();
     } catch (e) {
+      _log('Camera/model initialization failed: $e');
       _detectionStatus = 'Initialization failed: $e';
       debugPrint('❌ Camera/Model init error: $e');
       notifyListeners();
@@ -170,9 +210,11 @@ class PoseDetectionProvider extends ChangeNotifier {
 
   // Start detection
   void startDetection() {
+    _log('Starting MoveNet pose detection');
     debugPrint('🚀 Starting MoveNet pose detection...');
 
     if (!isPlatformSupported) {
+      _log('Pose detection not supported on web platform');
       _detectionStatus =
           'Pose detection not supported on web. Use Android/iOS device.';
       notifyListeners();
@@ -180,12 +222,17 @@ class PoseDetectionProvider extends ChangeNotifier {
     }
 
     if (_cameraController == null || !_isCameraInitialized || !_isModelLoaded) {
+      _log('Cannot start detection - camera or model not ready');
       _detectionStatus = 'Camera or model not ready';
+      _isDetecting = false;
+      _hasDetectionBeenStarted = false;
       notifyListeners();
       return;
     }
 
     _isDetecting = true;
+    _hasDetectionBeenStarted = true;
+    notifyListeners();
     _startTime = DateTime.now();
     _frameCount = 0;
     _detectionStatus =
@@ -194,17 +241,20 @@ class PoseDetectionProvider extends ChangeNotifier {
     // Start camera stream processing
     _cameraController!.startImageStream(_processCameraImage);
 
+    _log('Pose detection started successfully');
     notifyListeners();
   }
 
   // Stop detection
   void stopDetection() {
     _isDetecting = false;
+    notifyListeners();
+    _log('Stopping MoveNet pose detection');
     _cameraController?.stopImageStream();
     _detectionStatus = 'Detection stopped';
     _poses = []; // Clear poses when stopping
     debugPrint('🛑 MoveNet pose detection stopped');
-    notifyListeners();
+    _log('Pose detection stopped successfully');
   }
 
   // Process camera image with MoveNet SinglePose Lightning inference
@@ -282,8 +332,8 @@ class PoseDetectionProvider extends ChangeNotifier {
         final hasDetection = poses.isNotEmpty;
         final totalKeypoints = poses.isNotEmpty
             ? poses.first.landmarks
-                  .where((l) => l.confidence > confidenceThreshold)
-                  .length
+                .where((l) => l.confidence > confidenceThreshold)
+                .length
             : 0;
         _detectionStatus =
             'SinglePose Lightning: ${fps.toStringAsFixed(1)} FPS | ${hasDetection ? "Person detected" : "No person"}, $totalKeypoints keypoints';
@@ -372,12 +422,11 @@ class PoseDetectionProvider extends ChangeNotifier {
     }
 
     // Calculate overall pose confidence (average of visible keypoints)
-    final visibleLandmarks = landmarks
-        .where((l) => l.confidence > confidenceThreshold)
-        .toList();
+    final visibleLandmarks =
+        landmarks.where((l) => l.confidence > confidenceThreshold).toList();
     final poseConfidence = visibleLandmarks.isNotEmpty
         ? visibleLandmarks.map((l) => l.confidence).reduce((a, b) => a + b) /
-              visibleLandmarks.length
+            visibleLandmarks.length
         : 0.0;
 
     // Debug: Show detection details every 50 frames
@@ -427,6 +476,37 @@ class PoseDetectionProvider extends ChangeNotifier {
     final angle = math.acos(cosAngle.clamp(-1.0, 1.0));
 
     return angle * 180 / math.pi;
+  }
+
+  // Start video recording
+  Future<void> startVideoRecording() async {
+    if (_cameraController != null && !_isRecording) {
+      try {
+        await _cameraController!.startVideoRecording();
+        _isRecording = true;
+        notifyListeners();
+      } catch (e, stack) {
+        _log('Failed to start video recording: $e');
+        debugPrint('Failed to start video recording: $e\n$stack');
+      }
+    }
+  }
+
+  // Stop video recording
+  Future<XFile?> stopVideoRecording() async {
+    if (_cameraController != null && _isRecording) {
+      try {
+        final file = await _cameraController!.stopVideoRecording();
+        _isRecording = false;
+        _recordedVideoFile = file;
+        notifyListeners();
+        return file;
+      } catch (e, stack) {
+        _log('Failed to stop video recording: $e');
+        debugPrint('Failed to stop video recording: $e\n$stack');
+      }
+    }
+    return null;
   }
 
   @override
