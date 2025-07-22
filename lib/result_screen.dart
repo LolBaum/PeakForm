@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'package:open_file/open_file.dart';
 import 'vision_detector_views/feedback_generator.dart';
 
+import 'vision_detector_views/pose_detector_view.dart';
 class FeedbackItem {
   final String label;
   final String? timestamp;
@@ -46,7 +47,10 @@ class _ResultScreenState extends State<ResultScreen> {
   void initState() {
     super.initState();
     _generateThumbnail();
-    errorCounters.updateAll((key, value) => 0);
+    errorCounters_unten.updateAll((key, value) => 0);
+    errorCounters_oben.updateAll((key, value) => 0);
+    errorCounters_static.updateAll((key, value) => 0);
+
   }
 
   Future<void> _generateThumbnail() async {
@@ -271,8 +275,12 @@ class _ResultScreenState extends State<ResultScreen> {
                   child: SizedBox(
                     width: 400,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(context)
-                          .pushNamedAndRemoveUntil('/gym', (route) => false),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                        goodFeedback = [];
+                        badFeedback = [];
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(

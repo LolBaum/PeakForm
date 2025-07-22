@@ -25,11 +25,11 @@ import 'feedback_generator.dart';
 
 
 double score = 0.0;
-final List<FeedbackItem> goodFeedback = [];
+List<FeedbackItem> goodFeedback = [];
 
-final List<FeedbackItem> badFeedback = [];
+List<FeedbackItem> badFeedback = [];
 
-final List<FeedbackItem> tips = [];
+List<FeedbackItem> tips = [];
 
 class PoseDetectorView extends StatefulWidget {
   final ExerciseType exerciseType;
@@ -111,15 +111,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
     super.initState();
     mostRecentExercise = widget.exerciseType;
     if (widget.exerciseType == ExerciseType.lateralRaises) {
-      lar = General_MovementReference(1.0,
+      lar = General_MovementReference(1.0, widget.exerciseType,
           [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
           [false, true, true, false, true, true]); // false ist static
     } else if(widget.exerciseType == ExerciseType.bicepCurls){
-      lar = General_MovementReference(1.0,
+      lar = General_MovementReference(1.0, widget.exerciseType,
           [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
           [true, false, true, false]); // false ist static
     } else if(widget.exerciseType == ExerciseType.lunges){
-      lar = General_MovementReference(1.0,
+      lar = General_MovementReference(1.0, widget.exerciseType,
           [r_hak_name, l_hak_name],
           [true, true]); // false ist static
     }
@@ -165,10 +165,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
                 //   "angle: ${lar.debug_angle}",
                 //   style: TextStyle(color: Colors.white, fontSize: 20),
                 // ),
-                Text(
-                  "Reps: ${lar.debug_counter}",
-                  style: TextStyle(color: Colors.white, fontSize: 20,decoration: TextDecoration.none, fontFamily: "League Spartan"),
-                ),
+                Positioned(right: 16, bottom: 100, child: PoseFeedbackTooltip(title: "Reps: ${lar.debug_counter}", color: Colors.white))
+
               ],
             ),
           ),
@@ -176,10 +174,10 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
         lar.debug_feedback.trim().isNotEmpty == true
             ? Positioned(
           right: 16,
-          bottom: 150,
+          top: 157,
           child: PoseFeedbackTooltip(
             title: lar.debug_feedback,
-            color: Colors.green,
+            color: lar.neg_feedback ? Colors.red : Colors.green,
           ),
         )
             : SizedBox.shrink(),
@@ -308,15 +306,15 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
           if(init_pose.triggered){
             //neu starten der übung wenn man kurz raus war sollte es neu starten
             if (widget.exerciseType == ExerciseType.lateralRaises) {
-              lar = General_MovementReference(1.0,
+              lar = General_MovementReference(1.0, widget.exerciseType,
                   [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
                   [false, true, true, false, true, true]); // false ist static
             } else if(widget.exerciseType == ExerciseType.bicepCurls){
-              lar = General_MovementReference(1.0,
+              lar = General_MovementReference(1.0, widget.exerciseType,
                   [r_wes_name, r_esh_name, l_wes_name, l_esh_name],
                   [true, false, true, false]); // false ist static
             } else if(widget.exerciseType == ExerciseType.lunges){
-              lar = General_MovementReference(1.0,
+              lar = General_MovementReference(1.0, widget.exerciseType,
                   [r_hak_name, l_hak_name],
                   [true, true]); // false ist static
             }
@@ -332,8 +330,8 @@ class _PoseDetectorViewState extends State<PoseDetectorView> {
             lar.update_joint_Buffer(l_wes_name, l_wes.angle);
             lar.update_joint_Buffer(l_esh_name, l_esh.angle);
 
-            lar.checkStatic_execution(r_wes_name, 180, 30, 5, 85, 1);
-            lar.checkStatic_execution(l_wes_name, 180, 30, 5, 85, 1);
+            lar.checkStatic_execution(r_wes_name, 180, 30, 7, 85, 1);
+            lar.checkStatic_execution(l_wes_name, 180, 30, 7, 85, 1);
 
             //mischregister für repeating machen
             lar.checkRepeating_execution(r_esh_name, 85, 20, 20, 25, 10, [-6, 2, 6, 15, 17], [10, 15, 20, 25], true);

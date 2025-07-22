@@ -98,8 +98,10 @@ flutter:
     - assets/videos/planks/planks.mov
     - assets/videos/lunges/lunges.mov
     - assets/videos/running/running.mov
+    - assets/videos/biceps/biceps-curls.mov
     - assets/images/thumbnail/thumbnail-running.jpeg
     - assets/images/thumbnail/thumbnail-dumbbell-lateral-raises.jpeg
     - assets/images/thumbnail/thumbnail-planks.jpeg
     - assets/images/thumbnail/thumbnail-lunges.jpeg
+    - assets/images/thumbnail/thumbnail-biceps-curls.jpeg
   generate: true

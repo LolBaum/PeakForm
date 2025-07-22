@@ -1,6 +1,7 @@
 //import 'dart:ffi';
 import 'dart:math';
 import 'package:google_ml_kit_example/result_screen.dart';
+import 'package:google_ml_kit_example/vision_detector_views/exerciseType.dart';
 import 'package:google_ml_kit_example/vision_detector_views/pose_detector_view.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
@@ -257,6 +258,7 @@ class General_MovementReference {
   bool session_started = false;
   SlidingAverage score = SlidingAverage(1000);
   bool neg_feedback = false;
+  late ExerciseType exercise_type;
 
   DateTime? _lastActionTime;
   final Duration _cooldown = Duration(milliseconds: 125); //vorher 250
@@ -284,14 +286,14 @@ class General_MovementReference {
   final Map<String, direction> body_joint_movement_dir = {};
   final Map<String, bool> body_joint_was_it_down = {};
 
-  General_MovementReference(this.minTime, List<String> items, List<bool> movement){
+  General_MovementReference(this.minTime, this.exercise_type, List<String> items, List<bool> movement){
     int i = 0;
     for (String name in items){
       if (body_joint_buffers.containsKey(name) && body_joint_feedbacks.containsKey(name) && body_joint_counter.containsKey(name)) {
         print("Buffer '$name' existiert bereits!");
         return;
       }
-      body_joint_buffers[name] = CircularBuffer<double>(7);
+      body_joint_buffers[name] = CircularBuffer<double>(12);
       body_joint_feedbacks[name] = " ";
       body_joint_counter[name] = 1; // wenn init gleich t_pose ist
       if (movement[i]) {
@@ -438,15 +440,20 @@ class General_MovementReference {
     } else{
       update_Buffer_counter(name, 0);
       update_Buffer_feedback(name, name + " good");
-      neg_feedback = false;
+      //neg_feedback = false;
       print("good");
     }
 
     if(bent_count > counter_tolerance){
       update_Buffer_feedback(name, name + " nicht gerade");
-      badFeedback.add(FeedbackItem(label: "$name nicht gerade", timestamp: getFormattedStopwatchTimestamp()));
-      errorCounters["nicht_gerade"] = (errorCounters["nicht_gerade"] ?? 0) + 1;
-      neg_feedback = true;
+      /*
+      if (exercise_type == ExerciseType.lateralRaises){
+        badFeedback.add(FeedbackItem(label: "Dein Arm ist nicht gestreckt", timestamp: getFormattedStopwatchTimestamp()));
+        errorCounters_static["nicht_gerade"] = (errorCounters_static["nicht_gerade"] ?? 0) + 1;
+        neg_feedback = true;
+        debug_feedback = badFeedback.last.label;
+      }
+      */
       print("not straight");
     }
   }
@@ -549,21 +556,59 @@ class General_MovementReference {
         //todo: toleranz werte tweaken ?
 
         if (esh_upper_diff < upper_tolerances[0] && hyper_movement) {
-          update_Buffer_feedback(name, name + " zu hoch");
+          //update_Buffer_feedback(name, name + " oben zu hoch");
           //bad feedbackadd wenn ne anhal davon kam
-          badFeedback.add(FeedbackItem(label: "$name zu hoch", timestamp: getFormattedStopwatchTimestamp()));
-          errorCounters["oben_zu_hoch"] = (errorCounters["oben_zu_hoch"] ?? 0) + 1;
+          //badFeedback.add(FeedbackItem(label: "$name oben zu hoch", timestamp: getFormattedStopwatchTimestamp()));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n ging zu weit nach oben", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der linke Arm \n wurde zu nah rangezogen", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das linke Bein \n ist überstreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n ging zu weit nach oben", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der rechte Arm \n wurde zu nah rangezogen", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist überstreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          update_Buffer_feedback(name, badFeedback.last.label);
+          debug_feedback = badFeedback.last.label;
+          errorCounters_oben["oben_zu_hoch"] = (errorCounters_oben["oben_zu_hoch"] ?? 0) + 1;
           neg_feedback = true;
           score.add(0.8,2); //strafpunkt für die gesundheit
           if (was_it_down){
             update_joint_Buffer_was_it_down(name, false);
             update_Buffer_counter(name, counter+1);
           }
-        } else
-        if (esh_upper_diff < upper_tolerances[1]) {
-          update_Buffer_feedback(name, name + " oben super");
-          goodFeedback.add(FeedbackItem(label: "$name oben super",timestamp: getFormattedStopwatchTimestamp()));
-          errorCounters["oben_sehr_gut"] = (errorCounters["oben_sehr_gut"] ?? 0) + 1;
+        } else if (esh_upper_diff < upper_tolerances[1]) {
+          //update_Buffer_feedback(name, name + " oben super");
+          //goodFeedback.add(FeedbackItem(label: "$name oben super",timestamp: getFormattedStopwatchTimestamp()));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n ging genau richtig hoch", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der linke Arm \n hat den perfekten Winkel oben", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das linke Bein \n ist perfekt gestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n ging genau richtig hoch", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der linke Arm \n hat den perfekten Winkel oben", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist perfekt gestrecktt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          update_Buffer_feedback(name, goodFeedback.last.label);
+          debug_feedback = goodFeedback.last.label;
+
+          errorCounters_oben["oben_sehr_gut"] = (errorCounters_oben["oben_sehr_gut"] ?? 0) + 1;
           neg_feedback = false;
           if (was_it_down){
             update_joint_Buffer_was_it_down(name, false);
@@ -571,28 +616,81 @@ class General_MovementReference {
           }
         } else
         if (esh_upper_diff < upper_tolerances[2]) {
-          update_Buffer_feedback(name, name + " oben gut");
-          goodFeedback.add(FeedbackItem(label: "$name oben gut",timestamp: getFormattedStopwatchTimestamp()));
-          errorCounters["oben_sehr_gut"] = (errorCounters["oben_sehr_gut"] ?? 0) + 1;
+          //update_Buffer_feedback(name, name + " oben gut");
+          //goodFeedback.add(FeedbackItem(label: "$name oben gut",timestamp: getFormattedStopwatchTimestamp()));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n ging korrekt hoch", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der linke Arm \n hat den Winkel oben richtig", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das linke Bein \n ist gut gestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n ging korrekt richtig hoch", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der linke Arm \n hat den richtigen Winkel oben richtig", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist gut gestrecktt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          update_Buffer_feedback(name, goodFeedback.last.label);
+          debug_feedback = goodFeedback.last.label;
+          errorCounters_oben["oben_gut"] = (errorCounters_oben["oben_gut"] ?? 0) + 1;
           neg_feedback = false;
           if (was_it_down){
             update_joint_Buffer_was_it_down(name, false);
             update_Buffer_counter(name, counter+1);
           }
-        } else
-        if (esh_upper_diff < upper_tolerances[3]) {
-          update_Buffer_feedback(name, name + " oben noch etwas höher");
+        } else if (esh_upper_diff < upper_tolerances[3]) {
+          //update_Buffer_feedback(name, name + " oben noch etwas höher");
           //tips.add(FeedbackItem(label: "$name oben noch etwas höher"));
-          badFeedback.add(FeedbackItem(label: "$name oben noch etwas höher",timestamp: getFormattedStopwatchTimestamp()));
-          errorCounters["oben_zu_niedrig"] = (errorCounters["oben_zu_niedrig"] ?? 0) + 1;
-
-          neg_feedback = false;
-        } else
-        if (esh_upper_diff < upper_tolerances[4]) {
-          update_Buffer_feedback(name, name + " oben zu niedrig");
-          badFeedback.add(FeedbackItem(label: "$name zu niedrig",timestamp: getFormattedStopwatchTimestamp()));
-          errorCounters["oben_zu_niedrig"] = (errorCounters["oben_zu_niedrig"] ?? 0) + 1;
-
+          //badFeedback.add(FeedbackItem(label: "$name oben noch etwas höher",timestamp: getFormattedStopwatchTimestamp()));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n war nicht ganz oben", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der linke Arm \n wurde nicht nah genug rangezogen", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das linke Bein \n ist nicht ganz gestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n war nicht ganz oben", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der rechte Arm \n wurde nicht nah genug rangezogen", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist nicht ganz gestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          errorCounters_oben["oben_zu_niedrig"] = (errorCounters_oben["oben_zu_niedrig"] ?? 0) + 1;
+          update_Buffer_feedback(name, badFeedback.last.label);
+          debug_feedback = badFeedback.last.label;
+          neg_feedback = true;
+        } else if (esh_upper_diff < upper_tolerances[4]) {
+          //update_Buffer_feedback(name, name + " oben zu niedrig");
+          //badFeedback.add(FeedbackItem(label: "$name zu niedrig",timestamp: getFormattedStopwatchTimestamp()));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n war zu niedrig", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der linke Arm \n war nicht richtig rangezogen", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das linke Bein \n ist nicht gestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n war zu niedrig", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der rechte Arm \n war nicht richtig rangezogen", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist nicht gestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          errorCounters_oben["oben_zu_niedrig"] = (errorCounters_oben["oben_zu_niedrig"] ?? 0) + 1;
+          update_Buffer_feedback(name, badFeedback.last.label);
+          debug_feedback = badFeedback.last.label;
           neg_feedback = true;
         }
       }
@@ -605,37 +703,110 @@ class General_MovementReference {
         //todo: toleranz werte tweaken ? //feedback reaktion noch langsam
 
         if (esh_downer_diff < downer_tolerances[0]) {
-          update_Buffer_feedback(name, name + " unten super");
-          goodFeedback.add(FeedbackItem(label: "$name unten super",timestamp: getFormattedStopwatchTimestamp()));
-          errorCounters["unten_sehr_gut"] = (errorCounters["unten_sehr_gut"] ?? 0) + 1;
-
+          //update_Buffer_feedback(name, name + " unten super");
+          //goodFeedback.add(FeedbackItem(label: "$name unten super",timestamp: getFormattedStopwatchTimestamp()));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n ist genau wie gewollt am Körper", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der linke Arm \n ist perfekt ausgestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das linke Bein \n ist perfekt gewinkelt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n ist genau wie gewollt am Körper", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der rechte Arm \n ist perfekt ausgestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist perfekt gewinkelt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          errorCounters_unten["unten_sehr_gut"] = (errorCounters_unten["unten_sehr_gut"] ?? 0) + 1;
+          update_Buffer_feedback(name, goodFeedback.last.label);
+          debug_feedback = goodFeedback.last.label;
+          neg_feedback = false;
 
           if(!was_it_down){
             update_joint_Buffer_was_it_down(name, true);
           }
-        } else
-        if (esh_downer_diff < downer_tolerances[1]) {
+        } else if (esh_downer_diff < downer_tolerances[1]) {
           update_Buffer_feedback(name, name + " unten gut");
-          goodFeedback.add(FeedbackItem(label: "$name unten gut",timestamp: getFormattedStopwatchTimestamp()));
-          errorCounters["unten_gut"] = (errorCounters["unten_gut"] ?? 0) + 1;
-
+          //goodFeedback.add(FeedbackItem(label: "$name unten gut",timestamp: getFormattedStopwatchTimestamp()));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n ist nah am Körper", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der linke Arm \n ist gut ausgestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das linke Bein \n ist gut gewinkelt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              goodFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n ist nah am Körper", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              goodFeedback.add(FeedbackItem(label: "Der rechte Arm \n ist gut ausgestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              goodFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist gut gewinkelt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          errorCounters_unten["unten_gut"] = (errorCounters_unten["unten_gut"] ?? 0) + 1;
+          update_Buffer_feedback(name, goodFeedback.last.label);
+          debug_feedback = goodFeedback.last.label;
+          neg_feedback = false;
 
           if(!was_it_down){
             update_joint_Buffer_was_it_down(name, true);
           }
         } else
         if (esh_downer_diff < downer_tolerances[2]) {
-          update_Buffer_feedback(name, name + " unten weiter runter");
-          badFeedback.add(FeedbackItem(label: "$name unten weiter runter"));
-          errorCounters["unten_zu_hoch"] = (errorCounters["unten_zu_hoch"] ?? 0) + 1;
-
-        } else
-        if (esh_downer_diff < downer_tolerances[3]) {
-          update_Buffer_feedback(name, name + " unten viel weiter runter");
-          badFeedback.add(FeedbackItem(label: "$name unten viel weiter runter"));
-          errorCounters["unten_viel_zu_hoch"] = (errorCounters["unten_viel_zu_hoch"] ?? 0) + 1;
-
-          neg_feedback = false;
+          //update_Buffer_feedback(name, name + " unten weiter runter");
+          //badFeedback.add(FeedbackItem(label: "$name unten weiter runter"));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n war fast niedrig genug", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der linke Arm \n war nicht ganz ausgestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das linke Bein \n ist nicht ganz gewinkelt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n war fast niedrig genug", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der rechte Arm \n war nicht ganz ausgestreckt", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist nicht ganz gewinkelt", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          errorCounters_unten["unten_zu_hoch"] = (errorCounters_unten["unten_zu_hoch"] ?? 0) + 1;
+          update_Buffer_feedback(name, badFeedback.last.label);
+          debug_feedback = badFeedback.last.label;
+          neg_feedback = true;
+        } else if (esh_downer_diff < downer_tolerances[3]) {
+          //update_Buffer_feedback(name, name + " unten viel weiter runter");
+          //badFeedback.add(FeedbackItem(label: "$name unten viel weiter runter"));
+          if (name.contains('l')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die linke Armbewegung \n war nicht niedrig genug", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der linke Arm \n war nicht ausgestreckt genug", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das linke Bein \n ist nicht gewinkelt genug", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          } else if (name.contains('r')) {
+            if (exercise_type == ExerciseType.lateralRaises) {
+              badFeedback.add(FeedbackItem(label: "Die rechte Armbewegung \n war nicht niedrig genug", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.bicepCurls) {
+              badFeedback.add(FeedbackItem(label: "Der rechte Arm \n war nicht ausgestreckt genug", timestamp: getFormattedStopwatchTimestamp()));
+            } else if (exercise_type == ExerciseType.lunges) {
+              badFeedback.add(FeedbackItem(label: "Das rechte Bein \n ist nicht gewinkelt genug", timestamp: getFormattedStopwatchTimestamp()));
+            }
+          }
+          errorCounters_unten["unten_viel_zu_hoch"] = (errorCounters_unten["unten_viel_zu_hoch"] ?? 0) + 1;
+          update_Buffer_feedback(name, badFeedback.last.label);
+          debug_feedback = badFeedback.last.label;
+          neg_feedback = true;
         }
       }
       direction_changed = false; //abgearbeitet
